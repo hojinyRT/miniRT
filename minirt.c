@@ -1,8 +1,16 @@
 #include "minirt.h"
 
-int	convert_color(t_color clr)
+int	key_press(int keycode)
 {
-	return ((int)((clr.x * (float)pow(16, 4)) + (clr.y * (float)pow(16, 2)) + clr.z));
+	if (keycode == KEY_ESC)
+		exit(0);
+	return (0);
+}
+
+int	convert_color(t_vec clr)
+{	
+	int tmp = ((int)clr.x * 16 * 16 * 16 * 16) + ((int)clr.y * 16 * 16) + (int)(clr.z);
+	return (tmp);
 }
 
 void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
@@ -26,25 +34,22 @@ int main()
 	img->ptr = mlx_new_image(info.mlx, 400, 300);
 	img->addr = (int *)mlx_get_data_addr(img->ptr, \
 		&(img->bits_per_pixel), &(img->line_length), &(img->endian));
-	i = 0;
-	while (i < 300)
+	i = 299;
+	while (i >= 0)
 	{
 		j = 0;
 		while (j < 400)
 		{
-			color = vec_init((float)j / 399.0 * 255.0, (float) i / 299.0 * 255.0, (float)(0.25 * 255.0));
-			// printf("color -> x : |%f|,  y: |%f|, z: |%f|\n", color.x, color.y, color.z);
-			int c = convert_color(color);
-			printf("HEX : |%X|\n", c);
-			// color = vec_init(1, 1, 1);
-			mlx_pixel_put(info.mlx, info.win, j, i, c);
-			// my_mlx_pixel_put(img, j, i, color);
+			color = vec_init((float)j / 399 * 255, (float) i / 299 * 255, 0.25 * 255);
+			// int c = convert_color(color);
+			// mlx_pixel_put(info.mlx, info.win, j, i, c);
+			my_mlx_pixel_put(img, j, i, color);
 			j++;
 		}
-		i++;
+		i--;
 	}
-	// mlx_put_image_to_window(info.mlx, info.win, img->ptr, 100, 100);
-	mlx_loop(info.mlx);	return (0);
+	mlx_put_image_to_window(info.mlx, info.win, img->ptr, 300, 350);
+	mlx_hook(info.win, EVENT_KEY_PRESS, 0, key_press, 0);
+	mlx_loop(info.mlx);
+	return (0);
 }
-
-

@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
+#    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/19 16:08:00 by hchang           ###   ########.fr        #
+#    Updated: 2022/09/19 18:19:55 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ LIBFT_DIR = libft
 
 MLX_DIR = mlx
 
-SRCS = minirt.c vector.c
+SRCS = minirt.c vector.c material.c
 
 BONUS = minirt.c vector.c
 
