@@ -1,5 +1,4 @@
-#include "miniRT.h"
-#include <math.h>
+#include "minirt.h"
 
 t_vec	vec_add(t_vec u, t_vec v)
 {
@@ -80,7 +79,7 @@ float	vec_len(t_vec u)
 // float	vec_len_sqr(t_vec u);
 t_vec	vec_unit(t_vec u)
 {
-	return (vec_div_float(u, ft_vec3_len(u)));
+	return (vec_div_float(u, vec_len(u)));
 }
 t_vec	vec_init(float x, float y, float z)
 {
