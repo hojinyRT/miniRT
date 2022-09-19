@@ -1,5 +1,32 @@
 #include "minirt.h"
 
+int		hit_sphere(t_sphere sp, t_ray ray)
+{
+	t_vec	oc;
+	float	a;
+	float	b;
+	float	c;
+	float	dis;
+
+	oc = vec_sub(ray.orig, sp.center);
+	a = vec_dot(ray.dir, ray.dir);
+	b = 2.0 * vec_dot(oc, ray.dir);
+	c = vec_dot(oc, oc) - sp.radius2;
+	dis = b * b - 4 * a * c;
+	return (dis > 0);
+}
+
+t_sphere	sphere_init(t_point center, float radius)
+{
+	t_sphere	init;
+
+	init.center = center;
+	init.radius = radius;
+	init.radius2 = radius * radius;
+	return (init);
+}
+
+
 t_ray	ray_init(t_point orig, t_vec dir)
 {
 	t_ray init;
@@ -22,20 +49,27 @@ t_ray	ray_primary(t_camera cam, double u, double v)
 
     ray.orig = cam.orig;
     // left_bottom + u * horizontal + v * vertical - origin 의 단위 벡터.
-    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam.start_point, vec_multi_float(cam.horizontal, u)), vec_multi_float(cam->vertical, v)), cam->orig));
+    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam.start_point, vec_multi_float(cam.horizontal, u)), vec_multi_float(cam.vertical, v)), cam.orig));
     return (ray);
 }
 
-t_color    ray_color(t_ray ray)
+t_color    ray_color(t_ray ray, t_sphere sp)
 {
     double  t;
+	int result;
 
-    t = 0.5 * (ray.dir.y + 1.0);
-    // (1-t) * 흰색 + t * 하늘색
-    return (vec_add(vec_multi_float(vec_init(1, 1, 1), 1.0 - t), vec_multi_float(vec_init(0.5, 0.7, 1.0), t)));
+	result = hit_sphere(sp, ray);
+	if (result == 1)
+		return (vec_init(50 , 127, 50));
+	else
+	{
+		t = 0.5 * (ray.dir.y + 1.0);
+		// (1-t) * 흰색 + t * 하늘색
+		return (vec_add(vec_multi_float(vec_init(255, 255, 255), 1.0 - t), vec_multi_float(vec_init(128, 178, 255), t)));
+	}	
 }
 
-t_camera	camera(t_canvas *canvas, t_point orig)
+t_camera	camera_init(t_canvas canvas, t_point orig)
 {
     t_camera    cam;
     double      focal_len;
@@ -45,7 +79,7 @@ t_camera	camera(t_canvas *canvas, t_point orig)
     focal_len = 1.0;
     cam.orig = orig;
     cam.viewport_h = viewport_height;
-    cam.viewport_w = viewport_height * canvas->aspect_ratio;
+    cam.viewport_w = viewport_height * canvas.aspect_ratio;
     cam.focal_len = focal_len;
     cam.horizontal = vec_init(cam.viewport_w, 0, 0);
     cam.vertical = vec_init(0, cam.viewport_h, 0);

@@ -24,6 +24,16 @@
 # define KEY_I 34
 # define KEY_TAB 48
 
+# define TRUE 1
+# define FALSE 0
+
+# define WIN_H 1000
+# define WIN_W 2000
+
+# define MLX_H 1000
+# define MLX_W 2000
+
+
 typedef struct  s_img
 {
   void	*ptr;
@@ -73,6 +83,13 @@ typedef struct s_canvas
   float	aspect_ratio;
 }		t_canvas;
 
+typedef struct s_sphere
+{
+	t_point	center;
+	float	radius;
+	float	radius2;
+}		t_sphere;
+
 t_vec	vec_add(t_vec u, t_vec v);
 t_vec	vec_sub(t_vec u, t_vec v);
 t_vec	vec_multi(t_vec u, t_vec v);
@@ -91,5 +108,10 @@ t_vec	vec_init(float x, float y, float z);
 //------ray.c--------
 t_ray	ray_init(t_point orig, t_vec dir);
 t_point	ray_at(t_ray ray, float t);
+t_ray	ray_primary(t_camera cam, double u, double v);
+t_color    ray_color(t_ray ray, t_sphere sphere);
+t_canvas	canvas_init(int  width, int height);
+t_camera	camera_init(t_canvas canvas, t_point orig);
+t_sphere	sphere_init(t_point center, float radius);
 
 #endif
