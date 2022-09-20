@@ -35,7 +35,7 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
 // }
 
 
-int	hit_sphere(t_sphere sp, t_ray ray, t_hit_record *rec)
+int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_vec	oc;
 	float	a;
@@ -46,15 +46,15 @@ int	hit_sphere(t_sphere sp, t_ray ray, t_hit_record *rec)
 	float	sqrtd;
 	double  root;
 
-	oc = vec_sub(ray.orig, sp.center);
+	oc = vec_sub(ray.orig, ((t_sphere*)obj->element)->center);
 	// a = vec_dot(ray.dir, ray.dir);
 	// b = 2.0 * vec_dot(oc, ray.dir);
-	// c = vec_dot(oc, oc) - sp.radius2;
+	// c = vec_dot(oc, oc) - sp->radius2;
 	// dis = b * b - 4 * a * c;
 
 	a = vec_len_sqr(ray.dir);
 	half_b = vec_dot(oc, ray.dir);
-	c = vec_len_sqr(oc) - sp.radius2;
+	c = vec_len_sqr(oc) - ((t_sphere*)obj->element)->radius2;
 	dis = half_b * half_b - a * c;
 	if (dis < 0)
 		return (FALSE);
@@ -69,18 +69,20 @@ int	hit_sphere(t_sphere sp, t_ray ray, t_hit_record *rec)
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	// printf("what the rec->p : %f | sp.center : %f\n", rec->p.x, sp.center.x);
-	rec->normal = vec_div_float(vec_sub(rec->p, sp.center), sp.radius); // 정규화된 법선 벡터.
+	rec->normal = vec_div_float(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius); // 정규화된 법선 벡터.
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
 }
 
-t_sphere	sphere_init(t_point center, float radius)
+t_sphere	*sphere_init(t_point center, float radius)
 {
-	t_sphere	init;
+	t_sphere *init;
 
-	init.center = center;
-	init.radius = radius;
-	init.radius2 = radius * radius;
+    if(!(init = (t_sphere *)malloc(sizeof(t_sphere))))
+        return (NULL);
+	init->center = center;
+	init->radius = radius;
+	init->radius2 = radius * radius;
 	return (init);
 }
 
@@ -111,7 +113,7 @@ t_ray	ray_primary(t_camera cam, double u, double v)
     return (ray);
 }
 
-t_color    ray_color(t_ray ray, t_sphere sp)
+t_color    ray_color(t_ray ray, t_object *obj)
 {
     float			t;
 	t_vec			n;
@@ -121,7 +123,7 @@ t_color    ray_color(t_ray ray, t_sphere sp)
 	rec.tmin = 0;
     rec.tmax = 100000;
 	// t = hit_sphere(sp, ray, rec);
-	if (hit_sphere(sp, ray, &rec))
+	if (hit_sphere(obj, ray, &rec))
 	{
 		// n = vec_unit(vec_sub(ray_at(ray, t), sp.center));
 		// printf("hey => x : %f | y : %f | z : %f\n", rec.normal.x + 1.0, rec.normal.y+ 1.0, rec.normal.z+ 1.0);

@@ -6,7 +6,7 @@
 #    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/20 11:57:23 by hchang           ###   ########.fr        #
+#    Updated: 2022/09/20 13:48:48 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ LIBFT_DIR = libft
 
 MLX_DIR = mlx
 
-SRCS = minirt.c vector.c material.c
+SRCS = minirt.c vector.c material.c object.c
 
 BONUS = minirt.c vector.c
 
@@ -42,7 +42,7 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	make -C $(LIBFT_DIR)
 	# make -C $(MLX_DIR)
-	$(CC) -o miniRT $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit -fsanitize=address
+	$(CC) -o miniRT $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit -g
 
 bonus:
 	make BONUS_FLAG=1 all

@@ -31,9 +31,12 @@ int main()
 	t_canvas	canv;
 	t_camera	camera;
 	t_ray		ray;
-	t_sphere	sp;
+	// t_sphere	*sp;
+	t_object    *obj;
 
-	sp = sphere_init(vec_init(2, 0, -5), 2);
+	obj = object_init(SP, (t_object *)sphere_init(vec_init(0, 0, -5), 2));
+	obj_add(&obj, (t_object *)sphere_init(vec_init(2, 0, -5), 1));
+	obj_add(&obj, (t_object *)sphere_init(vec_init(0, 10, -30), 10));
 	canv = canvas_init(WIN_W, WIN_H);
 	camera = camera_init(canv, vec_init(0, 0 ,0));
 	info.mlx = mlx_init();
@@ -51,7 +54,7 @@ int main()
 			u = (float)j / (canv.width - 1);
 			v = (float)i / (canv.height - 1);
 			ray = ray_primary(camera, u, v);
-			color = ray_color(ray, sp);
+			color = ray_color(ray, obj);
 			my_mlx_pixel_put(img, j, WIN_H - 1 - i, color);
 			j++;
 		}

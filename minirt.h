@@ -33,6 +33,15 @@
 # define MLX_H 1000
 # define MLX_W 2000
 
+typedef int t_object_type;
+# define SP 0
+
+typedef struct  s_object
+{
+    t_object_type   type;
+    void            *element;
+    void            *next;
+}                   t_object;
 
 typedef struct  s_img
 {
@@ -119,14 +128,24 @@ t_vec	vec_init(float x, float y, float z);
 t_ray     ray_init(t_point orig, t_vec dir);
 t_point   ray_at(t_ray ray, float t);
 t_ray     ray_primary(t_camera cam, double u, double v);
-t_color   ray_color(t_ray ray, t_sphere sphere);
+t_color   ray_color(t_ray ray, t_object *world);
 t_canvas  canvas_init(int  width, int height);
 t_camera  camera_init(t_canvas canvas, t_point orig);
-t_sphere  sphere_init(t_point center, float radius);
+t_sphere	*sphere_init(t_point center, float radius);
 
 
-int		hit_sphere(t_sphere sp, t_ray ray, t_hit_record *rec);
+
 // float		hit_sphere2(t_sphere sp, t_ray ray, t_hit_record rec);
 void		set_face_normal(t_ray ray, t_hit_record *rec);
+
+
+// ---------object.c---------//
+t_object	*object_init(t_object_type type, void *element);
+int hit(t_object *obj, t_ray ray, t_hit_record *rec);
+int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
+// int hit_sphere(t_object *world, t_ray ray, t_hit_record *rec);
+int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
+void        obj_add(t_object **list, t_object *new);
+t_object    *obj_last(t_object *list);
 
 #endif
