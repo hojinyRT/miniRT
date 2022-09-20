@@ -4,11 +4,11 @@ t_object    *object_init(t_object_type type, void *element)
 {
     t_object    *new;
 
-    if (!(new = (t_object *)malloc(sizeof(t_object))))
+    if (!(new = (t_object *)calloc(1, sizeof(t_object))))
         return (NULL);
     new->type = type;
-    printf("|%d| vs |%d|\n", new->type, type);
     new->element = element;
+    printf("center z : |%f|\n", ((t_sphere*)new->element)->center.z);
     new->next = NULL;
     return (new);
 }
@@ -17,7 +17,7 @@ void    obj_add(t_object **list, t_object *new)
 {
     t_object    *cur;
 
-    printf("HEY : |%d|\n", new->type);
+	printf("((t_sphere*)obj->element)->center.x  : %f\n", ((t_sphere*)new->element)->center.x);
     if (list == NULL)
         return ;
     if (*list == NULL)
@@ -26,10 +26,10 @@ void    obj_add(t_object **list, t_object *new)
         return ;
     }
     cur = *list;
-    while (cur && cur->next)
+    while (cur->next)
         cur = cur->next;
     cur->next = new;
-    printf("END\n");
+    new->next = NULL;
 }
 
 t_object    *obj_last(t_object *list)
@@ -50,6 +50,7 @@ int hit(t_object *obj, t_ray ray, t_hit_record *rec)
     hit_anything = FALSE;
     while(obj)
     {
+        // printf("START OBJ : %f\n",((t_sphere*)obj->element)->center.x);
         if (hit_obj(obj, ray, &temp_rec))
         {
             hit_anything = TRUE;

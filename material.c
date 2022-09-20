@@ -123,7 +123,7 @@ t_color    ray_color(t_ray ray, t_object *obj)
 	rec.tmin = 0;
     rec.tmax = 100000;
 	// t = hit_sphere(sp, ray, rec);
-	if (hit_sphere(obj, ray, &rec))
+	if (hit(obj, ray, &rec))
 	{
 		// n = vec_unit(vec_sub(ray_at(ray, t), sp.center));
 		// printf("hey => x : %f | y : %f | z : %f\n", rec.normal.x + 1.0, rec.normal.y+ 1.0, rec.normal.z+ 1.0);

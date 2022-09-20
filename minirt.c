@@ -19,6 +19,21 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 }
 
 
+void	print_obj(t_object *obj)
+{
+	t_object	*curr;
+	
+	curr = obj;
+	while (curr)
+	{
+		printf("type : %d \n", obj->type);
+		printf("x : %f ", ((t_sphere *)obj->element)->center.x);
+		printf("y : %f ", ((t_sphere *)obj->element)->center.y);
+		printf("z : %f \n", ((t_sphere *)obj->element)->center.z);
+		curr = curr->next;
+	}
+}
+
 int main()
 {
 	t_info	info;
@@ -34,9 +49,11 @@ int main()
 	// t_sphere	*sp;
 	t_object    *obj;
 
-	obj = object_init(SP, (t_object *)sphere_init(vec_init(0, 0, -5), 2));
-	obj_add(&obj, (t_object *)sphere_init(vec_init(2, 0, -5), 1));
-	obj_add(&obj, (t_object *)sphere_init(vec_init(0, 10, -30), 10));
+	obj = object_init(SP, (t_object *)sphere_init(vec_init(10, 0, -5), 2));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1)));
+	print_obj(obj);
+
 	canv = canvas_init(WIN_W, WIN_H);
 	camera = camera_init(canv, vec_init(0, 0 ,0));
 	info.mlx = mlx_init();
