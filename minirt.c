@@ -33,7 +33,7 @@ int main()
 	t_ray		ray;
 	t_sphere	sp;
 
-	sp = sphere_init(vec_init(0, 0, -5), 2);
+	sp = sphere_init(vec_init(2, 0, -5), 2);
 	canv = canvas_init(WIN_W, WIN_H);
 	camera = camera_init(canv, vec_init(0, 0 ,0));
 	info.mlx = mlx_init();

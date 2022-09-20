@@ -76,7 +76,10 @@ float	vec_len(t_vec u)
 {
 	return (sqrt(pow(u.x, 2.0) + pow(u.y, 2.0) + pow(u.z, 2.0)));
 }
-// float	vec_len_sqr(t_vec u);
+float	vec_len_sqr(t_vec u)
+{
+    return (pow(u.x, 2.0) + pow(u.y, 2.0) + pow(u.z, 2.0));
+}
 t_vec	vec_unit(t_vec u)
 {
 	return (vec_div_float(u, vec_len(u)));

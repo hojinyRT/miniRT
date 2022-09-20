@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
+#    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/19 20:01:55 by jinypark         ###   ########.fr        #
+#    Updated: 2022/09/20 11:57:23 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,7 +41,7 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	make -C $(LIBFT_DIR)
-	make -C $(MLX_DIR)
+	# make -C $(MLX_DIR)
 	$(CC) -o miniRT $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit -fsanitize=address
 
 bonus:
@@ -49,7 +49,7 @@ bonus:
 
 clean:
 	make clean -C $(LIBFT_DIR)
-	make clean -C $(MLX_DIR)
+	# make clean -C $(MLX_DIR)
 	rm -f $(OBJS) $(OBJS_BONUS)
 
 fclean: clean
