@@ -1,6 +1,6 @@
 #include "minirt.h"
 
-t_object    *object_init(t_object_type type, void *element)
+t_object    *object_init(t_object_type type, void *element, t_vec albedo)
 {
     t_object    *new;
 
@@ -8,7 +8,7 @@ t_object    *object_init(t_object_type type, void *element)
         return (NULL);
     new->type = type;
     new->element = element;
-    printf("center z : |%f|\n", ((t_sphere*)new->element)->center.z);
+    new->albedo = albedo;
     new->next = NULL;
     return (new);
 }
@@ -17,7 +17,6 @@ void    obj_add(t_object **list, t_object *new)
 {
     t_object    *cur;
 
-	printf("((t_sphere*)obj->element)->center.x  : %f\n", ((t_sphere*)new->element)->center.x);
     if (list == NULL)
         return ;
     if (*list == NULL)
@@ -29,7 +28,6 @@ void    obj_add(t_object **list, t_object *new)
     while (cur->next)
         cur = cur->next;
     cur->next = new;
-    new->next = NULL;
 }
 
 t_object    *obj_last(t_object *list)
