@@ -1,5 +1,16 @@
 #include "minirt.h"
 
+int in_shadow(t_object *objs, t_ray light_ray, float light_len)
+{
+    t_hit_record rec;
+
+    rec.tmin = 0;
+    rec.tmax = light_len;
+    if (hit(objs, light_ray, &rec))
+        return (TRUE);
+    return (FALSE);
+}
+
 t_vec          reflect(t_vec v, t_vec n)
 {
     //v - 2 * dot(v, n) * n;
@@ -11,17 +22,33 @@ t_vec        point_light_get(t_scene *scene, t_light *light)
 {
     t_color    diffuse;
     t_vec      light_dir;
-    double      kd; // diffuse의 강도
+    float      kd; // diffuse의 강도
         
     t_color    specular;
     t_vec      view_dir;
     t_vec      reflect_dir;
+
+    float       light_len;
+    t_ray       light_ray;
+
     float      spec;
     float      ksn;
     float      ks;
     float      brightness;
 
-    light_dir = vec_unit(vec_sub(light->origin, scene->rec.p)); //교점에서 출발하여 광원을 향하는 벡터(정규화 됨)
+    // light_dir = vec_unit(vec_sub(light->origin, scene->rec.p)); //교점에서 출발하여 광원을 향하는 벡터(정규화 됨)
+
+    // 추가
+    light_dir = vec_sub(light->origin, scene->rec.p);
+    light_len = vec_len(light_dir);
+    light_ray = ray_init(vec_add(scene->rec.p, vec_multi_float(scene->rec.normal, EPSILON)), light_dir);
+    if (in_shadow(scene->obj, light_ray, light_len))
+    {
+        return (vec_init(0,0,0));
+    }
+    light_dir = vec_unit(light_dir);
+    // 추가끝
+
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
     kd = fmax(vec_dot(scene->rec.normal, light_dir), 0.0);// (교점에서 출발하여 광원을 향하는 벡터)와 (교점에서의 법선벡터)의 내적값.
     diffuse = vec_multi_float(light->light_color, kd);

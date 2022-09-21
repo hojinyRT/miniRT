@@ -6,7 +6,7 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
     rec->front_face = vec_dot(ray.dir, rec->normal) < 0;
     // 광선의 앞면에 hit 면 그대로 아니면 법선을 반대로 뒤집는다. 
 	// (항상 광선 방향벡터와 법선 벡터를 반대인 상태로 사용하기위해)
-	if (rec->front_face == 0)
+	if (rec->front_face == 0)	
 		rec->normal = vec_multi_float(rec->normal, -1);
     return ;
 }
@@ -21,7 +21,7 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	float		dis;
 	float		half_b;
 	float		sqrtd;
-	double		root;
+	float		root;
 
 	sp = obj->element;
 	oc = vec_sub(ray.orig, ((t_sphere*)obj->element)->center);
@@ -76,7 +76,7 @@ t_point	ray_at(t_ray ray, float t)
 	return (at);
 }
 
-t_ray	ray_primary(t_camera cam, double u, double v)
+t_ray	ray_primary(t_camera cam, float u, float v)
 {
     t_ray	ray;
 

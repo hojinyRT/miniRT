@@ -46,16 +46,17 @@ int hit(t_object *obj, t_ray ray, t_hit_record *rec)
 
     temp_rec = *rec; // temp_rec의 tmin, tmax 값 초기화를 위해.
     hit_anything = FALSE;
-    while(obj)
+    t_object *tmp = obj;
+    while(tmp)
     {
-        // printf("START OBJ : %f\n",((t_sphere*)obj->element)->center.x);
-        if (hit_obj(obj, ray, &temp_rec))
+        // printf("START OBJ : %f\n",((t_sphere*)tmp->element)->center.x);
+        if (hit_obj(tmp, ray, &temp_rec))
         {
             hit_anything = TRUE;
             temp_rec.tmax = temp_rec.t;
             *rec = temp_rec;
         }
-        obj = obj->next;
+        tmp = tmp->next;
     }
     return (hit_anything);
 }

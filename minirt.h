@@ -136,6 +136,7 @@ typedef struct s_scene
 }					t_scene;
 
 
+void	print_obj(t_object *obj);
 t_vec 	vec_min(t_vec vec1, t_vec vec2);
 t_vec	vec_add(t_vec u, t_vec v);
 t_vec	vec_sub(t_vec u, t_vec v);
@@ -155,7 +156,7 @@ t_vec	vec_init(float x, float y, float z);
 //------material.c-------//
 t_ray		ray_init(t_point orig, t_vec dir);
 t_point		ray_at(t_ray ray, float t);
-t_ray		ray_primary(t_camera cam, double u, double v);
+t_ray		ray_primary(t_camera cam, float u, float v);
 t_color		ray_color(t_scene *scene);
 t_canvas	canvas_init(int  width, int height);
 t_camera	camera_init(t_canvas canvas, t_point orig);
@@ -175,6 +176,6 @@ t_object	*obj_last(t_object *list);
 // ---------light.c---------//
 t_light     *light_point(t_vec light_origin, t_vec light_color, float bright_ratio);
 t_vec		phong_lighting(t_scene *scene);
-
+int			in_shadow(t_object *objs, t_ray light_ray, float light_len);
 
 #endif
