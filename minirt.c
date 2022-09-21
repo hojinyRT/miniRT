@@ -44,13 +44,14 @@ t_scene	*scene_init(void)
         return (NULL);
     scene->canvas = canvas_init(WIN_W, WIN_H);
     scene->camera = camera_init(scene->canvas, vec_init(0, 0 ,0));
-	obj = object_init(SP, sphere_init(vec_init(10, 0, -5), 2), vec_init(0.5, 0, 0));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -200, -20), 200), vec_init(0, 0.5, 0)));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 0, -5), 1), vec_init(0, 0.5, 0)));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1), vec_init(1, 1, 1)));
+	obj = object_init(SP, sphere_init(vec_init(-2, 0, -5), 2), vec_init(0.5, 0, 0));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -200, -20), 200), vec_init(0, 0.5, 0)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 0, -5), 2), vec_init(0, 0.5, 0)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1), vec_init(1, 1, 1)));
 	scene->obj = obj;
-	light = object_init(LIGHT_POINT, light_point(vec_init(0, 5, 0), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0));
+	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 5), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0));
 	scene->light = light;
+	ka = 0.1;
 	scene->ambient = vec_multi_float(vec_init(1, 1, 1), ka);
 	return (scene);
 }

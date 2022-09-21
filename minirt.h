@@ -27,16 +27,17 @@
 # define TRUE 1
 # define FALSE 0
 
-# define WIN_H 1000
-# define WIN_W 2000
+# define WIN_H 1200
+# define WIN_W 1200
 
-# define MLX_H 1000
-# define MLX_W 2000
+# define MLX_H 1200
+# define MLX_W 1200
 
 # define SP 0
 # define LIGHT_POINT 1
 
 # define EPSILON 1e-6
+# define LUMEN 3
 
 typedef int t_object_type;
 
@@ -135,7 +136,7 @@ typedef struct s_scene
 }					t_scene;
 
 
-
+t_vec 	vec_min(t_vec vec1, t_vec vec2);
 t_vec	vec_add(t_vec u, t_vec v);
 t_vec	vec_sub(t_vec u, t_vec v);
 t_vec	vec_multi(t_vec u, t_vec v);
