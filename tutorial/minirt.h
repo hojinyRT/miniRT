@@ -27,11 +27,11 @@
 # define TRUE 1
 # define FALSE 0
 
-# define IMG_H 1200
-# define IMG_W 1200
-
 # define WIN_H 1200
 # define WIN_W 1200
+
+# define MLX_H 1200
+# define MLX_W 1200
 
 # define SP 0
 # define LIGHT_POINT 1
@@ -43,19 +43,18 @@ typedef int t_object_type;
 
 typedef struct  s_img
 {
-	void	*img_ptr;
+	void	*ptr;
 	int		*addr;
 	int		bits_per_pixel;
 	int		line_length;
 	int		endian;
 }			t_img;
 
-typedef struct	s_mlx
+typedef struct	s_info
 {
-	void	*ptr;
+	void	*mlx;
 	void	*win;
-	t_img	img;
-}			t_mlx;
+}			t_info;
 
 typedef struct s_vec
 {
@@ -125,7 +124,7 @@ typedef struct  s_light
     double	bright_ratio;
 }			t_light;
 
-typedef struct s_info
+typedef struct s_scene
 {
     t_canvas		canvas;
     t_camera		camera;
@@ -134,7 +133,7 @@ typedef struct s_info
     t_color			ambient; // 8.4에서 설명할 요소
     t_ray			ray;
     t_hit_record	rec;
-}					t_info;
+}					t_scene;
 
 
 void	print_obj(t_object *obj);
@@ -158,7 +157,7 @@ t_vec	vec_init(double x, double y, double z);
 t_ray		ray_init(t_point orig, t_vec dir);
 t_point		ray_at(t_ray ray, double t);
 t_ray		ray_primary(t_camera cam, double u, double v);
-t_color		ray_color(t_info *info);
+t_color		ray_color(t_scene *scene);
 t_canvas	canvas_init(int  width, int height);
 t_camera	camera_init(t_canvas canvas, t_point orig);
 t_sphere	*sphere_init(t_point center, double radius);
@@ -176,7 +175,7 @@ t_object	*obj_last(t_object *list);
 
 // ---------light.c---------//
 t_light     *light_point(t_vec light_origin, t_vec light_color, double bright_ratio);
-t_vec		phong_lighting(t_info *info);
+t_vec		phong_lighting(t_scene *scene);
 int			in_shadow(t_object *objs, t_ray light_ray, double light_len);
 
 #endif
