@@ -3,6 +3,7 @@
 
 # include <stdio.h>
 # include <math.h>
+# include <fcntl.h>
 # include "libft/libft.h"
 # include "mlx/mlx.h"
 
@@ -33,8 +34,13 @@
 # define WIN_H 1200
 # define WIN_W 1200
 
-# define SP 0
-# define LIGHT_POINT 1
+# define A 0
+# define C 1
+# define L 2
+# define SP 3
+# define PL 4
+# define CY 5
+
 
 # define EPSILON 1e-6
 # define LUMEN 3
