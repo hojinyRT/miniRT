@@ -38,7 +38,7 @@ t_scene	*scene_init(void)
 	t_scene		*scene;
 	t_object	*obj;
 	t_object	*light;
-	float		ka;
+	double		ka;
 
 	if(!(scene = (t_scene *)malloc(sizeof(t_scene))))
         return (NULL);
@@ -51,11 +51,11 @@ t_scene	*scene_init(void)
 	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1), vec_init(1, 1, 1)));
 	scene->obj = obj;
 	// light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 5), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0));
-	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 5), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0)); // 더미 albedo
+	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 0), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0)); // 더미 albedo
 
 	scene->light = light;
 	ka = 0.1;
-	scene->ambient = vec_multi_float(vec_init(1, 1, 1), ka);
+	scene->ambient = vec_multi_double(vec_init(1, 1, 1), ka);
 	return (scene);
 }
 
@@ -67,8 +67,8 @@ int main()
 	t_img	*img;
 	int i;
 	int	j;
-	float	u;
-	float	v;
+	double	u;
+	double	v;
 	t_ray		ray;
 
 	scene = scene_init();
@@ -87,8 +87,8 @@ int main()
 		j = 0;
 		while (j < WIN_W)
 		{
-			u = (float)j / (scene->canvas.width - 1);
-			v = (float)i / (scene->canvas.height - 1);
+			u = (double)j / (scene->canvas.width - 1);
+			v = (double)i / (scene->canvas.height - 1);
 			scene->ray = ray_primary(scene->camera, u, v);
 			color = ray_color(scene);
 			my_mlx_pixel_put(img, j, WIN_H - 1 - i, color);
