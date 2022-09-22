@@ -6,7 +6,7 @@
 #    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/20 14:13:24 by hchang           ###   ########.fr        #
+#    Updated: 2022/09/21 15:28:05 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,7 +20,7 @@ LIBFT_DIR = libft
 
 MLX_DIR = mlx
 
-SRCS = minirt.c vector.c material.c object.c
+SRCS = minirt.c vector.c material.c object.c light.c
 
 BONUS = minirt.c vector.c
 

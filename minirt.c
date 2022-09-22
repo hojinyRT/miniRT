@@ -18,7 +18,6 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 	img->addr[WIN_W * y + x] = convert_color(color);
 }
 
-
 void	print_obj(t_object *obj)
 {
 	t_object	*curr;
@@ -26,16 +25,43 @@ void	print_obj(t_object *obj)
 	curr = obj;
 	while (curr)
 	{
-		printf("type : %d \n", obj->type);
-		printf("x : %f ", ((t_sphere *)obj->element)->center.x);
-		printf("y : %f ", ((t_sphere *)obj->element)->center.y);
-		printf("z : %f \n", ((t_sphere *)obj->element)->center.z);
+		printf("type : %d \n", curr->type);
+		printf("x : %f ", ((t_sphere *)curr->element)->center.x);
+		printf("y : %f ", ((t_sphere *)curr->element)->center.y);
+		printf("z : %f \n", ((t_sphere *)curr->element)->center.z);
 		curr = curr->next;
 	}
 }
 
+t_scene	*scene_init(void)
+{
+	t_scene		*scene;
+	t_object	*obj;
+	t_object	*light;
+	float		ka;
+
+	if(!(scene = (t_scene *)malloc(sizeof(t_scene))))
+        return (NULL);
+    scene->canvas = canvas_init(WIN_W, WIN_H);
+    scene->camera = camera_init(scene->canvas, vec_init(0, 0 ,0));
+	obj = object_init(SP, sphere_init(vec_init(-2, 0, -5), 2), vec_init(0.5, 0, 0));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -200, -20), 200), vec_init(0, 0.5, 0)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -1000, 0), 995), vec_init(1, 1, 1)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 0, -5), 2), vec_init(0, 0.5, 0)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1), vec_init(1, 1, 1)));
+	scene->obj = obj;
+	// light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 5), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0));
+	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 5), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0)); // 더미 albedo
+
+	scene->light = light;
+	ka = 0.1;
+	scene->ambient = vec_multi_float(vec_init(1, 1, 1), ka);
+	return (scene);
+}
+
 int main()
 {
+	t_scene	*scene;
 	t_info	info;
 	t_color	color;
 	t_img	*img;
@@ -43,19 +69,12 @@ int main()
 	int	j;
 	float	u;
 	float	v;
-	t_canvas	canv;
-	t_camera	camera;
 	t_ray		ray;
-	// t_sphere	*sp;
-	t_object    *obj;
 
-	obj = object_init(SP, (t_object *)sphere_init(vec_init(10, 0, -5), 2));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1)));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1)));
-	print_obj(obj);
+	scene = scene_init();
 
-	canv = canvas_init(WIN_W, WIN_H);
-	camera = camera_init(canv, vec_init(0, 0 ,0));
+	// printf("hey : %d\n", (scene->light->type));
+	print_obj(scene->obj);
 	info.mlx = mlx_init();
 	info.win = mlx_new_window(info.mlx, MLX_W, MLX_H, "HojinyRT");
 	img = ft_calloc(1, sizeof(t_img));
@@ -68,10 +87,10 @@ int main()
 		j = 0;
 		while (j < WIN_W)
 		{
-			u = (float)j / (canv.width - 1);
-			v = (float)i / (canv.height - 1);
-			ray = ray_primary(camera, u, v);
-			color = ray_color(ray, obj);
+			u = (float)j / (scene->canvas.width - 1);
+			v = (float)i / (scene->canvas.height - 1);
+			scene->ray = ray_primary(scene->camera, u, v);
+			color = ray_color(scene);
 			my_mlx_pixel_put(img, j, WIN_H - 1 - i, color);
 			j++;
 		}

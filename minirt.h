@@ -27,21 +27,19 @@
 # define TRUE 1
 # define FALSE 0
 
-# define WIN_H 1000
-# define WIN_W 2000
+# define WIN_H 1200
+# define WIN_W 1200
 
-# define MLX_H 1000
-# define MLX_W 2000
+# define MLX_H 1200
+# define MLX_W 1200
+
+# define SP 0
+# define LIGHT_POINT 1
+
+# define EPSILON 1e-6
+# define LUMEN 3
 
 typedef int t_object_type;
-# define SP 0
-
-typedef struct  s_object
-{
-    t_object_type   type;
-    void            *element;
-    void            *next;
-}                   t_object;
 
 typedef struct  s_img
 {
@@ -70,34 +68,43 @@ typedef t_vec	t_point;
 
 typedef struct s_ray
 {
-  t_point	orig;
-  t_vec		dir;
-}			    t_ray;
+	t_point	orig;
+	t_vec	dir;
+}			t_ray;
 
 typedef struct s_camera
 {
-  t_point	orig;
-  float		viewport_h;
-  float		viewport_w;
-  t_vec		horizontal;
-  t_vec		vertical;
-  float		focal_len;
-  t_point	start_point;
+	t_point	orig;
+	float	viewport_h;
+	float	viewport_w;
+	t_vec	horizontal;
+	t_vec	vertical;
+	float	focal_len;
+	t_point	start_point;
 }			    t_camera;
 
 typedef struct s_canvas
 {
-  int   width;
-  int   height;
-  float aspect_ratio;
-}		    t_canvas;
+	int		width;
+	int		height;
+	float	aspect_ratio;
+}			t_canvas;
 
 typedef struct s_sphere
 {
-	t_point center;
-	float   radius;
-	float   radius2;
-}		      t_sphere;
+	t_point	center;
+	float	radius;
+	float	radius2;
+}			t_sphere;
+
+typedef struct  s_object
+{
+    t_object_type   type;
+    void            *element;
+    void            *next;
+	t_vec			albedo;
+}                   t_object;
+
 
 typedef struct s_hit_record
 {
@@ -107,8 +114,30 @@ typedef struct s_hit_record
     float		tmax;
     float		t;
     int			front_face;
+	t_vec		albedo;
 }				t_hit_record;
 
+typedef struct  s_light
+{
+    t_vec	origin;
+    t_vec	light_color;
+    float	bright_ratio;
+}			t_light;
+
+typedef struct s_scene
+{
+    t_canvas		canvas;
+    t_camera		camera;
+    t_object		*obj;
+    t_object		*light;
+    t_color			ambient; // 8.4에서 설명할 요소
+    t_ray			ray;
+    t_hit_record	rec;
+}					t_scene;
+
+
+void	print_obj(t_object *obj);
+t_vec 	vec_min(t_vec vec1, t_vec vec2);
 t_vec	vec_add(t_vec u, t_vec v);
 t_vec	vec_sub(t_vec u, t_vec v);
 t_vec	vec_multi(t_vec u, t_vec v);
@@ -124,28 +153,29 @@ float	vec_len_sqr(t_vec u);
 t_vec	vec_unit(t_vec u);
 t_vec	vec_init(float x, float y, float z);
 
-//------ray.c-------//
-t_ray     ray_init(t_point orig, t_vec dir);
-t_point   ray_at(t_ray ray, float t);
-t_ray     ray_primary(t_camera cam, double u, double v);
-t_color   ray_color(t_ray ray, t_object *world);
-t_canvas  canvas_init(int  width, int height);
-t_camera  camera_init(t_canvas canvas, t_point orig);
+//------material.c-------//
+t_ray		ray_init(t_point orig, t_vec dir);
+t_point		ray_at(t_ray ray, float t);
+t_ray		ray_primary(t_camera cam, float u, float v);
+t_color		ray_color(t_scene *scene);
+t_canvas	canvas_init(int  width, int height);
+t_camera	camera_init(t_canvas canvas, t_point orig);
 t_sphere	*sphere_init(t_point center, float radius);
-
-
-
-// float		hit_sphere2(t_sphere sp, t_ray ray, t_hit_record rec);
 void		set_face_normal(t_ray ray, t_hit_record *rec);
 
 
 // ---------object.c---------//
-t_object	*object_init(t_object_type type, void *element);
-int hit(t_object *obj, t_ray ray, t_hit_record *rec);
-int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
-// int hit_sphere(t_object *world, t_ray ray, t_hit_record *rec);
-int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
-void        obj_add(t_object **list, t_object *new);
-t_object    *obj_last(t_object *list);
+t_object    *object_init(t_object_type type, void *element, t_vec albedo);
+int			hit(t_object *obj, t_ray ray, t_hit_record *rec);
+int			hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
+int			hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
+void		obj_add(t_object **list, t_object *new);
+t_object	*obj_last(t_object *list);
+
+
+// ---------light.c---------//
+t_light     *light_point(t_vec light_origin, t_vec light_color, float bright_ratio);
+t_vec		phong_lighting(t_scene *scene);
+int			in_shadow(t_object *objs, t_ray light_ray, float light_len);
 
 #endif

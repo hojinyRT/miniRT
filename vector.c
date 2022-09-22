@@ -1,5 +1,17 @@
 #include "minirt.h"
 
+t_vec  vec_min(t_vec vec1, t_vec vec2)
+{
+    if (vec1.x > vec2.x)
+        vec1.x = vec2.x;
+    if (vec1.y > vec2.y)
+        vec1.y = vec2.y;
+    if (vec1.z > vec2.z)
+        vec1.z = vec2.z;
+    return (vec1);
+}
+
+
 t_vec	vec_add(t_vec u, t_vec v)
 {
     t_vec   init;
