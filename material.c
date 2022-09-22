@@ -7,7 +7,7 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
     // 광선의 앞면에 hit 면 그대로 아니면 법선을 반대로 뒤집는다. 
 	// (항상 광선 방향벡터와 법선 벡터를 반대인 상태로 사용하기위해)
 	if (rec->front_face == 0)	
-		rec->normal = vec_multi_float(rec->normal, -1);
+		rec->normal = vec_multi_double(rec->normal, -1);
     return ;
 }
 
@@ -15,13 +15,13 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 {	
 	t_sphere	*sp;
 	t_vec		oc;
-	float		a;
-	float		b;
-	float		c;
-	float		dis;
-	float		half_b;
-	float		sqrtd;
-	float		root;
+	double		a;
+	double		b;
+	double		c;
+	double		dis;
+	double		half_b;
+	double		sqrtd;
+	double		root;
 
 	sp = obj->element;
 	oc = vec_sub(ray.orig, ((t_sphere*)obj->element)->center);
@@ -42,12 +42,12 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->albedo = obj->albedo;
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	rec->normal = vec_div_float(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius); // 정규화된 법선 벡터.
+	rec->normal = vec_div_double(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius); // 정규화된 법선 벡터.
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
 }
 
-t_sphere	*sphere_init(t_point center, float radius)
+t_sphere	*sphere_init(t_point center, double radius)
 {
 	t_sphere *init;
 
@@ -66,23 +66,24 @@ t_ray	ray_init(t_point orig, t_vec dir)
 
 	init.orig = orig;
 	init.dir = vec_unit(dir);
+	return (init);
 }
 
-t_point	ray_at(t_ray ray, float t)
+t_point	ray_at(t_ray ray, double t)
 {
 	t_point at;
 
-	at = vec_add(ray.orig, vec_multi_float(ray.dir, t));
+	at = vec_add(ray.orig, vec_multi_double(ray.dir, t));
 	return (at);
 }
 
-t_ray	ray_primary(t_camera cam, float u, float v)
+t_ray	ray_primary(t_camera cam, double u, double v)
 {
     t_ray	ray;
 
     ray.orig = cam.orig;
     // left_bottom + u * horizontal + v * vertical - origin 의 단위 벡터.
-    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam.start_point, vec_multi_float(cam.horizontal, u)), vec_multi_float(cam.vertical, v)), cam.orig));
+    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam.start_point, vec_multi_double(cam.horizontal, u)), vec_multi_double(cam.vertical, v)), cam.orig));
     return (ray);
 }
 
@@ -97,7 +98,7 @@ t_hit_record record_init(void)
 
 t_color    ray_color(t_scene *scene)
 {
-    float			t;
+    double			t;
 
 	scene->rec = record_init();
 	if (hit(scene->obj, scene->ray, &(scene->rec)))
@@ -105,15 +106,15 @@ t_color    ray_color(t_scene *scene)
 	else
 	{
 		t = 0.5 * (scene->ray.dir.y + 1.0);
-		return (vec_add(vec_multi_float(vec_init(255, 255, 255), 1.0 - t), vec_multi_float(vec_init(128, 178, 255), t)));
+		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), vec_multi_double(vec_init(128, 178, 255), t)));
 	}	
 }
 
 t_camera	camera_init(t_canvas canvas, t_point orig)
 {
     t_camera	cam;
-    float		focal_len;
-    float		viewport_height;
+    double		focal_len;
+    double		viewport_height;
 
     viewport_height = 2.0;
     focal_len = 1.0;
@@ -123,8 +124,8 @@ t_camera	camera_init(t_canvas canvas, t_point orig)
     cam.focal_len = focal_len;
     cam.horizontal = vec_init(cam.viewport_w, 0, 0);
     cam.vertical = vec_init(0, cam.viewport_h, 0);
-    cam.start_point = vec_sub(vec_sub(vec_sub(cam.orig, vec_div_float(cam.horizontal, 2)),
-                                vec_div_float(cam.vertical, 2)), vec_init(0, 0, focal_len));
+    cam.start_point = vec_sub(vec_sub(vec_sub(cam.orig, vec_div_double(cam.horizontal, 2)),
+                                vec_div_double(cam.vertical, 2)), vec_init(0, 0, focal_len));
     return (cam);
 }
 
@@ -134,6 +135,6 @@ t_canvas	canvas_init(int  width, int height)
 
     init.width = width;
     init.height = height;
-    init.aspect_ratio = (float)width / (float)height;
+    init.aspect_ratio = (double)width / (double)height;
     return (init);
 }
