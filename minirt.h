@@ -2,6 +2,7 @@
 # define MINIRT_H
 
 # include <stdio.h>
+# include <limits.h>
 # include <math.h>
 # include <fcntl.h>
 # include "libft/libft.h"
@@ -41,6 +42,9 @@
 # define PL 4
 # define CY 5
 
+# define RGB 0
+# define XYZ 1
+# define UNIT 2
 
 # define EPSILON 1e-6
 # define LUMEN 3
@@ -88,6 +92,8 @@ typedef struct s_camera
 	t_vec	vertical;
 	double	focal_len;
 	t_point	start_point;
+	int		fov;
+	t_vec	normal;
 }			    t_camera;
 
 typedef struct s_canvas
@@ -129,6 +135,7 @@ typedef struct  s_light
     t_vec	origin;
     t_vec	light_color;
     double	bright_ratio;
+	void            *next;
 }			t_light;
 
 typedef struct s_info

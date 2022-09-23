@@ -3,66 +3,60 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
+#    By: jinypark <jinypark@student.42seoul.>       +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/23 10:35:19 by jinypark         ###   ########.fr        #
+#    Updated: 2022/03/31 18:17:44 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = miniRT
+NAME = libft.a
 
-CC = cc
+CC = gcc
 
 CFLAGS = -Wall -Wextra -Werror
 
-LIBFT_DIR = libft
+SRCS = ft_memset.c ft_bzero.c ft_memcpy.c ft_memmove.c \
+	   ft_memchr.c ft_memcmp.c ft_strlen.c ft_strlcpy.c \
+	   ft_strlcat.c ft_strchr.c ft_strrchr.c ft_strnstr.c \
+	   ft_strncmp.c ft_atoi.c ft_isalpha.c ft_isdigit.c \
+	   ft_isalnum.c ft_isascii.c ft_isprint.c ft_toupper.c \
+	   ft_tolower.c ft_calloc.c ft_strdup.c ft_substr.c ft_strjoin.c \
+	   ft_strtrim.c ft_split.c ft_itoa.c ft_strmapi.c ft_striteri.c \
+	   ft_putchar_fd.c ft_putstr_fd.c ft_putendl_fd.c ft_putnbr_fd.c
 
-MLX_DIR = mlx
-
-SRCS = minirt.c vector.c material.c object.c light.c
-
-BONUS = minirt.c vector.c
+BONUS = ft_lstnew.c ft_lstadd_front.c ft_lstsize.c ft_lstlast.c \
+		ft_lstadd_back.c ft_lstdelone.c ft_lstclear.c ft_lstiter.c \
+		ft_lstmap.c
 
 OBJS_SRCS = $(SRCS:.c=.o)
 
 OBJS_BONUS = $(BONUS:.c=.o)
 
 ifdef BONUS_FLAG
-	OBJS = $(OBJS_BONUS)
+	OBJS = $(OBJS_SRCS:.c=.o) $(BONUS:.c=.o)
 else
-	OBJS = $(OBJS_SRCS)
+	OBJS = $(OBJS_SRCS:.c=.o)
 endif
 
 all: $(NAME)
 
 %.o : %.c
-	$(CC) -c -o $@ $<
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJS)
-	make -C $(LIBFT_DIR)
-	make -C $(MLX_DIR)
-	$(CC) -o miniRT $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit -fsanitize=address
+	ar rcs $@ $^
+
 
 bonus:
 	make BONUS_FLAG=1 all
 
 clean:
-	make clean -C $(LIBFT_DIR)
-	# make clean -C $(MLX_DIR)
 	rm -f $(OBJS) $(OBJS_BONUS)
 
 fclean: clean
-	make fclean -C $(LIBFT_DIR)
 	rm -f $(NAME)
 
-re:
-	make fclean
-	make all
-
-run:
-	make all
-	make clean
-	./miniRT
+re: fclean all
 
 .PHONY: bonus all clean fclean re

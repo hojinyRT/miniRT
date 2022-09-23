@@ -128,7 +128,6 @@ t_camera	camera_init(t_canvas canvas, t_point orig)
                                 vec_div_double(cam.vertical, 2)), vec_init(0, 0, focal_len));
     return (cam);
 }
-
 t_canvas	canvas_init(int  width, int height)
 {
     t_canvas	init;

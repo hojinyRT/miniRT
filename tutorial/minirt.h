@@ -27,11 +27,11 @@
 # define TRUE 1
 # define FALSE 0
 
-# define WIN_H 1200
-# define WIN_W 1200
+# define WIN_H 1440
+# define WIN_W 2560
 
-# define MLX_H 1200
-# define MLX_W 1200
+# define MLX_H 1440
+# define MLX_W 2560
 
 # define SP 0
 # define LIGHT_POINT 1
