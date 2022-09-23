@@ -27,11 +27,11 @@
 # define TRUE 1
 # define FALSE 0
 
-# define WIN_H 1200
-# define WIN_W 1200
+# define WIN_H 1000
+# define WIN_W 1000
 
-# define MLX_H 1200
-# define MLX_W 1200
+# define MLX_HH 1000
+# define MLX_WW 1000
 
 # define SP 0
 # define LIGHT_POINT 1
@@ -58,9 +58,9 @@ typedef struct	s_info
 
 typedef struct s_vec
 {
-	float	x;
-	float	y;
-	float	z;
+	double	x;
+	double	y;
+	double	z;
 }		    t_vec;
 
 typedef t_vec	t_color;
@@ -75,11 +75,11 @@ typedef struct s_ray
 typedef struct s_camera
 {
 	t_point	orig;
-	float	viewport_h;
-	float	viewport_w;
+	double	viewport_h;
+	double	viewport_w;
 	t_vec	horizontal;
 	t_vec	vertical;
-	float	focal_len;
+	double	focal_len;
 	t_point	start_point;
 }			    t_camera;
 
@@ -87,14 +87,14 @@ typedef struct s_canvas
 {
 	int		width;
 	int		height;
-	float	aspect_ratio;
+	double	aspect_ratio;
 }			t_canvas;
 
 typedef struct s_sphere
 {
 	t_point	center;
-	float	radius;
-	float	radius2;
+	double	radius;
+	double	radius2;
 }			t_sphere;
 
 typedef struct  s_object
@@ -110,9 +110,9 @@ typedef struct s_hit_record
 {
     t_point		p;
     t_vec		normal;
-    float		tmin;
-    float		tmax;
-    float		t;
+    double		tmin;
+    double		tmax;
+    double		t;
     int			front_face;
 	t_vec		albedo;
 }				t_hit_record;
@@ -121,7 +121,7 @@ typedef struct  s_light
 {
     t_vec	origin;
     t_vec	light_color;
-    float	bright_ratio;
+    double	bright_ratio;
 }			t_light;
 
 typedef struct s_scene
@@ -142,25 +142,25 @@ t_vec	vec_add(t_vec u, t_vec v);
 t_vec	vec_sub(t_vec u, t_vec v);
 t_vec	vec_multi(t_vec u, t_vec v);
 t_vec	vec_div(t_vec u, t_vec v);
-t_vec	vec_multi_float(t_vec u, float n);
-t_vec	vec_div_float(t_vec u, float n);
+t_vec	vec_multi_double(t_vec u, double n);
+t_vec	vec_div_double(t_vec u, double n);
 
-float	vec_dot(t_vec u, t_vec v);
+double	vec_dot(t_vec u, t_vec v);
 t_vec	vec_cross(t_vec u, t_vec v);
 
-float	vec_len(t_vec u);
-float	vec_len_sqr(t_vec u);
+double	vec_len(t_vec u);
+double	vec_len_sqr(t_vec u);
 t_vec	vec_unit(t_vec u);
-t_vec	vec_init(float x, float y, float z);
+t_vec	vec_init(double x, double y, double z);
 
 //------material.c-------//
 t_ray		ray_init(t_point orig, t_vec dir);
-t_point		ray_at(t_ray ray, float t);
-t_ray		ray_primary(t_camera cam, float u, float v);
+t_point		ray_at(t_ray ray, double t);
+t_ray		ray_primary(t_camera cam, double u, double v);
 t_color		ray_color(t_scene *scene);
 t_canvas	canvas_init(int  width, int height);
 t_camera	camera_init(t_canvas canvas, t_point orig);
-t_sphere	*sphere_init(t_point center, float radius);
+t_sphere	*sphere_init(t_point center, double radius);
 void		set_face_normal(t_ray ray, t_hit_record *rec);
 
 
@@ -174,8 +174,8 @@ t_object	*obj_last(t_object *list);
 
 
 // ---------light.c---------//
-t_light     *light_point(t_vec light_origin, t_vec light_color, float bright_ratio);
+t_light     *light_point(t_vec light_origin, t_vec light_color, double bright_ratio);
 t_vec		phong_lighting(t_scene *scene);
-int			in_shadow(t_object *objs, t_ray light_ray, float light_len);
+int			in_shadow(t_object *objs, t_ray light_ray, double light_len);
 
 #endif
