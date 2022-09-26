@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include "minirt.h"
 #include <stdlib.h>
 
@@ -62,17 +63,20 @@ t_scene	*scene_init(void)
         return (NULL);
     scene->canvas = canvas_init(WIN_W, WIN_H);
     scene->camera = camera_init(scene->canvas, vec_init(0, 0 ,0));
-	obj = object_init(SP, sphere_init(vec_init(-2, 0, -5), 2), vec_init(0.5, 0, 0));
+	// obj = object_init(PL, plane_init(vec_init(-2, -1, -5), vec_init(0, 1, 0)), vec_init(0.5, 0, 0));
+	obj = object_init(SP, sphere_init(vec_init(-2, 0, -10), 2), vec_init(1, 0.75, 0.80));
 	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -200, -20), 200), vec_init(0, 0.5, 0)));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -1000, 0), 995), vec_init(1, 1, 1)));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 0, -5), 2), vec_init(0, 0.5, 0)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 1, -10), 2), vec_init(0.7, 0.43, 0.91)));
+	obj_add(&obj, object_init(PL, plane_init(vec_init(0 , -3, 0), vec_init(0, -1, 0)), vec_init(0.9, 0.9, 0.9)));
+	obj_add(&obj, object_init(PL, plane_init(vec_init(0 , 0 , -20), vec_init(0, 0, -1)), vec_init(1, 1, 1)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -1000, 0), 995), vec_init(1, 1, 1)));
 	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1), vec_init(1, 1, 1)));
 	scene->obj = obj;
 	// light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 5), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0));
-	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 0), vec_init(1, 1, 1), 0.5), vec_init(0, 0, 0)); // 더미 albedo
+	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 0), vec_init(1, 1, 1), 0.1), vec_init(0, 0, 0)); // 더미 albedo
 
 	scene->light = light;
-	ka = 0.1;
+	ka = 0.5;
 	scene->ambient = vec_multi_double(vec_init(1, 1, 1), ka);
 	return (scene);
 }
@@ -85,31 +89,24 @@ double	random_double(void)
 	return ((double)rand() / (RAND_MAX + 1.0));
 }
 
-int main()
+void *render(void *param)
 {
-	t_scene	*scene;
-	t_info	info;
-	t_color	color = vec_init(0,0,0);
-	t_img	*img;
-	int i;
-	int	j;
+	t_param *tmp;
+	t_color		color;
+	int		i;
+	int		j;
+	int		samples_per_pixel = 1;
 	double	u;
 	double	v;
-	t_ray		ray;
-	int		samples_per_pixel = 100;
-
-	scene = scene_init();
-
-	// printf("hey : %d\n", (scene->light->type));
-	print_obj(scene->obj);
-	info.mlx = mlx_init();
-	info.win = mlx_new_window(info.mlx, MLX_WW, MLX_HH, "HojinyRT");
-	img = ft_calloc(1, sizeof(t_img));
-	img->ptr = mlx_new_image(info.mlx, WIN_W, WIN_H);
-	img->addr = (int *)mlx_get_data_addr(img->ptr, \
-		&(img->bits_per_pixel), &(img->line_length), &(img->endian));
-	i = WIN_H - 1;
-	while (i >= 0)
+	t_img *img;
+	t_scene *scene;
+	tmp = (t_param *)param;
+	img = tmp->img;
+	scene = &tmp->scene;
+	int	div = WIN_H / 6;
+	i = WIN_H - 1 - tmp->idx * div;
+	int i2 = i - div;
+	while (i >= 0 && i >= i2)
 	{
 		j = 0;
 		while (j < WIN_W)
@@ -125,11 +122,75 @@ int main()
 			}
 			my_mlx_pixel_put(img, j, WIN_H - 1 - i, color, samples_per_pixel);
 			j++;
-			
 		}
-		printf("i : %d\n", i);
 		i--;
 	}
+	printf("%d thread's rendering is done...!\n", tmp->idx);
+	return (NULL);
+}
+
+int main()
+{
+	t_scene	*scene;
+	t_info	info;
+	t_color	color = vec_init(0,0,0);
+	t_img	*img;
+	int i;
+	int	j;
+	double	u;
+	double	v;
+	t_ray		ray;
+	pthread_t tid[6];
+	int idx = 0;
+	t_param *param;
+
+	scene = scene_init();
+
+	// printf("hey : %d\n", (scene->light->type));
+	print_obj(scene->obj);
+	info.mlx = mlx_init();
+	info.win = mlx_new_window(info.mlx, MLX_WW, MLX_HH, "HojinyRT");
+	img = ft_calloc(1, sizeof(t_img));
+	img->ptr = mlx_new_image(info.mlx, WIN_W, WIN_H);
+	img->addr = (int *)mlx_get_data_addr(img->ptr, \
+		&(img->bits_per_pixel), &(img->line_length), &(img->endian));
+	i = WIN_H - 1;
+	param = ft_calloc(6, sizeof(t_param));
+	while (idx < 6)
+	{
+		param[idx].scene = *scene;
+		param[idx].idx = idx;
+		param[idx].img = img;
+		pthread_create(&tid[idx], NULL, render, (void *)&param[idx]);
+		idx++;
+	}
+	idx = 0;
+	while (idx < 6)
+	{
+		pthread_join(tid[idx], NULL);
+		idx++;
+	}
+	// while (i >= 0)
+	// {
+	// 	j = 0;
+	// 	while (j < WIN_W)
+	// 	{
+	// 		color = vec_init(0, 0, 0);
+	// 		for (int s = 0; s < samples_per_pixel; ++s)
+	// 		{
+				
+	// 			u = ((double)j  + random_double()) / (scene->canvas.width - 1);
+	// 			v = ((double)i  + random_double()) / (scene->canvas.height - 1);
+	// 			scene->ray = ray_primary(scene->camera, u, v);
+	// 			color = vec_add(color, ray_color(scene));
+	// 		}
+	// 		my_mlx_pixel_put(img, j, WIN_H - 1 - i, color, samples_per_pixel);
+	// 		j++;
+			
+	// 	}
+	// 	printf("i : %d\n", i);
+	// 	i--;
+	// }
 	printf("DONE\n");
 	mlx_put_image_to_window(info.mlx, info.win, img->ptr, 0, 0);
 	mlx_hook(info.win, EVENT_KEY_PRESS, 0, key_press, 0);

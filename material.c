@@ -1,5 +1,16 @@
 #include "minirt.h"
 
+t_plane	*plane_init(t_point center, t_vec normal)
+{
+	t_plane *init;
+
+    if(!(init = (t_plane *)malloc(sizeof(t_plane))))
+        return (NULL);
+	init->center = center;
+	init->normal = normal;
+	return (init);
+}
+
 void    set_face_normal(t_ray ray, t_hit_record *rec)
 {
     // 광선의 방향벡터와 교점의 법선벡터의 내적이 음수이면 광선은 앞면(객체의)에 hit 한 것이다
@@ -10,6 +21,43 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
 	if (rec->front_face == 0)	
 		rec->normal = vec_multi_double(rec->normal, -1);
     return ;
+}
+
+int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
+{
+	t_plane *pl;
+	double		root;
+
+
+	pl = (t_plane *)obj->element;
+	// root = vec_dot(pl->center, pl->normal) / vec_dot(ray.dir, pl->normal);
+	if (vec_dot(ray.dir, pl->normal) < EPSILON)
+		return (FALSE);
+	root = vec_dot(vec_sub(pl->center, ray.orig), pl->normal) / vec_dot(ray.dir, pl->normal);
+	// ray의 방향벡터
+	// 평면위의 점
+	// 평면의 법선벡터
+
+	// ((tx - c1) * n1 + (ty - c2) * n2 + (tz - c3) * n3) = 0;
+	// tx*n1 - c1*n1 + ty*n2 - c2*n2 + tz*n3 - c3*n3 = 0;
+	// tx*n1 + ty*n2 * tz*n3 = c1n1 + c2n2 + c3n3;
+	// t(x*n1 + y*n2 + z*n3) = c1*n1 + c2*n2 + c3*n3
+	// t = c1*n1 + c2*n2 + c3*n3 / (x*n1 + y*n2 + z*n3)
+	 
+	if (root < rec->tmin || rec->tmax < root)
+	{
+		return (FALSE);
+	}
+	rec->albedo = obj->albedo;
+	rec->t = root;
+	rec->p = ray_at(ray, root);
+	rec->normal = pl->normal; // 정규화된 법선 벡터.
+	// printf("rec->p : %lf, %lf, %lf\n", rec->p.x, rec->p.y, rec->p.z);
+	// rec->normal = vec_unit(vec_sub(rec->p, (sp)->center)); // 정규화된 법선 벡터.
+	// printf("normal len: %lf\n", vec_len(rec->normal));
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	return (TRUE);
+	
 }
 
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -106,7 +154,9 @@ t_color    ray_color(t_scene *scene)
 
 	scene->rec = record_init();
 	if (hit(scene->obj, scene->ray, &(scene->rec)))
+	{
 		return (phong_lighting(scene));
+	}
 	else
 	{
 		t = 0.5 * (scene->ray.dir.y + 1.0);

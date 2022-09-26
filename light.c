@@ -61,7 +61,7 @@ t_vec        point_light_get(t_scene *scene, t_light *light)
     view_dir = vec_unit(vec_multi_double(scene->ray.dir, -1));
     reflect_dir = reflect(vec_multi_double(light_dir, -1), scene->rec.normal);
     ksn = 64; // shininess value
-    ks = 0.5; // specular strength
+    ks = 0.1; // specular strength
     spec = pow(fmax(vec_dot(view_dir, reflect_dir), 0.0), ksn);
     specular = vec_multi_double(vec_multi_double(light->light_color, ks), spec);
     brightness = light->bright_ratio * LUMEN; // 기준 광속/광량을 정의한 매크로

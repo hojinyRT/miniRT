@@ -1,10 +1,10 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
+# include "mlx/mlx.h"
 # include <stdio.h>
 # include <math.h>
 # include "libft/libft.h"
-# include "mlx/mlx.h"
 
 # define EVENT_KEY_PRESS 2
 # define EVENT_MOUSE_CLICK 4
@@ -27,19 +27,21 @@
 # define TRUE 1
 # define FALSE 0
 
-# define WIN_H 1000
-# define WIN_W 1000
+# define WIN_H 900
+# define WIN_W 1600	
 
-# define MLX_HH 1000
-# define MLX_WW 1000
+# define MLX_HH 900
+# define MLX_WW 1600
 
 # define SP 0
 # define LIGHT_POINT 1
+# define PL 2
 
 # define EPSILON 1e-6
 # define LUMEN 3
 
 typedef int t_object_type;
+
 
 typedef struct  s_img
 {
@@ -97,6 +99,12 @@ typedef struct s_sphere
 	double	radius2;
 }			t_sphere;
 
+typedef struct s_plane
+{
+	t_point	center;
+	t_vec	normal;
+}			t_plane;
+
 typedef struct  s_object
 {
     t_object_type   type;
@@ -135,6 +143,12 @@ typedef struct s_scene
     t_hit_record	rec;
 }					t_scene;
 
+typedef struct  s_param
+{
+	t_img *img;
+	int		idx;
+	t_scene scene;
+}			t_param;
 
 void	print_obj(t_object *obj);
 t_vec 	vec_min(t_vec vec1, t_vec vec2);
@@ -160,6 +174,7 @@ t_ray		ray_primary(t_camera cam, double u, double v);
 t_color		ray_color(t_scene *scene);
 t_canvas	canvas_init(int  width, int height);
 t_camera	camera_init(t_canvas canvas, t_point orig);
+t_plane	*plane_init(t_point center, t_vec normal);
 t_sphere	*sphere_init(t_point center, double radius);
 void		set_face_normal(t_ray ray, t_hit_record *rec);
 
@@ -168,6 +183,7 @@ void		set_face_normal(t_ray ray, t_hit_record *rec);
 t_object    *object_init(t_object_type type, void *element, t_vec albedo);
 int			hit(t_object *obj, t_ray ray, t_hit_record *rec);
 int			hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
+int			hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
 int			hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
 void		obj_add(t_object **list, t_object *new);
 t_object	*obj_last(t_object *list);
