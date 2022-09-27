@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "minirt.h": "c",
-        "limits.h": "c"
+        "limits.h": "c",
+        "locale": "c"
     }
 }

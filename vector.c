@@ -66,6 +66,12 @@ t_vec	vec_multi_double(t_vec u, double n)
 
 t_vec	vec_div_double(t_vec u, double n)
 {
+    // t_vec   init;
+
+    // init.x = u.x / n;
+    // init.y = u.y / n;
+    // init.z = u.z / n;
+    // return (init);
     return (vec_multi_double(u, (1 / n)));
 }
 

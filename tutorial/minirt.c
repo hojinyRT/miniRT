@@ -69,7 +69,6 @@ int main()
 	int	j;
 	double	u;
 	double	v;
-	t_ray		ray;
 
 	scene = scene_init();
 

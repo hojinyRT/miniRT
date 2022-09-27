@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42seoul.>       +#+  +:+       +#+        */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/03/15 17:47:39 by jinypark          #+#    #+#             */
-/*   Updated: 2022/03/31 18:10:26 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/09/27 11:19:27 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,5 +64,7 @@ int		ft_isascii(int c);
 int		ft_isalpha(int c);
 void	*ft_bzero(void *s, size_t n);
 void	*ft_calloc(size_t count, size_t size);
+char	*get_next_line(int fd);
+int		ft_atoi_base(char *str, char *base);
 
 #endif

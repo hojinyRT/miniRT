@@ -29,11 +29,16 @@
 # define TRUE 1
 # define FALSE 0
 
-# define IMG_H 1200
-# define IMG_W 1200
+# define X 0
+# define Y 1
+# define U 0
+# define V 1
 
-# define WIN_H 1200
-# define WIN_W 1200
+# define IMG_H 900
+# define IMG_W 1600
+
+# define WIN_H 900
+# define WIN_W 1600
 
 # define A 0
 # define C 1
@@ -96,19 +101,27 @@ typedef struct s_camera
 	t_vec	normal;
 }			    t_camera;
 
-typedef struct s_canvas
-{
-	int		width;
-	int		height;
-	double	aspect_ratio;
-}			t_canvas;
-
 typedef struct s_sphere
 {
 	t_point	center;
 	double	radius;
 	double	radius2;
 }			t_sphere;
+
+typedef struct s_plane
+{
+	t_point	center;
+	t_vec	normal;
+}			t_plane;
+
+typedef struct s_cylinder
+{
+	t_point	center;
+	double	radius;
+	double	radius2;
+	double	height;
+	t_vec	normal;
+}			t_cylinder;
 
 typedef struct  s_object
 {
@@ -134,23 +147,20 @@ typedef struct  s_light
 {
     t_vec	origin;
     t_vec	light_color;
-    double	bright_ratio;
+    double	brightness;
 	void            *next;
 }			t_light;
 
 typedef struct s_info
 {
-    t_canvas		canvas;
     t_camera		camera;
     t_object		*obj;
-    t_object		*light;
-    t_color			ambient; // 8.4에서 설명할 요소
+    t_light			*light;
+    t_color			ambient;
     t_ray			ray;
     t_hit_record	rec;
 }					t_info;
 
-
-void	print_obj(t_object *obj);
 t_vec 	vec_min(t_vec vec1, t_vec vec2);
 t_vec	vec_add(t_vec u, t_vec v);
 t_vec	vec_sub(t_vec u, t_vec v);
@@ -158,38 +168,38 @@ t_vec	vec_multi(t_vec u, t_vec v);
 t_vec	vec_div(t_vec u, t_vec v);
 t_vec	vec_multi_double(t_vec u, double n);
 t_vec	vec_div_double(t_vec u, double n);
-
 double	vec_dot(t_vec u, t_vec v);
 t_vec	vec_cross(t_vec u, t_vec v);
-
 double	vec_len(t_vec u);
 double	vec_len_sqr(t_vec u);
 t_vec	vec_unit(t_vec u);
 t_vec	vec_init(double x, double y, double z);
 
-//------material.c-------//
-t_ray		ray_init(t_point orig, t_vec dir);
-t_point		ray_at(t_ray ray, double t);
-t_ray		ray_primary(t_camera cam, double u, double v);
-t_color		ray_color(t_info *info);
-t_canvas	canvas_init(int  width, int height);
-t_camera	camera_init(t_canvas canvas, t_point orig);
+
+t_object    *object_init(t_object_type type, void *element, t_vec albedo);
 t_sphere	*sphere_init(t_point center, double radius);
-void		set_face_normal(t_ray ray, t_hit_record *rec);
+t_plane	*plane_init(t_point center, t_vec normal);
+t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal);
+t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness);
+
+
+// ---------utils.c---------//
+void	is_sign(char *str, int *idx, double *sign);
+double	ft_atod(char *str);
+void	check_unit(double *x, double *y, double *z, int flag);
+t_vec	ft_atovec(char *str, int flag);
+void	ft_strerror(char *err);
+void	split_free(char **split);
 
 
 // ---------object.c---------//
-t_object    *object_init(t_object_type type, void *element, t_vec albedo);
-int			hit(t_object *obj, t_ray ray, t_hit_record *rec);
-int			hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
-int			hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
-void		obj_add(t_object **list, t_object *new);
-t_object	*obj_last(t_object *list);
+t_hit_record	record_init(void);
+int				hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
+int				hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
+int				hit(t_object *obj, t_ray ray, t_hit_record *rec);
+t_vec			point_light_get(t_info *info, t_light *light);
+t_vec			phong_lighting(t_info info);
+t_point			ray_at(t_ray ray, double t);
 
-
-// ---------light.c---------//
-t_light     *light_point(t_vec light_origin, t_vec light_color, double bright_ratio);
-t_vec		phong_lighting(t_info *info);
-int			in_shadow(t_object *objs, t_ray light_ray, double light_len);
 
 #endif
