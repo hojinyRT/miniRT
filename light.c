@@ -23,7 +23,7 @@ t_vec        point_light_get(t_scene *scene, t_light *light)
     t_color    diffuse;
     t_vec      light_dir;
     double      kd; // diffuse의 강도
-        
+
     t_color    specular;
     t_vec      view_dir;
     t_vec      reflect_dir;
@@ -40,7 +40,7 @@ t_vec        point_light_get(t_scene *scene, t_light *light)
 
     // 추가
     // printf("light origin : %f, %f, %f\n", light->origin.x, light->origin.y, light->origin.z);
-    
+
     light_dir = vec_sub(light->origin, scene->rec.p);
     light_len = vec_len(light_dir);
     // printf("light len: %f\n", light_len);

@@ -15,10 +15,10 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
 {
     // 광선의 방향벡터와 교점의 법선벡터의 내적이 음수이면 광선은 앞면(객체의)에 hit 한 것이다
     rec->front_face = vec_dot(ray.dir, rec->normal) < 0;
-    // 광선의 앞면에 hit 면 그대로 아니면 법선을 반대로 뒤집는다. 
+    // 광선의 앞면에 hit 면 그대로 아니면 법선을 반대로 뒤집는다.
 	// (항상 광선 방향벡터와 법선 벡터를 반대인 상태로 사용하기위해)
 	// rec->normal = (rec->front_face) ? rec->normal : vec_multi_double(rec->normal, -1);
-	if (rec->front_face == 0)	
+	if (rec->front_face == 0)
 		rec->normal = vec_multi_double(rec->normal, -1);
     return ;
 }
@@ -43,7 +43,7 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	// tx*n1 + ty*n2 * tz*n3 = c1n1 + c2n2 + c3n3;
 	// t(x*n1 + y*n2 + z*n3) = c1*n1 + c2*n2 + c3*n3
 	// t = c1*n1 + c2*n2 + c3*n3 / (x*n1 + y*n2 + z*n3)
-	 
+
 	if (root < rec->tmin || rec->tmax < root)
 	{
 		return (FALSE);
@@ -57,11 +57,11 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	// printf("normal len: %lf\n", vec_len(rec->normal));
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
-	
+
 }
 
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
-{	
+{
 	t_sphere	*sp;
 	t_vec		oc;
 	double		a;
@@ -161,7 +161,7 @@ t_color    ray_color(t_scene *scene)
 	{
 		t = 0.5 * (scene->ray.dir.y + 1.0);
 		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), vec_multi_double(vec_init(128, 178, 255), t)));
-	}	
+	}
 }
 
 t_camera	camera_init(t_canvas canvas, t_point orig)

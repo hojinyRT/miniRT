@@ -19,13 +19,13 @@ int	key_press(int keycode)
 }
 
 int	convert_color(t_vec clr, int samples_per_pixel)
-{	
+{
 	double scale = 1.0 / (double)samples_per_pixel;
 
-	clr.x *= scale; 
-	clr.y *= scale; 
+	clr.x *= scale;
+	clr.y *= scale;
 	clr.z *= scale;
-	
+
 	// int tmp = (((int)clr.x * 16 * 16 * 16 * 16 + (int)clr.y  * 16 * 16 + (int)clr.z));
 	int tmp = (((int)clamp(clr.x, 0.0, 255.0)) * 16 * 16 * 16 * 16 + ((int)clamp(clr.y, 0.0, 255.0))  * 16 * 16 + (int)clamp(clr.z, 0.0, 255.0));
 	// printf("color = %#x\n", tmp);
@@ -40,7 +40,7 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color, int s)
 void	print_obj(t_object *obj)
 {
 	t_object	*curr;
-	
+
 	curr = obj;
 	while (curr)
 	{
@@ -64,11 +64,28 @@ t_scene	*scene_init(void)
     scene->canvas = canvas_init(WIN_W, WIN_H);
     scene->camera = camera_init(scene->canvas, vec_init(0, 0 ,0));
 	// obj = object_init(PL, plane_init(vec_init(-2, -1, -5), vec_init(0, 1, 0)), vec_init(0.5, 0, 0));
-	obj = object_init(SP, sphere_init(vec_init(-2, 0, -10), 2), vec_init(1, 0.75, 0.80));
-	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -200, -20), 200), vec_init(0, 0.5, 0)));
-	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 1, -10), 2), vec_init(0.7, 0.43, 0.91)));
-	obj_add(&obj, object_init(PL, plane_init(vec_init(0 , -3, 0), vec_init(0, -1, 0)), vec_init(0.9, 0.9, 0.9)));
-	obj_add(&obj, object_init(PL, plane_init(vec_init(0 , 0 , -20), vec_init(0, 0, -1)), vec_init(1, 1, 1)));
+	obj = object_init(SP, sphere_init(vec_init(0, -2, -7), 1), vec_init(1, 1, 1));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -2, -9), 1), vec_init(1, 1, 1)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -2, -11), 1), vec_init(1, 1, 1)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, -2, -7), 1), vec_init(0.82, 0.41, 0.12)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, -2, -9), 1), vec_init(0.82, 0.41, 0.12)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(2, -2, -11), 1), vec_init(0.82, 0.41, 0.12)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(-2, -2, -7), 1), vec_init(0.25, 0.88, 0.815)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(-2, -2, -9), 1), vec_init(0.25, 0.88, 0.815)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(-2, -2, -11), 1), vec_init(0.25, 0.88, 0.815)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(1, -2 + 1.55, -8), 1), vec_init(0.74, 0.72, 0.42)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(1, -2 + 1.55, -10), 1), vec_init(0.74, 0.72, 0.42)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(-1, -2 + 1.55, -8), 1), vec_init(0.5, 1, 0.83)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(-1, -2 + 1.55, -10), 1), vec_init(0.5, 1, 0.83)));
+	obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -2 + 1.55 + 1.55, -9), 1), vec_init(0, 0.5, 0)));
+
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(-2, -2, -12), 1), vec_init(1, 0.75, 0.80)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -2, -12), 1), vec_init(0.6, 0.6, 0.6)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(2, 1, -10), 2), vec_init(0.7, 0.43, 0.91)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(3, 3, -13), 2), vec_init(1, 0.43, 0.91)));
+	// obj_add(&obj, object_init(SP, sphere_init(vec_init(4, 4, -15), 2), vec_init(0.7, 0.7, 0.91)));
+	obj_add(&obj, object_init(PL, plane_init(vec_init(0 , -3, 0), vec_init(0, -1, 0)), vec_init(1, 1, 1)));
+	// obj_add(&obj, object_init(PL, plane_init(vec_init(0 , 0 , -50), vec_init(0, 0, -1)), vec_init(1, 1, 1)));
 	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, -1000, 0), 995), vec_init(1, 1, 1)));
 	// obj_add(&obj, object_init(SP, sphere_init(vec_init(0, 0, -5), 1), vec_init(1, 1, 1)));
 	scene->obj = obj;
@@ -76,7 +93,7 @@ t_scene	*scene_init(void)
 	light = object_init(LIGHT_POINT, light_point(vec_init(0, 20, 0), vec_init(1, 1, 1), 0.1), vec_init(0, 0, 0)); // 더미 albedo
 
 	scene->light = light;
-	ka = 0.5;
+	ka = 0.6;
 	scene->ambient = vec_multi_double(vec_init(1, 1, 1), ka);
 	return (scene);
 }
@@ -95,7 +112,7 @@ void *render(void *param)
 	t_color		color;
 	int		i;
 	int		j;
-	int		samples_per_pixel = 1;
+	int		samples_per_pixel = 10;
 	double	u;
 	double	v;
 	t_img *img;
@@ -114,7 +131,7 @@ void *render(void *param)
 			color = vec_init(0, 0, 0);
 			for (int s = 0; s < samples_per_pixel; ++s)
 			{
-				
+
 				u = ((double)j  + random_double()) / (scene->canvas.width - 1);
 				v = ((double)i  + random_double()) / (scene->canvas.height - 1);
 				scene->ray = ray_primary(scene->camera, u, v);
@@ -178,7 +195,7 @@ int main()
 	// 		color = vec_init(0, 0, 0);
 	// 		for (int s = 0; s < samples_per_pixel; ++s)
 	// 		{
-				
+
 	// 			u = ((double)j  + random_double()) / (scene->canvas.width - 1);
 	// 			v = ((double)i  + random_double()) / (scene->canvas.height - 1);
 	// 			scene->ray = ray_primary(scene->camera, u, v);
@@ -186,7 +203,7 @@ int main()
 	// 		}
 	// 		my_mlx_pixel_put(img, j, WIN_H - 1 - i, color, samples_per_pixel);
 	// 		j++;
-			
+
 	// 	}
 	// 	printf("i : %d\n", i);
 	// 	i--;
