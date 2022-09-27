@@ -1,9 +1,17 @@
 #include "minirt.h"
 
-int	key_press(int keycode)
+int	key_press(int keycode, void *param)
 {
+	t_info *info;
+
+	info = (t_info *)param;
 	if (keycode == KEY_ESC)
 		exit(0);
+	else if (keycode == KEY_A)
+	{
+		render(info);
+	}
+	
 	return (0);
 }
 
@@ -96,7 +104,7 @@ int main()
 		i--;
 	}
 	mlx_put_image_to_window(info.mlx, info.win, img->ptr, 0, 0);
-	mlx_hook(info.win, EVENT_KEY_PRESS, 0, key_press, 0);
+	mlx_hook(info.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(info.mlx);
 	return (0);
 }

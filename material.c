@@ -59,5 +59,6 @@ t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness
     light->origin = light_origin;
     light->light_color = light_color;
     light->brightness = brightness;
+    light->next = 0;
     return (light);
 }

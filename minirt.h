@@ -148,7 +148,7 @@ typedef struct  s_light
     t_vec	origin;
     t_vec	light_color;
     double	brightness;
-	void            *next;
+	void	*next;
 }			t_light;
 
 typedef struct s_info
@@ -159,6 +159,7 @@ typedef struct s_info
     t_color			ambient;
     t_ray			ray;
     t_hit_record	rec;
+	t_mlx			mlx;
 }					t_info;
 
 t_vec 	vec_min(t_vec vec1, t_vec vec2);
@@ -192,14 +193,21 @@ void	ft_strerror(char *err);
 void	split_free(char **split);
 
 
-// ---------object.c---------//
+// ---------object.c--------//
 t_hit_record	record_init(void);
 int				hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
 int				hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
 int				hit(t_object *obj, t_ray ray, t_hit_record *rec);
 t_vec			point_light_get(t_info *info, t_light *light);
-t_vec			phong_lighting(t_info info);
+t_vec			phong_lighting(t_info *info);
 t_point			ray_at(t_ray ray, double t);
+int				hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
+int				in_shadow(t_object *objs, t_ray light_ray, double light_len);
+t_ray			ray_init(t_point orig, t_vec dir);
+
+
+// ---------tmp--------//
+void	print_obj(t_object *obj);
 
 
 #endif

@@ -2,6 +2,9 @@
     "files.associations": {
         "minirt.h": "c",
         "limits.h": "c",
-        "locale": "c"
+        "locale": "c",
+        "atomic": "c",
+        "unordered_map": "c",
+        "utility": "c"
     }
 }

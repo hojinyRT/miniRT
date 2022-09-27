@@ -80,7 +80,7 @@ void	put_l(t_info *info, char **argv)
 	brightness = ft_atod(argv[2]);
 	color = ft_atovec(argv[3], RGB);
 
-	tmp = (t_light *)object_init(L, light_init(origin, color, brightness), vec_init(0, 0, 0)); // 더미 albedo
+	tmp = light_init(origin, color, brightness); // 더미 albedo
 	light_add(&(info->light), tmp);
 }
 
@@ -131,6 +131,8 @@ void	put_cy(t_info *info, char **argv)
 
 int 	check_format(char *format)
 {
+	if (!format)
+		return (-1);
 	if (!ft_strncmp(format, "sp", 3))
 		return (SP);
 	else if (!ft_strncmp(format, "pl", 3))
@@ -154,6 +156,8 @@ void	put_info(t_info *info, char **argv)
 	int			type;
 
 	type = check_format(argv[0]);
+	if (type == -1)
+		return ;
 	run[type](info, argv);
 }
 
@@ -183,7 +187,7 @@ t_info	info_init(t_info info, char *file)
 	return (info);
 }
 
-int	key_press(int keycode)
+int	key_press(int keycode, t_info *info)
 {
 	if (keycode == KEY_ESC)
 		exit(0);
@@ -270,12 +274,12 @@ t_color    ray_color(t_info info)
 
 	info.rec = record_init();
 	if (hit(info.obj, info.ray, &(info.rec)))
-		return (vec_init(255, 0, 0));
+		return (phong_lighting(&info));
 	else
 	{
 		t = 0.5 * (info.ray.dir.y + 1.0);
 		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), vec_multi_double(vec_init(128, 178, 255), t)));
-	}	
+	}
 }
 
 t_ray	ray_init(t_point orig, t_vec dir)
@@ -318,7 +322,6 @@ int main(int argc, char **argv)
 	idx[Y] = WIN_H - 1;
 	
 	t_color color; // 지워야함 
-	
 	while (idx[Y] >= 0)
 	{
 		idx[X] = 0;
@@ -335,6 +338,7 @@ int main(int argc, char **argv)
 		idx[Y]--;
 	}
 	mlx_put_image_to_window(mlx.ptr, mlx.win, mlx.img.img_ptr, 0, 0);
+	info.mlx = mlx;
 	mlx_hook(mlx.win, EVENT_KEY_PRESS, 0, key_press, 0);
 	mlx_loop(mlx.ptr);
 	return (0);
