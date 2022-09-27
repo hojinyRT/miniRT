@@ -55,12 +55,12 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 		return (FALSE);
 	sqrtd = sqrt(dis);
 	root = (-half_b - sqrtd) / a;
-	// if (root < rec->tmin || rec->tmax < root)
-	// {
-	// 	root = (-half_b + sqrtd) / a;
-	// 	if (root < rec->tmin || rec->tmax < root)
-	// 		return (FALSE);
-	// }
+	if (root < rec->tmin || rec->tmax < root)
+	{
+		root = (-half_b + sqrtd) / a;
+		if (root < rec->tmin || rec->tmax < root)
+			return (FALSE);
+	}
     if (root < rec->tmin || rec->tmax < root)
 		return (FALSE);
 	rec->albedo = obj->albedo;
@@ -185,7 +185,9 @@ t_vec	phong_lighting(t_info *info)
 		light_color = vec_add(light_color, point_light_get(info, lights));
 		lights = lights->next;
     }
+	// printf("%lf, %lf, %lf\n", info->ambient.x, info->ambient.y, info->ambient.z);
     light_color = vec_add(light_color, info->ambient);
+	// printf("%lf,%lf,%lf\n", light_color.x, light_color.y, light_color.z);
     return (vec_multi_double(vec_min(vec_multi(light_color, info->rec.albedo), vec_init(1, 1, 1)), 255));
     //모든 광원에 의한 빛의 양을 구한 후, 오브젝트의 반사율과 곱해준다. 그 값이 (1, 1, 1)을 넘으면 (1, 1, 1)을 반환한다.
 }

@@ -6,17 +6,14 @@ void    obj_add(t_object **list, t_object *new)
 
     if (list == NULL)
         return ;
-	printf("?\n");
     if (*list == NULL)
     {
         *list = new;
         return ;
     }
-	printf("??\n");
     cur = *list;
     while (cur->next)
         cur = cur->next;
-	printf("???\n");
     cur->next = new;
 }
 
@@ -43,8 +40,7 @@ void	put_a(t_info *info, char **argv)
 	t_color	color;
 
 	brightness = ft_atod(argv[1]);
-	printf("b\n");
-	color = ft_atovec(argv[2], RGB);
+	color = vec_div_double(ft_atovec(argv[2], RGB), 255);
 	info->ambient = vec_multi_double(color, brightness);
 }
 
@@ -78,7 +74,7 @@ void	put_l(t_info *info, char **argv)
 
 	origin = ft_atovec(argv[1], XYZ);
 	brightness = ft_atod(argv[2]);
-	color = ft_atovec(argv[3], RGB);
+	color = vec_div_double(ft_atovec(argv[3], RGB), 255);
 
 	tmp = light_init(origin, color, brightness); // 더미 albedo
 	light_add(&(info->light), tmp);

@@ -34,11 +34,11 @@
 # define U 0
 # define V 1
 
-# define IMG_H 900
-# define IMG_W 1600
+# define IMG_H 1440
+# define IMG_W 2560
 
-# define WIN_H 900
-# define WIN_W 1600
+# define WIN_H 1440
+# define WIN_W 2560
 
 # define A 0
 # define C 1
