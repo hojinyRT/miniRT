@@ -276,10 +276,8 @@ t_color    ray_color(t_info info)
     double			t;
 
 	info.rec = record_init();
-	// if (hit(info.obj, info.ray, &(info.rec)))
-	// 	return (phong_lighting(&info));
 	if (hit(info.obj, info.ray, &(info.rec)))
-		return (vec_init(152,124,242));
+		return (phong_lighting(&info));
 	else
 	{
 		t = 0.5 * (info.ray.dir.y + 1.0);

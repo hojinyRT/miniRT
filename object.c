@@ -62,13 +62,15 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
-	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height))
+	// set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0))
 	{
 		printf("근 바꿈\n");
 		root = (-half_b + sqrtd) / a;
-		// if (root < rec->tmin || rec->tmax < root)
-		// 	return (FALSE);
+		if (root < rec->tmin || rec->tmax < root)
+			return (FALSE);
+		// else
+			// return (TRUE);
 		// rec->albedo = obj->albedo;
 		rec->t = root;
 		rec->p = ray_at(ray, root);
@@ -80,7 +82,7 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	// rec->t = root;
 	// rec->p = ray_at(ray, root);
 	// rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
-	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	// set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) && vec_dot(vec_sub(rec->p, cy->center), cy->normal) < cy->height)
 	{
 		if (root == (-half_b + sqrtd) / a)
