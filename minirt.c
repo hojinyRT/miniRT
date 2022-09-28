@@ -104,7 +104,7 @@ void	put_pl(t_info *info, char **argv)
 
 	origin = ft_atovec(argv[1], XYZ);
 	normal = ft_atovec(argv[2], UNIT);
-	color = ft_atovec(argv[4], RGB);
+	color = ft_atovec(argv[3], RGB);
 
 	tmp = object_init(PL, plane_init(origin, normal), vec_div_double(color, 255));
 	obj_add(&(info->obj), tmp);

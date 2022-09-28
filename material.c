@@ -33,7 +33,6 @@ t_plane	*plane_init(t_point center, t_vec normal)
         return (NULL);
 	init->center = center;
 	init->normal = normal;
-    init->radius = 2;
 	return (init);
 }
 

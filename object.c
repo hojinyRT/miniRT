@@ -1,5 +1,6 @@
 #include "minirt.h"
 
+
 t_point	ray_at(t_ray ray, double t)
 {
 	t_point at;
@@ -44,11 +45,7 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	double		root;
 
 
-    // printf("hit cy!\n");
-    // -half_b +- root(b2 - ac) / a
-    // printf("IN ! \n");
 	cy = (t_cylinder *)obj->element;
-    // printf("%lf, %lf, %lf, %lf,%lf,%lf , %lf, %lf\n",cy->center.x,cy->center.y,cy->center.z, cy->normal.x,cy->normal.y,cy->normal.z, cy->radius, cy->height);
 	oc = vec_sub(ray.orig, cy->center);
 	a = vec_dot(ray.dir, ray.dir) - vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal);
 	half_b = vec_dot(oc, ray.dir) - ((vec_dot(ray.dir, cy->normal)) *  vec_dot(oc, cy->normal));
@@ -60,12 +57,17 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	root = (-half_b - sqrtd) / a;
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	rec->albedo = obj->albedo;
-	rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
+	t_vec cp, cq;
+	double	cq_val;
+
+	// cp = vec_sub(rec->p, cy->center);
+	// cq_val = vec_dot(cp, cy->normal);
+	// cq = vec_multi_double(cy->normal, cq_val);
+	// rec->normal = vec_sub(cp, cq);
 	// set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0))
 	{
-		printf("근 바꿈\n");
+		// printf("근 바꿈\n");
 		root = (-half_b + sqrtd) / a;
 		if (root < rec->tmin || rec->tmax < root)
 			return (FALSE);
@@ -74,19 +76,21 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 		// rec->albedo = obj->albedo;
 		rec->t = root;
 		rec->p = ray_at(ray, root);
-		rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
+		// rec->normal = vec_sub(t,y); // 정규화된 법선 벡터.
 	}
-    // if (root < rec->tmin || rec->tmax < root)
-		// return (FALSE);
-	// rec->albedo = obj->albedo;
+    if (root < rec->tmin || rec->tmax < root)
+		return (FALSE);
+	cp = vec_sub(rec->p, cy->center);
+	cq_val = vec_dot(cp, cy->normal);
+	cq = vec_multi_double(cy->normal, cq_val);
+	rec->normal = vec_unit(vec_sub(cp, cq));
+	rec->albedo = obj->albedo;
 	// rec->t = root;
 	// rec->p = ray_at(ray, root);
 	// rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
-	// set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) && vec_dot(vec_sub(rec->p, cy->center), cy->normal) < cy->height)
 	{
-		if (root == (-half_b + sqrtd) / a)
-			printf("해결함\n");
 		return (TRUE);
 	}
     return (FALSE);
@@ -131,6 +135,32 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	return (TRUE);
 }
 
+// int	hit_cylinder_cap(t_object *obj, t_ray ray, t_hit_record *rec)
+// {
+// 	t_plane	*pl;
+// 	double	root;
+// 	double	numrator;
+// 	double	denominator;
+
+// 	pl = (t_plane *)obj->element;
+// 	denominator = vec_dot(ray.dir, pl->normal);
+// 	if (fabs(denominator) < EPSILON)
+// 		return (FALSE);
+// 	numrator = vec_dot(vec_sub(pl->center, ray.orig), pl->normal);
+// 	root = numrator / denominator;
+// 	if (root < rec->tmin || rec->tmax < root)
+// 		return (FALSE);
+// 	rec->t = root;
+// 	rec->p = ray_at(ray, root);
+// 	rec->albedo = obj->albedo;
+// 	rec->normal = pl->normal;
+//     t_vec pcv = vec_sub(rec->p, pl->center);
+//     // printf("plr %lf\n", pl->radius);
+//     // if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
+//         // return (FALSE);
+// 	return (TRUE);
+// }
+
 int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_plane	*pl;
@@ -150,34 +180,9 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
-    t_vec pcv = vec_sub(rec->p, pl->center);
-    // printf("plr %lf\n", pl->radius);
-    // if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
-        // return (FALSE);
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
 }
-
-// int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
-// {
-// 	t_plane	*pl;
-// 	double	root;
-// 	double	numrator;
-// 	double	denominator;
-
-// 	pl = (t_plane *)obj->element;
-// 	denominator = vec_dot(ray.dir, pl->normal);
-// 	if (fabs(denominator) < EPSILON)
-// 		return (FALSE);
-// 	numrator = vec_dot(vec_sub(pl->center, ray.orig), pl->normal);
-// 	root = numrator / denominator;
-// 	if (root < rec->tmin || rec->tmax < root)
-// 		return (FALSE);
-// 	rec->t = root;
-// 	rec->p = ray_at(ray, root);
-// 	rec->albedo = obj->albedo;
-// 	rec->normal = pl->normal;
-// 	return (TRUE);
-// }
 
 int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
 {

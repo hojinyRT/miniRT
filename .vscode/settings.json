@@ -5,6 +5,7 @@
         "locale": "c",
         "atomic": "c",
         "unordered_map": "c",
-        "utility": "c"
+        "utility": "c",
+        "cmath": "c"
     }
 }
