@@ -32,8 +32,66 @@ int in_shadow(t_object *objs, t_ray light_ray, double light_len)
     return (FALSE);
 }
 
+int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
+{
+	t_cylinder	*cy;
+	t_vec		oc;
+	double		a;
+	double		half_b;
+	double		c;
+	double		dis;
+	double		sqrtd;
+	double		root;
+
+
+    // printf("hit cy!\n");
+    // -half_b +- root(b2 - ac) / a
+    // printf("IN ! \n");
+	cy = (t_cylinder *)obj->element;
+    // printf("%lf, %lf, %lf, %lf,%lf,%lf , %lf, %lf\n",cy->center.x,cy->center.y,cy->center.z, cy->normal.x,cy->normal.y,cy->normal.z, cy->radius, cy->height);
+	oc = vec_sub(ray.orig, cy->center);
+	a = vec_dot(ray.dir, ray.dir) - vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal);
+	half_b = vec_dot(oc, ray.dir) - ((vec_dot(ray.dir, cy->normal)) *  vec_dot(oc, cy->normal));
+	c = vec_len_sqr(oc) - vec_dot(oc, cy->normal) * vec_dot(oc, cy->normal) - (cy->radius) * (cy->radius);
+	dis = half_b * half_b - a * c;
+	if (dis < 0)
+		return (FALSE);
+	sqrtd = sqrt(dis);
+	root = (-half_b - sqrtd) / a;
+	rec->t = root;
+	rec->p = ray_at(ray, root);
+	rec->albedo = obj->albedo;
+	rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height))
+	{
+		printf("근 바꿈\n");
+		root = (-half_b + sqrtd) / a;
+		// if (root < rec->tmin || rec->tmax < root)
+		// 	return (FALSE);
+		// rec->albedo = obj->albedo;
+		rec->t = root;
+		rec->p = ray_at(ray, root);
+		rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
+	}
+    // if (root < rec->tmin || rec->tmax < root)
+		// return (FALSE);
+	// rec->albedo = obj->albedo;
+	// rec->t = root;
+	// rec->p = ray_at(ray, root);
+	// rec->normal = vec_div_double(vec_sub(rec->p, cy->center), cy->radius); // 정규화된 법선 벡터.
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) && vec_dot(vec_sub(rec->p, cy->center), cy->normal) < cy->height)
+	{
+		if (root == (-half_b + sqrtd) / a)
+			printf("해결함\n");
+		return (TRUE);
+	}
+    return (FALSE);
+}
+
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
-{	
+{
 	t_sphere	*sp;
 	t_vec		oc;
 	double		a;
@@ -90,8 +148,34 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
+    t_vec pcv = vec_sub(rec->p, pl->center);
+    // printf("plr %lf\n", pl->radius);
+    // if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
+        // return (FALSE);
 	return (TRUE);
 }
+
+// int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
+// {
+// 	t_plane	*pl;
+// 	double	root;
+// 	double	numrator;
+// 	double	denominator;
+
+// 	pl = (t_plane *)obj->element;
+// 	denominator = vec_dot(ray.dir, pl->normal);
+// 	if (fabs(denominator) < EPSILON)
+// 		return (FALSE);
+// 	numrator = vec_dot(vec_sub(pl->center, ray.orig), pl->normal);
+// 	root = numrator / denominator;
+// 	if (root < rec->tmin || rec->tmax < root)
+// 		return (FALSE);
+// 	rec->t = root;
+// 	rec->p = ray_at(ray, root);
+// 	rec->albedo = obj->albedo;
+// 	rec->normal = pl->normal;
+// 	return (TRUE);
+// }
 
 int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
 {
@@ -102,6 +186,8 @@ int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
         hit_result = hit_sphere(obj, ray, rec);
 	else if (obj->type == PL)
         hit_result = hit_plane(obj, ray, rec);
+    else if (obj->type == CY)
+        hit_result = hit_cylinder(obj, ray, rec);
     return (hit_result);
 }
 
@@ -137,7 +223,7 @@ t_vec        point_light_get(t_info *info, t_light *light)
     t_color    diffuse;
     t_vec      light_dir;
     double      kd; // diffuse의 강도
-        
+
     t_color    specular;
     t_vec      view_dir;
     t_vec      reflect_dir;
@@ -166,7 +252,7 @@ t_vec        point_light_get(t_info *info, t_light *light)
     view_dir = vec_unit(vec_multi_double(info->ray.dir, -1));
     reflect_dir = reflect(vec_multi_double(light_dir, -1), info->rec.normal);
     ksn = 64; // shininess value
-    ks = 0.5; // specular strength 강도 계수  
+    ks = 0.1; // specular strength 강도 계수
     spec = pow(fmax(vec_dot(view_dir, reflect_dir), 0.0), ksn);
     specular = vec_multi_double(vec_multi_double(light->light_color, ks), spec);
     brightness = light->brightness * LUMEN; // 기준 광속/광량을 정의한 매크로

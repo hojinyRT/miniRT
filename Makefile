@@ -3,16 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
+#    By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/27 14:26:06 by jinypark         ###   ########.fr        #
+#    Updated: 2022/09/28 12:24:39 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME = miniRT
 
 CC = cc
+RM = rm -rvf
 
 CFLAGS = -Wall -Wextra -Werror
 
@@ -52,8 +53,9 @@ clean:
 	rm -f $(OBJS) $(OBJS_BONUS)
 
 fclean: clean
-	make fclean -C $(LIBFT_DIR)
-	rm -f $(NAME)
+	@make fclean -C $(LIBFT_DIR)
+	@echo ">>>>>>deleted list<<<<<<<"
+	$(RM) $(NAME)
 
 re:
 	make fclean

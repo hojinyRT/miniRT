@@ -1,3 +1,4 @@
+
 #include "minirt.h"
 
 void    obj_add(t_object **list, t_object *new)
@@ -103,7 +104,7 @@ void	put_pl(t_info *info, char **argv)
 
 	origin = ft_atovec(argv[1], XYZ);
 	normal = ft_atovec(argv[2], UNIT);
-	color = ft_atovec(argv[3], RGB);
+	color = ft_atovec(argv[4], RGB);
 
 	tmp = object_init(PL, plane_init(origin, normal), vec_div_double(color, 255));
 	obj_add(&(info->obj), tmp);
@@ -172,6 +173,12 @@ t_info	info_init(t_info info, char *file)
 		ft_strerror("읽을 거 없음");
 	while(line)
 	{
+		if (line[0] == '#')
+		{
+			free(line);
+			line = get_next_line(fd);
+			continue ;
+		}
 		split = ft_split(line, ' ');
 		if (split == NULL)
 			ft_strerror("스플릿 실패(할당 실패)");
@@ -190,10 +197,10 @@ int	key_press(int keycode, t_info *info)
 	return (0);
 }
 
-void	print_obj(t_object *obj) // 지워야함 
+void	print_obj(t_object *obj) // 지워야함
 {
 	t_object	*curr;
-	
+
 	curr = obj;
 	printf("==========print_obj start==========\n");
 	while (curr)
@@ -244,7 +251,7 @@ void	print_obj(t_object *obj) // 지워야함
 	printf("==========print_obj end==========\n");
 }
 int	convert_color(t_vec clr)
-{	
+{
 	int tmp = ((int)clr.x * 16 * 16 * 16 * 16) + ((int)clr.y * 16 * 16) + (int)(clr.z);
 	return (tmp);
 }
@@ -269,8 +276,10 @@ t_color    ray_color(t_info info)
     double			t;
 
 	info.rec = record_init();
+	// if (hit(info.obj, info.ray, &(info.rec)))
+	// 	return (phong_lighting(&info));
 	if (hit(info.obj, info.ray, &(info.rec)))
-		return (phong_lighting(&info));
+		return (vec_init(152,124,242));
 	else
 	{
 		t = 0.5 * (info.ray.dir.y + 1.0);
@@ -287,16 +296,16 @@ t_ray	ray_init(t_point orig, t_vec dir)
 	return (init);
 }
 
-// void    set_face_normal(t_ray ray, t_hit_record *rec)
-// {
-//     // 광선의 방향벡터와 교점의 법선벡터의 내적이 음수이면 광선은 앞면(객체의)에 hit 한 것이다
-//     rec->front_face = vec_dot(ray.dir, rec->normal) < 0;
-//     // 광선의 앞면에 hit 면 그대로 아니면 법선을 반대로 뒤집는다. 
-// 	// (항상 광선 방향벡터와 법선 벡터를 반대인 상태로 사용하기위해)
-// 	if (rec->front_face == 0)	
-// 		rec->normal = vec_multi_double(rec->normal, -1);
-//     return ;
-// }
+void    set_face_normal(t_ray ray, t_hit_record *rec)
+{
+    // 광선의 방향벡터와 교점의 법선벡터의 내적이 음수이면 광선은 앞면(객체의)에 hit 한 것이다
+    rec->front_face = vec_dot(ray.dir, rec->normal) < 0;
+    // 광선의 앞면에 hit 면 그대로 아니면 법선을 반대로 뒤집는다.
+	// (항상 광선 방향벡터와 법선 벡터를 반대인 상태로 사용하기위해)
+	if (rec->front_face == 0)
+		rec->normal = vec_multi_double(rec->normal, -1);
+    return ;
+}
 
 int main(int argc, char **argv)
 {
@@ -316,8 +325,8 @@ int main(int argc, char **argv)
 	mlx.img.addr = (int *)mlx_get_data_addr(mlx.img.img_ptr, \
 		&(mlx.img.bits_per_pixel), &(mlx.img.line_length), &(mlx.img.endian));
 	idx[Y] = WIN_H - 1;
-	
-	t_color color; // 지워야함 
+
+	t_color color; // 지워야함
 	while (idx[Y] >= 0)
 	{
 		idx[X] = 0;
@@ -325,7 +334,7 @@ int main(int argc, char **argv)
 		{
 			vdx[U] = (double)idx[X] / (WIN_W - 1);
 			vdx[V] = (double)idx[Y] / (WIN_H - 1);
-			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);			
+			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);
 			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
 			color = ray_color(info);
 			my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);

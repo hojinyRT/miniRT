@@ -34,11 +34,11 @@
 # define U 0
 # define V 1
 
-# define IMG_H 1440
-# define IMG_W 2560
+# define IMG_H 720
+# define IMG_W 1280
 
-# define WIN_H 1440
-# define WIN_W 2560
+# define WIN_H 720
+# define WIN_W 1280
 
 # define A 0
 # define C 1
@@ -112,6 +112,7 @@ typedef struct s_plane
 {
 	t_point	center;
 	t_vec	normal;
+	double	radius;
 }			t_plane;
 
 typedef struct s_cylinder
@@ -128,7 +129,7 @@ typedef struct  s_object
     t_object_type   type;
     void            *element;
     void            *next;
-	t_vec			albedo;
+	t_color			albedo;
 }                   t_object;
 
 
@@ -205,6 +206,7 @@ int				hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
 int				in_shadow(t_object *objs, t_ray light_ray, double light_len);
 t_ray			ray_init(t_point orig, t_vec dir);
 
+void    set_face_normal(t_ray ray, t_hit_record *rec);
 
 // ---------tmp--------//
 void	print_obj(t_object *obj);
