@@ -6,7 +6,7 @@
 #    By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/07/18 13:56:06 by jinypark         ###   ########.fr        #
+#    Updated: 2022/09/29 13:45:16 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -43,10 +43,12 @@ endif
 all: $(NAME)
 
 %.o : %.c
-	$(CC) $(CFLAGS) -c -o $@ $<
+	@echo "[$<] compiling ..."
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 $(NAME): $(OBJS)
-	ar rcs $@ $^
+	@echo "[$@] making library ..."
+	@ar rcs $@ $^
 
 
 bonus:

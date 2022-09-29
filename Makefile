@@ -6,7 +6,7 @@
 #    By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/29 13:34:12 by jinypark         ###   ########.fr        #
+#    Updated: 2022/09/29 13:42:30 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,26 +20,25 @@ MLX_DIR 	=	mlx
 MANDA_SRCS 	=	minirt.c vector.c material.c utils.c object.c
 BONUS_SRCS 	=	minirt.c vector.c
 
-SRCS 		=	minirt.c vector.c material.c utils.c object.c
-OBJS_SRCS 	=	$(SRCS:.c=.o)
-OBJS_BONUS	=	$(BONUS:.c=.o)
+OBJS_MANDA 	=	$(MANDA_SRCS:.c=.o)
+OBJS_BONUS	=	$(BONUS_SRCS:.c=.o)
 
 ifdef BONUS_FLAG
 	OBJS = $(OBJS_BONUS)
 else
-	OBJS = $(OBJS_SRCS)
+	OBJS = $(OBJS_MANDA)
 endif
 
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	make -C $(LIBFT_DIR)
-	@echo [$@] linking ...
+	@make -C $(LIBFT_DIR)
+	@echo "[$@] linking ..."
 	@$(CC) -o $@ $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit -fsanitize=address
 # make -C $(MLX_DIR)
 
 %.o : %.c
-	@echo [$<] compling ...
+	@echo [$<] compiling ...
 	@$(CC) -c -o $@ $<
 
 bonus:

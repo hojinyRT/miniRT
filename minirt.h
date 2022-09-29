@@ -40,13 +40,17 @@
 # define WIN_H 720
 # define WIN_W 1280
 
-# define A 0
-# define C 1
-# define L 2
-# define SP 3
-# define PL 4
-# define CY 5
-# define CAP 6
+enum e_material_type
+{
+	A,
+	C,
+	L,
+	SP,
+	PL,
+	CY,
+	CAP,
+	CN
+};
 
 # define RGB 0
 # define XYZ 1
@@ -124,6 +128,15 @@ typedef struct s_cylinder
 	double	height;
 	t_vec	normal;
 }			t_cylinder;
+
+typedef struct s_cone
+{
+	t_point	center;
+	double	radius;
+	double	radius2;
+	double	height;
+	t_vec	normal;
+}			t_cone;
 
 typedef struct  s_object
 {
