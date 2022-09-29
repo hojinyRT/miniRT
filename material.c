@@ -25,7 +25,7 @@ t_sphere	*sphere_init(t_point center, double radius)
 	return (init);
 }
 
-t_plane	*plane_init(t_point center, t_vec normal)
+t_plane	*plane_init(t_point center, t_vec normal, double radius)
 {
 	t_plane *init;
 
@@ -33,6 +33,7 @@ t_plane	*plane_init(t_point center, t_vec normal)
         return (NULL);
 	init->center = center;
 	init->normal = normal;
+    init->radius = radius;
 	return (init);
 }
 

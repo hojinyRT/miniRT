@@ -46,6 +46,7 @@
 # define SP 3
 # define PL 4
 # define CY 5
+# define CAP 6
 
 # define RGB 0
 # define XYZ 1
@@ -112,6 +113,7 @@ typedef struct s_plane
 {
 	t_point	center;
 	t_vec	normal;
+	double	radius;
 }			t_plane;
 
 typedef struct s_cylinder
@@ -179,7 +181,7 @@ t_vec	vec_init(double x, double y, double z);
 
 t_object    *object_init(t_object_type type, void *element, t_vec albedo);
 t_sphere	*sphere_init(t_point center, double radius);
-t_plane	*plane_init(t_point center, t_vec normal);
+t_plane	*plane_init(t_point center, t_vec normal, double radius);
 t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal);
 t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness);
 
