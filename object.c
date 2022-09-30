@@ -14,7 +14,7 @@ t_hit_record record_init(void)
     t_hit_record    record;
 
     record.tmin = EPSILON;
-    record.tmax = 100000;
+    record.tmax = 10000;
     return (record);
 }
 
@@ -79,7 +79,7 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 
 int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 {
-	t_cylinder		*cone;
+	t_cylinder	*cy;
 	t_vec		oc;
 	double		a;
 	double		half_b;
@@ -87,42 +87,46 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	double		dis;
 	double		sqrtd;
 	double		root;
-	t_vec 		cp, cq;
-	double		cq_val;
-	double		x;
+	t_vec cp, cq;
+	double	cq_val;
+	double	m;
+	t_vec	w;
 
-	cone = (t_cylinder *)obj->element;
-	oc = vec_sub(ray.orig, cone->center);
-	a = vec_dot(ray.dir, ray.dir) - vec_dot(ray.dir, cone->normal) * vec_dot(ray.dir, cone->normal) - vec_len_sqr(ray.dir) * vec_len_sqr(cone->normal);
-	half_b = vec_dot(oc, ray.dir) - ((vec_dot(ray.dir, cone->normal)) *  vec_dot(oc, cone->normal)) - vec_dot(ray.dir, vec_sub(ray.orig, cone->center)) * vec_len_sqr(cone->normal);
-	c = vec_len_sqr(oc) - vec_dot(oc, cone->normal) * vec_dot(oc, cone->normal) - vec_len_sqr(vec_sub(ray.orig, cone->center)) * vec_len_sqr(cone->normal);
-  	dis = half_b * half_b - a * c;
+	cy = (t_cylinder *)obj->element;
+	w = vec_sub(ray.orig, vec_add(cy->center, vec_multi_double(cy->normal, cy->height)));
+	m = cy->radius * cy->radius / vec_len_sqr(vec_sub(cy->center, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))));
+	oc = vec_sub(ray.orig, cy->center);
+	a = vec_dot(ray.dir, ray.dir) - (m * vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal)) - (vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal));
+	half_b = vec_dot(w, ray.dir) - (m * ((vec_dot(ray.dir, cy->normal)) *  vec_dot(w, cy->normal))) - (vec_dot(ray.dir, cy->normal) * vec_dot(w, cy->normal));
+	c = vec_len_sqr(w) - (m * vec_dot(w, cy->normal) * vec_dot(w, cy->normal)) - (vec_dot(w, cy->normal) * vec_dot(w, cy->normal));
+	dis = half_b * half_b - a * c;
 	if (dis < 0)
 		return (FALSE);
 	sqrtd = sqrt(dis);
 	root = (-half_b - sqrtd) / a;
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	// if ((vec_dot(vec_sub(rec->p, cone->center), cone->normal) > cone->height) || (vec_dot(vec_sub(rec->p, cone->center), cone->normal) < 0))
-	// {
-	// 	root = (-half_b + sqrtd) / a;
-	// 	if (root < rec->tmin || rec->tmax < root)
-	// 		return (FALSE);
-	// 	rec->t = root;
-	// 	rec->p = ray_at(ray, root);
-	// }
+	if ((vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) > cy->height) || (vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) < 0))
+	{
+		root = (-half_b + sqrtd) / a;
+		if (root < rec->tmin || rec->tmax < root)
+			return (FALSE);
+		rec->t = root;
+		rec->p = ray_at(ray, root);
+	}
     if (root < rec->tmin || rec->tmax < root)
 		return (FALSE);
-	cp = vec_sub(rec->p, cone->center);
-	cq_val = vec_dot(cp, cone->normal);
-	cq = vec_multi_double(cone->normal, cq_val);
-	// rec->normal = vec_unit(vec_sub(cp, cq));
+	cp = vec_sub(rec->p, cy->center);
+	cq_val = vec_dot(cp, cy->normal);
+	cq = vec_multi_double(cy->normal, cq_val);
+	rec->normal = vec_unit(vec_sub(cp, cq));
 	rec->albedo = obj->albedo;
-	// set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	// if (0 <= vec_dot(vec_sub(rec->p, cone->center), cone->normal) && vec_dot(vec_sub(rec->p, cone->center), cone->normal) < cone->height)
-	// 	return (TRUE);
-    return (TRUE);
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	if (0 <= vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) && vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) < cy->height)
+		return (TRUE);
+    return (FALSE);
 }
+
 
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 {
@@ -283,8 +287,8 @@ t_vec        point_light_get(t_info *info, t_light *light)
     light_dir = vec_sub(light->origin, info->rec.p);
     light_len = vec_len(light_dir);
     light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
-    // if (in_shadow(info->obj, light_ray, light_len))
-        // return (vec_init(0,0,0));
+    if (in_shadow(info->obj, light_ray, light_len))
+        return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
     // 추가끝
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
@@ -292,7 +296,7 @@ t_vec        point_light_get(t_info *info, t_light *light)
     diffuse = vec_multi_double(light->light_color, kd);
     view_dir = vec_unit(vec_multi_double(info->ray.dir, -1));
     reflect_dir = reflect(vec_multi_double(light_dir, -1), info->rec.normal);
-    ksn = 64; // shininess value
+    ksn = 30; // shininess value
     ks = 0.1; // specular strength 강도 계수
     spec = pow(fmax(vec_dot(view_dir, reflect_dir), 0.0), ksn);
     specular = vec_multi_double(vec_multi_double(light->light_color, ks), spec);
