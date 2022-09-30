@@ -133,8 +133,8 @@ void	put_cy(t_info *info, char **argv)
 	color = ft_atovec(argv[5], RGB);
 	tmp = object_init(CY, cylinder_init(get_cap_point(center, format[1], normal, -1), format[0], format[1], normal), vec_div_double(color, 255));
 	obj_add(&(info->obj), tmp);
-	// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, 1), normal, format[0]), vec_div_double(color, 255));
-	// obj_add(&(info->obj), tmp);
+	tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255));
+	obj_add(&(info->obj), tmp);
 	// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255));
 	// obj_add(&(info->obj), tmp);
 }

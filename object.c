@@ -91,12 +91,17 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	double	cq_val;
 	double	m;
 	t_vec	w;
+	t_vec	v;
 
+	// h = (C - H) = center - center + (normal * height) = (normal * height )
+	// H = center + (normal * height)
+	// v = ray.dir
+	// h unit => normal
 	cy = (t_cylinder *)obj->element;
 	w = vec_sub(ray.orig, vec_add(cy->center, vec_multi_double(cy->normal, cy->height)));
 	m = cy->radius * cy->radius / vec_len_sqr(vec_sub(cy->center, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))));
 	oc = vec_sub(ray.orig, cy->center);
-	a = vec_dot(ray.dir, ray.dir) - (m * vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal)) - (vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal));
+	a = vec_dot(ray.dir, ray.dir) - (m * (vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal))) - (vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal));
 	half_b = vec_dot(w, ray.dir) - (m * ((vec_dot(ray.dir, cy->normal)) *  vec_dot(w, cy->normal))) - (vec_dot(ray.dir, cy->normal) * vec_dot(w, cy->normal));
 	c = vec_len_sqr(w) - (m * vec_dot(w, cy->normal) * vec_dot(w, cy->normal)) - (vec_dot(w, cy->normal) * vec_dot(w, cy->normal));
 	dis = half_b * half_b - a * c;
@@ -116,13 +121,16 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	}
     if (root < rec->tmin || rec->tmax < root)
 		return (FALSE);
-	cp = vec_sub(rec->p, cy->center);
-	cq_val = vec_dot(cp, cy->normal);
-	cq = vec_multi_double(cy->normal, cq_val);
-	rec->normal = vec_unit(vec_sub(cp, cq));
+	t_vec h = vec_add(cy->center, vec_multi_double(cy->normal, cy->height));
+	cp = vec_sub(rec->p, h);
+	// cq_val = vec_dot(cp, cy->normal);
+	// cq = vec_multi_double(cy->normal, cq_val);
+	// v = vec_multi_double(cy->normal, -1);
+	v = vec_unit(vec_sub(cy->center, h));
+	rec->normal = vec_unit(vec_sub(cp, vec_multi_double(v, (vec_len_sqr(cp) / vec_dot(cp, v)))));
 	rec->albedo = obj->albedo;
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	if (0 <= vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) && vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) < cy->height)
+	if (0 >= vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) && vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) > -cy->height)
 		return (TRUE);
     return (FALSE);
 }

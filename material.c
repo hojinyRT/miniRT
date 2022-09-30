@@ -31,9 +31,11 @@ t_plane	*plane_init(t_point center, t_vec normal, double radius)
 
     if(!(init = (t_plane *)malloc(sizeof(t_plane))))
         return (NULL);
+
 	init->center = center;
 	init->normal = normal;
     init->radius = radius;
+    printf("plane %lf %lf %lf\n", center.x, center.y, center.z);
 	return (init);
 }
 
@@ -48,6 +50,7 @@ t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec no
     init->radius2 = radius * radius;
 	init->height = height;
     init->normal = normal;
+    printf("%lf %lf %lf\n", center.x, center.y, center.z);
 	return (init);
 }
 
