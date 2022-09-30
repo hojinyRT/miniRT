@@ -61,6 +61,30 @@ enum e_material_type
 
 typedef int t_object_type;
 
+typedef struct s_vec
+{
+	double	x;
+	double	y;
+	double	z;
+}		    t_vec;
+
+typedef t_vec	t_color;
+typedef t_vec	t_point;
+
+typedef struct s_texture
+{
+	int				type;
+	t_color			color;
+	char			*file_name;
+	void			*image;
+	void			*addr;
+	int				height;
+	int				width;
+	int				bits_per_pixel;
+	int				line_length;
+	int				endian;
+}	t_texture;
+
 typedef struct  s_img
 {
 	void	*img_ptr;
@@ -72,20 +96,11 @@ typedef struct  s_img
 
 typedef struct	s_mlx
 {
-	void	*ptr;
-	void	*win;
-	t_img	img;
+	void		*ptr;
+	void		*win;
+	t_img		img;
+	t_texture	texture;
 }			t_mlx;
-
-typedef struct s_vec
-{
-	double	x;
-	double	y;
-	double	z;
-}		    t_vec;
-
-typedef t_vec	t_color;
-typedef t_vec	t_point;
 
 typedef struct s_ray
 {
@@ -146,7 +161,6 @@ typedef struct  s_object
 	t_color			albedo;
 }                   t_object;
 
-
 typedef struct s_hit_record
 {
     t_point		p;
@@ -154,6 +168,8 @@ typedef struct s_hit_record
     double		tmin;
     double		tmax;
     double		t;
+	double		u;
+	double		v;
     int			front_face;
 	t_vec		albedo;
 }				t_hit_record;
@@ -214,7 +230,7 @@ int				hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
 int				hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
 int				hit(t_object *obj, t_ray ray, t_hit_record *rec);
 t_vec			point_light_get(t_info *info, t_light *light);
-t_vec			phong_lighting(t_info *info);
+t_vec	phong_lighting(t_info *info);
 t_point			ray_at(t_ray ray, double t);
 int				hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
 int				in_shadow(t_object *objs, t_ray light_ray, double light_len);

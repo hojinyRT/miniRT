@@ -13,6 +13,7 @@ t_hit_record record_init(void)
 {
     t_hit_record    record;
 
+	// ft_memset(&record, 0, sizeof(t_hit_record));
     record.tmin = EPSILON;
     record.tmax = 10000;
     return (record);
@@ -203,6 +204,23 @@ int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
 	return (TRUE);
 }
 
+void	get_plane_uv(t_hit_record *rec, t_point center, double size)
+{
+	const t_vec		p = vec_sub(rec->p, center);
+	const t_vec		n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
+
+	e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
+	if (e1.x == 0 && e1.y == 0 && e1.z == 0)
+		e1 = vec_unit(vec_cross(n, vec_init(1, 1, 0)));
+	e2 = vec_unit(vec_cross(n, e1));
+	rec->u = vec_dot(e1, p) / size;
+	rec->v = vec_dot(e2, p) / size;
+	rec->u = (rec->u + 1) / 2;
+	rec->v = (rec->v + 1) / 2;
+}
+
 int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_plane	*pl;
@@ -222,6 +240,7 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
+	get_plane_uv(rec, pl->center, 1);
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
 }
@@ -312,10 +331,23 @@ t_vec        point_light_get(t_info *info, t_light *light)
     return (vec_multi_double(vec_add(diffuse, specular), brightness));
 }
 
+t_color	checkerboard_value(t_hit_record rec)
+{
+	const int		width = 1;
+	const int		height = 1;
+	const double	u2 = floor(rec.u * width);
+	const double	v2 = floor(rec.v * height);
+
+	if (fmod(u2 + v2, 2.) == 0)
+		return (rec.albedo);
+	return (vec_init(1, 1, 1));
+}
+
 t_vec	phong_lighting(t_info *info)
 {
     t_color		light_color;
     t_light		*lights;
+	t_color		color;
 
     light_color = vec_init(0, 0, 0); //광원이 하나도 없다면, 빛의 양은 (0, 0, 0)일 것이다.
     lights = info->light;
@@ -327,6 +359,7 @@ t_vec	phong_lighting(t_info *info)
 	// printf("%lf, %lf, %lf\n", info->ambient.x, info->ambient.y, info->ambient.z);
     light_color = vec_add(light_color, info->ambient);
 	// printf("%lf,%lf,%lf\n", light_color.x, light_color.y, light_color.z);
-    return (vec_multi_double(vec_min(vec_multi(light_color, info->rec.albedo), vec_init(1, 1, 1)), 255));
+	color = checkerboard_value((info->rec));
+    return (vec_multi_double(vec_min(vec_multi(light_color, color), vec_init(1, 1, 1)), 255));
     //모든 광원에 의한 빛의 양을 구한 후, 오브젝트의 반사율과 곱해준다. 그 값이 (1, 1, 1)을 넘으면 (1, 1, 1)을 반환한다.
 }
