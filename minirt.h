@@ -48,8 +48,8 @@ enum e_material_type
 	SP,
 	PL,
 	CY,
-	CAP,
-	CN
+	CN,
+	CAP
 };
 
 # define RGB 0
@@ -135,6 +135,7 @@ typedef struct s_plane
 	double	radius;
 }			t_plane;
 
+
 typedef struct s_cylinder
 {
 	t_point	center;
@@ -144,14 +145,7 @@ typedef struct s_cylinder
 	t_vec	normal;
 }			t_cylinder;
 
-typedef struct s_cone
-{
-	t_point	center;
-	double	radius;
-	double	radius2;
-	double	height;
-	t_vec	normal;
-}			t_cone;
+typedef t_cylinder	t_cone;
 
 typedef struct  s_object
 {
@@ -168,10 +162,10 @@ typedef struct s_hit_record
     double		tmin;
     double		tmax;
     double		t;
-	double		u;
-	double		v;
     int			front_face;
 	t_vec		albedo;
+	double		u;
+	double		v;
 }				t_hit_record;
 
 typedef struct  s_light
@@ -210,9 +204,11 @@ t_vec	vec_init(double x, double y, double z);
 
 t_object    *object_init(t_object_type type, void *element, t_vec albedo);
 t_sphere	*sphere_init(t_point center, double radius);
-t_plane	*plane_init(t_point center, t_vec normal, double radius);
+t_plane		*plane_init(t_point center, t_vec normal, double radius);
 t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal);
 t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness);
+t_cone		*cone_init(t_point center, double radius, double height, t_vec normal);
+
 
 
 // ---------utils.c---------//

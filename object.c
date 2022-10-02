@@ -78,33 +78,99 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
     return (FALSE);
 }
 
-int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
+// int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)  //illusion catalyst function
+// {
+// 	t_cylinder	*cy;
+// 	t_vec		oc;
+// 	double		a;
+// 	double		half_b;
+// 	double		c;
+// 	double		dis;
+// 	double		sqrtd;
+// 	double		root;
+// 	t_vec cp, cq;
+// 	double	cq_val;
+// 	double	m;
+// 	t_vec	w;
+// 	t_vec	v;
+// 	t_vec	h;
+// 	t_point	h_point;
+
+// 	cy = (t_cylinder *)obj->element;
+// 	h_point = vec_add(vec_multi_double(cy->normal, cy->height), cy->center);
+// 	w = vec_sub(ray.orig, h_point);
+// 	m = cy->radius2 / (cy->height * cy->height);
+// 	oc = vec_sub(rec->p, cy->center);
+//     h = vec_multi_double(cy->normal, -1);
+// 	a = vec_dot(ray.dir, ray.dir) - ((m + 1) * vec_dot(ray.dir, h) * vec_dot(ray.dir, h));
+// 	half_b = vec_dot(ray.dir, w) - ((m + 1) * (vec_dot(ray.dir, h) * vec_dot(w, h)));
+// 	c = vec_dot(w, w) - ((m + 1) * (vec_dot(w, h)) * (vec_dot(w, h)));
+// 	printf("a = %lf || b = %lf || c = %lf\n", a, half_b, c);
+// 	dis = half_b * half_b - a * c;
+// 	if (dis < 0)
+// 		return (FALSE);
+// 	sqrtd = sqrt(dis);
+// 	root = (-half_b - sqrtd) / a;
+// 	rec->t = root;
+// 	rec->p = ray_at(ray, root);
+// 	if (vec_dot(vec_sub(rec->p, h_point), h) < 0 
+//         || vec_dot(vec_sub(rec->p, h_point), h) > cy->height)
+// 	{
+// 		root = (-half_b + sqrtd) / a;
+// 		if (root < rec->tmin || rec->tmax < root)
+// 			return (FALSE);
+// 		rec->t = root;
+// 		rec->p = ray_at(ray, root);
+// 	}
+//     if (root < rec->tmin || rec->tmax < root)
+// 		return (FALSE);
+// 	// t_vec h = vec_add(cy->center, vec_multi_double(cy->normal, cy->height));
+// 	cp = vec_sub(rec->p, h);
+// 	// cq_val = vec_dot(cp, cy->normal);
+// 	// cq = vec_multi_double(cy->normal, cq_val);
+// 	// v = vec_multi_double(cy->normal, -1);
+// 	v = vec_unit(vec_sub(cy->center, h));
+// 	double  a_c = cy->height - ((vec_len_sqr(vec_sub(rec->p, h_point))) / (cy->height - vec_dot(vec_sub(rec->p, cy->center), cy->normal)));
+//     t_vec   ac_vec = vec_multi_double(cy->normal, a_c);
+// 	rec->normal = vec_unit(vec_sub(rec->p, vec_add(ac_vec, cy->center)));
+// 	// printf("x : %lf ", rec->normal.x);
+// 	// printf("y : %lf ", rec->normal.y);
+// 	// printf("z : %lf ", rec->normal.z);
+// 	// printf("h : %lf\n", vec_dot(vec_sub(rec->p, h_point), h));
+// 	rec->albedo = obj->albedo;
+// 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+// 	if (0 <= vec_dot(vec_sub(rec->p, h_point), h) && \
+//         vec_dot(vec_sub(rec->p, h_point), h) <= cy->height)
+// 		return (TRUE);
+//     return (FALSE);
+// }
+
+int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)   // our function
 {
 	t_cylinder	*cy;
-	t_vec		oc;
+	// t_vec		oc;
 	double		a;
 	double		half_b;
 	double		c;
 	double		dis;
 	double		sqrtd;
 	double		root;
-	t_vec cp, cq;
-	double	cq_val;
+	// t_vec cp, cq;
+	// double	cq_val;
 	double	m;
 	t_vec	w;
-	t_vec	v;
+	// t_vec	v;
 
-	// h = (C - H) = center - center + (normal * height) = (normal * height )
-	// H = center + (normal * height)
-	// v = ray.dir
-	// h unit => normal
 	cy = (t_cylinder *)obj->element;
-	w = vec_sub(ray.orig, vec_add(cy->center, vec_multi_double(cy->normal, cy->height)));
-	m = cy->radius * cy->radius / vec_len_sqr(vec_sub(cy->center, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))));
-	oc = vec_sub(ray.orig, cy->center);
-	a = vec_dot(ray.dir, ray.dir) - (m * (vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal))) - (vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal));
-	half_b = vec_dot(w, ray.dir) - (m * ((vec_dot(ray.dir, cy->normal)) *  vec_dot(w, cy->normal))) - (vec_dot(ray.dir, cy->normal) * vec_dot(w, cy->normal));
-	c = vec_len_sqr(w) - (m * vec_dot(w, cy->normal) * vec_dot(w, cy->normal)) - (vec_dot(w, cy->normal) * vec_dot(w, cy->normal));
+	w = vec_sub(ray.orig, cy->center);
+	m = cy->radius2 / (cy->height * cy->height);
+	double	v_n_pow = (vec_dot(ray.dir, cy->normal)) * (vec_dot(ray.dir, cy->normal));
+	double	v_n_dot_w_n = (vec_dot(ray.dir, cy->normal) * vec_dot(w, cy->normal));
+	double	w_n_pow = vec_dot(w, cy->normal) * (vec_dot(w, cy->normal));
+	a = vec_dot(ray.dir, ray.dir) - ((m + 1) * v_n_pow);
+	half_b = vec_dot(ray.dir, w) - ((m + 1) * v_n_dot_w_n) + (m * cy->height * vec_dot(ray.dir, cy->normal));
+	c = vec_dot(w, w) - ((m + 1) * w_n_pow) + (2 * m * cy->height * vec_dot(w, cy->normal)) - cy->radius2;
+	// printf("a = %lf || b = %lf || c = %lf\n", a, half_b, c);
 	dis = half_b * half_b - a * c;
 	if (dis < 0)
 		return (FALSE);
@@ -112,7 +178,8 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	root = (-half_b - sqrtd) / a;
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	if ((vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) > cy->height) || (vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) < 0))
+	if (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0 
+        || vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
 	{
 		root = (-half_b + sqrtd) / a;
 		if (root < rec->tmin || rec->tmax < root)
@@ -122,27 +189,24 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	}
     if (root < rec->tmin || rec->tmax < root)
 		return (FALSE);
-	t_vec h = vec_add(cy->center, vec_multi_double(cy->normal, cy->height));
-	cp = vec_sub(rec->p, h);
-	// cq_val = vec_dot(cp, cy->normal);
-	// cq = vec_multi_double(cy->normal, cq_val);
-	// v = vec_multi_double(cy->normal, -1);
-	v = vec_unit(vec_sub(cy->center, h));
-	rec->normal = vec_unit(vec_sub(cp, vec_multi_double(v, (vec_len_sqr(cp) / vec_dot(cp, v)))));
+	double	nom = vec_len_sqr(vec_sub(vec_sub(rec->p, cy->center), vec_multi_double(cy->normal, cy->height)));
+	double	denom = cy->height - vec_dot(vec_sub(rec->p, cy->center), cy->normal);
+	double	a_c = cy->height - (nom / denom);
+	rec->normal = vec_unit(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, a_c))));
 	rec->albedo = obj->albedo;
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	if (0 >= vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) && vec_dot(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, cy->height))), cy->normal) > -cy->height)
+	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) &&
+    	vec_dot(vec_sub(rec->p, cy->center), cy->normal) <= cy->height)
 		return (TRUE);
     return (FALSE);
 }
-
 
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_sphere	*sp;
 	t_vec		oc;
 	double		a;
-	double		b;
+	// double		b;
 	double		c;
 	double		dis;
 	double		half_b;
@@ -254,11 +318,11 @@ int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
         hit_result = hit_sphere(obj, ray, rec);
 	else if (obj->type == PL)
         hit_result = hit_plane(obj, ray, rec);
-    // else if (obj->type == CY)
-        // hit_result = hit_cylinder(obj, ray, rec);
+    else if (obj->type == CY)
+        hit_result = hit_cylinder(obj, ray, rec);
 	else if (obj->type == CAP)
         hit_result = hit_cap(obj, ray, rec);
-	else if (obj->type == CY)
+	else if (obj->type == CN)
         hit_result = hit_cone(obj, ray, rec);
     return (hit_result);
 }

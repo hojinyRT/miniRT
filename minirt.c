@@ -135,8 +135,27 @@ void	put_cy(t_info *info, char **argv)
 	obj_add(&(info->obj), tmp);
 	tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255));
 	obj_add(&(info->obj), tmp);
-	// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255));
-	// obj_add(&(info->obj), tmp);
+	tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255));
+	obj_add(&(info->obj), tmp);
+}
+
+void	put_cn(t_info *info, char **argv)
+{
+	t_object	*tmp;
+	t_point		center;
+	t_vec		normal;
+	double		format[2];
+	t_color		color;
+
+	center = ft_atovec(argv[1], XYZ);
+	normal = ft_atovec(argv[2], UNIT);
+	format[0] = ft_atod(argv[3]) / 2;
+	format[1] = ft_atod(argv[4]);
+	color = ft_atovec(argv[5], RGB);
+	tmp = object_init(CN, cone_init(get_cap_point(center, format[1], normal, -1), format[0], format[1], normal), vec_div_double(color, 255));
+	obj_add(&(info->obj), tmp);
+	tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255));
+	obj_add(&(info->obj), tmp);
 }
 
 int 	check_format(char *format)
@@ -149,6 +168,8 @@ int 	check_format(char *format)
 		return (PL);
 	else if (!ft_strncmp(format, "cy", 3))
 		return (CY);
+	else if (!ft_strncmp(format, "cn", 3))
+		return (CN);
 	else if (!ft_strncmp(format, "A", 2))
 		return (A);
 	else if (!ft_strncmp(format, "C", 2))
@@ -162,7 +183,7 @@ int 	check_format(char *format)
 
 void	put_info(t_info *info, char **argv)
 {
-	static void	(*run[6])(t_info *, char **) = {put_a, put_c, put_l, put_sp, put_pl, put_cy};
+	static void	(*run[7])(t_info *, char **) = {put_a, put_c, put_l, put_sp, put_pl, put_cy, put_cn};
 	int			type;
 
 	type = check_format(argv[0]);
@@ -176,7 +197,7 @@ t_info	info_init(t_info info, char *file)
 	char		**split;
 	int			fd;
 	char		*line;
-	double		ka;
+	// double		ka;
 
 	fd = open(file, O_RDONLY);
 	if (fd < 0)
@@ -205,6 +226,7 @@ t_info	info_init(t_info info, char *file)
 
 int	key_press(int keycode, t_info *info)
 {
+	(void)info;
 	if (keycode == KEY_ESC)
 		exit(0);
 	return (0);
@@ -291,6 +313,8 @@ t_color    ray_color(t_info info)
 	info.rec = record_init();
 	if (hit(info.obj, info.ray, &(info.rec)))
 		return (phong_lighting(&info));
+	// if (hit(info.obj, info.ray, &(info.rec)))
+	// 	return (vec_multi_double(vec_init(0, 0, 255), 0.8));
 	else
 	{
 		t = 0.5 * (info.ray.dir.y + 1.0);

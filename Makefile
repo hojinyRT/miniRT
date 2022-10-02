@@ -3,17 +3,17 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+         #
+#    By: sesim <sesim@student.42seoul.kr>           +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/29 13:42:30 by jinypark         ###   ########.fr        #
+#    Updated: 2022/10/02 15:52:15 by sesim            ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC 			=	cc
 NAME		=	miniRT
 RM 			=	rm -rvf
-CFLAGS 		=	-Wall -Wextra -Werror
+CFLAGS 		=	-Wall -Wextra -Werror -g3 -fsanitize=address
 LIBFT_DIR 	=	libft
 MLX_DIR 	=	mlx
 
@@ -34,12 +34,12 @@ all: $(NAME)
 $(NAME): $(OBJS)
 	@make -C $(LIBFT_DIR)
 	@echo "[$@] linking ..."
-	@$(CC) -o $@ $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit -fsanitize=address
+	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit 
 # make -C $(MLX_DIR)
 
 %.o : %.c
 	@echo [$<] compiling ...
-	@$(CC) -c -o $@ $<
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
 bonus:
 	make BONUS_FLAG=1 all

@@ -54,6 +54,21 @@ t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec no
 	return (init);
 }
 
+t_cone	*cone_init(t_point center, double radius, double height, t_vec normal)
+{
+	t_cone *init;
+
+    if(!(init = (t_cone *)malloc(sizeof(t_cone))))
+        return (NULL);
+	init->center = center;
+	init->radius = radius;
+    init->radius2 = radius * radius;
+	init->height = height;
+    init->normal = normal;
+    printf("%lf %lf %lf\n", center.x, center.y, center.z);
+	return (init);
+}
+
 t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness)
 {
     t_light *light;
