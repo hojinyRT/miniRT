@@ -37,8 +37,8 @@
 # define IMG_H 720
 # define IMG_W 1280
 
-# define WIN_H 720
-# define WIN_W 1280
+# define WIN_H 30
+# define WIN_W 20
 
 enum e_material_type
 {
@@ -179,13 +179,13 @@ typedef struct  s_light
 
 typedef struct s_info
 {
+	t_mlx			*mlx;
     t_camera		*camera;
     t_object		*obj;
     t_light			*light;
     t_color			ambient;
     t_ray			ray;
     t_hit_record	rec;
-	t_mlx			mlx;
 }					t_info;
 
 t_vec 	vec_min(t_vec vec1, t_vec vec2);
@@ -222,7 +222,7 @@ void	split_free(char **split);
 
 
 // ---------object.c--------//
-t_hit_record	record_init(void);
+void			record_init(t_hit_record *rec);
 int				hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
 int				hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
 int				hit(t_object *obj, t_ray ray, t_hit_record *rec);

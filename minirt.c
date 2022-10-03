@@ -1,6 +1,32 @@
 
 #include "minirt.h"
 
+
+void	print_cam(t_camera *cam) // 지워야함
+{
+	t_camera	*curr;
+
+	curr = cam;
+	printf("==========print_cam start==========\n");
+	while (curr)
+	{
+		printf("-------CAM------\n");
+		printf("orign x : %lf ", (curr->orig.x));
+		printf("orign y : %lf ", (curr->orig.y));
+		printf("orign z : %lf \n", (curr->orig.z));
+		printf("viewport_w : %lf \n", (curr->viewport_w));
+		printf("viewport_h : %lf \n", (curr->viewport_h));
+		printf("normal x : %lf ", curr->normal.x);
+		printf("normal y : %lf ", curr->normal.y);
+		printf("normal z : %lf \n", curr->normal.z);
+		if (curr->next == cam)
+			break ;
+		curr = curr->next;
+	}
+	printf("==========print_cam end==========\n");
+}
+
+
 void    obj_add(t_object **list, t_object *new)
 {
     t_object    *cur;
@@ -333,18 +359,23 @@ t_ray	ray_primary(t_camera *cam, double u, double v)
     return (ray);
 }
 
-t_color    ray_color(t_info info)
+t_color    ray_color(t_info *info)
 {
     double			t;
 
-	info.rec = record_init();
-	if (hit(info.obj, info.ray, &(info.rec)))
-		return (phong_lighting(&info));
-	// if (hit(info.obj, info.ray, &(info.rec)))
+	// print_cam(info.camera);
+
+	record_init(&(info->rec));
+	if (hit(info->obj, info->ray, &(info->rec)))
+	{
+		printf("rec rec rec : tmax %lf tmin %lf\n", info->rec.tmax, info->rec.tmin);
+		return (phong_lighting(info));
+	}
+	// if (hit(info->obj, info->ray, &(info->rec)))
 	// 	return (vec_multi_double(vec_init(0, 0, 255), 0.8));
 	else
 	{
-		t = 0.5 * (info.ray.dir.y + 1.0);
+		t = 0.5 * (info->ray.dir.y + 1.0);
 		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), vec_multi_double(vec_init(128, 178, 255), t)));
 	}
 }
@@ -369,32 +400,12 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
     return ;
 }
 
-void	print_cam(t_camera *cam) // 지워야함
-{
-	t_camera	*curr;
-
-	curr = cam;
-	printf("==========print_cam start==========\n");
-	while (curr)
-	{
-		printf("-------CAM------\n");
-		printf("orign x : %lf ", (curr->orig.x));
-		printf("orign y : %lf ", (curr->orig.y));
-		printf("orign z : %lf \n", (curr->orig.z));
-		printf("viewport_w : %lf \n", (curr->viewport_w));
-		printf("viewport_h : %lf \n", (curr->viewport_h));
-		printf("normal x : %lf ", curr->normal.x);
-		printf("normal y : %lf ", curr->normal.y);
-		printf("normal z : %lf \n", curr->normal.z);
-		if (curr->next == cam)
-			break ;
-		curr = curr->next;
-	}
-	printf("==========print_cam end==========\n");
-}
-
-// void draw()
+// void ft_draw(t_info *info)
 // {
+// 	int		idx[2];
+// 	int		vdx[2];
+// 	t_color	color;
+
 // 	idx[Y] = WIN_H - 1;
 // 	while (idx[Y] >= 0)
 // 	{
@@ -403,57 +414,22 @@ void	print_cam(t_camera *cam) // 지워야함
 // 		{
 // 			vdx[U] = (double)idx[X] / (WIN_W - 1);
 // 			vdx[V] = (double)idx[Y] / (WIN_H - 1);
-// 			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);
+// 			info->ray = ray_primary(info->camera, vdx[U], vdx[V]);
 // 			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
-// 			color = ray_color(info);
-// 			my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);
+// 			color = ray_color(*info);
+// 			my_mlx_pixel_put(&(info->mlx.img), idx[X], WIN_H - 1 - idx[Y], color);
 // 			idx[X]++;
 // 		}
 // 		idx[Y]--;
 // 	}
 // }
 
-int	key_press(int keycode, t_info *info)
+void ft_draw(t_info *info, t_mlx *mlx)
 {
-	(void)info;
-	if (keycode == KEY_ESC)
-		exit(0);
-	return (0);
-}
-
-// int	main_loop(t_mlx *mlx)
-// {
-// 	mlx_destroy_image(mlx->mlx, mlx->img->ptr);
-// 	mlx_clear_window(mlx->mlx, mlx->win);
-// 	mlx->img->ptr = mlx_new_image(mlx->mlx, WIN_W, WIN_H);
-// 	mlx->img->data = (int *)mlx_get_data_addr(mlx->img->ptr, \
-// 		&(mlx->img->bpp), &(mlx->img->size_l), \
-// 		&(mlx->img->endian));
-// 	draw_liner(fdf);
-// 	mlx_put_image_to_window(mlx->mlx, mlx->win, \
-// 			mlx->img->ptr, 0, 0);
-// 	return (0);
-// }
-
-int main(int argc, char **argv)
-{
-	t_info	info;
-	t_mlx	mlx;
-	t_color color; // 지워야함
 	int		idx[2];
-	double	vdx[2];
-
-	ft_memset(&info, 0, sizeof(t_info));
-	if (argc != 2)
-		ft_strerror("인자 잘못넣음");
-	info = info_init(info, argv[1]);
-	print_cam(info.camera);
-	// print_obj(info.obj);
-	mlx.ptr = mlx_init();
-	mlx.win = mlx_new_window(mlx.ptr, WIN_W, WIN_H, "HojinySesiMinsukiR2");
-	mlx.img.img_ptr = mlx_new_image(mlx.ptr, IMG_W, IMG_H);
-	mlx.img.addr = (int *)mlx_get_data_addr(mlx.img.img_ptr, \
-		&(mlx.img.bits_per_pixel), &(mlx.img.line_length), &(mlx.img.endian));
+	int		vdx[2];
+	int color_chk;
+	t_color	color;
 	idx[Y] = WIN_H - 1;
 	while (idx[Y] >= 0)
 	{
@@ -462,17 +438,114 @@ int main(int argc, char **argv)
 		{
 			vdx[U] = (double)idx[X] / (WIN_W - 1);
 			vdx[V] = (double)idx[Y] / (WIN_H - 1);
-			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);
+			info->ray = ray_primary(info->camera, vdx[U], vdx[V]);
 			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
 			color = ray_color(info);
+			// if (idx[Y] == WIN_H - 1)
+			// {
+			// 	printf("color  R : %lf ", color.x);
+			// 	printf("color  G : %lf ", color.y);
+			// 	printf("color  B : %lf \n", color.z);
+			// }
+			color_chk = convert_color(color);
+			// printf("What's the wrong with you : %x\n", color_chk);
+			mlx->img.addr[WIN_W * (WIN_H - 1 - idx[Y]) +  idx[X]] = color_chk;
+			// my_mlx_pixel_put(&mlx->img, idx[X], WIN_H - 1 - idx[Y], color);
+
+			// my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);
+
+			idx[X]++;
+		}
+		idx[Y]--;
+	}
+	// for (int i = 0; i < 100; i++)
+	// {
+	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2, WIN_H / 2 + i, vec_init(255, 0, 0));
+	// }
+	// for (int i = 0; i < 100; i++)
+	// {
+	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2 + i, WIN_H / 2, vec_init(255, 0, 0));
+	// }
+}
+
+void	main_loop(t_info *info, t_mlx *mlx, int key)
+{
+	mlx_destroy_image(mlx->ptr, mlx->img.img_ptr);
+	mlx_clear_window(mlx->ptr, mlx->win);
+	// print_cam(info->camera);
+	mlx->img.img_ptr = mlx_new_image(mlx->ptr, WIN_W, WIN_H);
+	mlx->img.addr = (int *)mlx_get_data_addr(mlx->img.img_ptr, \
+		&(mlx->img.bits_per_pixel), &(mlx->img.line_length), \
+		&(mlx->img.endian));
+
+	if (key == 8)
+		info->camera = info->camera->next;
+	ft_draw(info, mlx);
+	// my_mlx_pixel_put(&(mlx->img), 50, 50, vec_init(255, 255, 255));
+	// mlx_string_put(mlx->ptr, mlx->win, 50, 50, 0xFFFFFF, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+	mlx_put_image_to_window(mlx->ptr, mlx->win, \
+			mlx->img.img_ptr, 0, 0);
+}
+
+int	key_press(int keycode, t_info *info)
+{
+	(void)info;
+	if (keycode == KEY_ESC)
+		exit(0);
+	else if (keycode == 8)
+	{
+		printf("C clicked\n");
+		main_loop(info, info->mlx, keycode);
+	}
+	return (0);
+}
+
+int main(int argc, char **argv)
+{
+	t_info	info;
+	t_mlx	mlx;
+	int		idx[2];
+	double	vdx[2];
+
+	ft_memset(&info, 0, sizeof(t_info));
+	if (argc != 2)
+		ft_strerror("인자 잘못넣음");
+	info = info_init(info, argv[1]);
+	// print_obj(info.obj);
+	mlx.ptr = mlx_init();
+	mlx.win = mlx_new_window(mlx.ptr, WIN_W, WIN_H, "HojinySesiMinsukiR2");
+	mlx.img.img_ptr = mlx_new_image(mlx.ptr, IMG_W, IMG_H);
+	mlx.img.addr = (int *)mlx_get_data_addr(mlx.img.img_ptr, \
+		&(mlx.img.bits_per_pixel), &(mlx.img.line_length), &(mlx.img.endian));
+	// print_cam(info.camera);
+	idx[Y] = WIN_H - 1;
+	t_color color; // 지워야함 
+	while (idx[Y] >= 0)
+	{
+		idx[X] = 0;
+		while (idx[X] < WIN_W)
+		{
+			vdx[U] = (double)idx[X] / (WIN_W - 1);
+			vdx[V] = (double)idx[Y] / (WIN_H - 1);
+			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);			
+			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
+			color = ray_color(&info);
+			// color_chk = convert_color(color);
+
+			// if (idx[Y] == WIN_H - 1)
+			// {
+			// 	printf("color  R : %lf ", color.x);
+			// 	printf("color  G : %lf ", color.y);
+			// 	printf("color  B : %lf \n", color.z);
+			// }
 			my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);
 			idx[X]++;
 		}
 		idx[Y]--;
 	}
 	mlx_put_image_to_window(mlx.ptr, mlx.win, mlx.img.img_ptr, 0, 0);
-	info.mlx = mlx;
-	mlx_hook(mlx.win, EVENT_KEY_PRESS, 0, key_press, 0);
+	info.mlx = &mlx;
+	mlx_hook(mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(mlx.ptr);
 	return (0);
 }

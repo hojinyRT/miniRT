@@ -9,14 +9,11 @@ t_point	ray_at(t_ray ray, double t)
 	return (at);
 }
 
-t_hit_record record_init(void)
+void record_init(t_hit_record *rec)
 {
-    t_hit_record    record;
-
-	ft_memset(&record, 0, sizeof(t_hit_record));
-    record.tmin = EPSILON;
-    record.tmax = 10000;
-    return (record);
+	ft_memset(rec, 0, sizeof(t_hit_record));
+    rec->tmin = EPSILON;
+    rec->tmax = 10000;
 }
 
 int in_shadow(t_object *objs, t_ray light_ray, double light_len)
@@ -413,6 +410,7 @@ t_vec	phong_lighting(t_info *info)
     t_light		*lights;
 	t_color		color;
 
+	// printf("rec rec rec : tmax %lf tmin %lf\n", info->rec.tmax, info->rec.tmin);
     light_color = vec_init(0, 0, 0); //광원이 하나도 없다면, 빛의 양은 (0, 0, 0)일 것이다.
     lights = info->light;
     while (lights) //여러 광원에서 나오는 모든 빛에 대해 각각 diffuse, specular 값을 모두 구해줘야 한다
