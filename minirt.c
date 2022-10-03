@@ -250,7 +250,7 @@ void	put_info(t_info *info, char **argv)
 	run[type](info, argv);
 }
 
-t_info	info_init(t_info info, char *file)
+void info_init(t_info *info, char *file)
 {
 	char		**split;
 	int			fd;
@@ -274,12 +274,11 @@ t_info	info_init(t_info info, char *file)
 		split = ft_split(line, ' ');
 		if (split == NULL)
 			ft_strerror("스플릿 실패(할당 실패)");
-		put_info(&info, split);
+		put_info(info, split);
 		split_free(split);
 		free(line);
 		line = get_next_line(fd);
 	}
-	return (info);
 }
 
 
@@ -348,29 +347,27 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 {
 	img->addr[WIN_W * y + x] = convert_color(color);
 }
+//win_W 5
+//win_H 2
+//00000 00000
 
-t_ray	ray_primary(t_camera *cam, double u, double v)
+void	ray_primary(t_ray *ray, t_camera *cam, double u, double v)
 {
-    t_ray	ray;
-
-    ray.orig = cam->orig;
-    // left_bottom + u * horizontal + v * vertical - origin 의 단위 벡터.
-    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam->start_point, vec_multi_double(cam->horizontal, u)), vec_multi_double(cam->vertical, v)), cam->orig));
-    return (ray);
+    ray->orig = cam->orig;
+    ray->dir = vec_unit(vec_sub(vec_add(vec_add(cam->start_point, \
+							vec_multi_double(cam->horizontal, u)), \
+							vec_multi_double(cam->vertical, v)), cam->orig));
 }
+// left_bottom + u * horizontal + v * vertical - origin 의 단위 벡터.
 
 t_color    ray_color(t_info *info)
 {
     double			t;
 
 	// print_cam(info.camera);
-
 	record_init(&(info->rec));
 	if (hit(info->obj, info->ray, &(info->rec)))
-	{
-		printf("rec rec rec : tmax %lf tmin %lf\n", info->rec.tmax, info->rec.tmin);
 		return (phong_lighting(info));
-	}
 	// if (hit(info->obj, info->ray, &(info->rec)))
 	// 	return (vec_multi_double(vec_init(0, 0, 255), 0.8));
 	else
@@ -426,10 +423,10 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
 
 void ft_draw(t_info *info, t_mlx *mlx)
 {
-	int		idx[2];
-	int		vdx[2];
-	int color_chk;
-	t_color	color;
+	int			idx[2];
+	double		vdx[2];
+	t_color		color;
+
 	idx[Y] = WIN_H - 1;
 	while (idx[Y] >= 0)
 	{
@@ -438,34 +435,13 @@ void ft_draw(t_info *info, t_mlx *mlx)
 		{
 			vdx[U] = (double)idx[X] / (WIN_W - 1);
 			vdx[V] = (double)idx[Y] / (WIN_H - 1);
-			info->ray = ray_primary(info->camera, vdx[U], vdx[V]);
-			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
+			ray_primary(&info->ray, info->camera, vdx[U], vdx[V]);
 			color = ray_color(info);
-			// if (idx[Y] == WIN_H - 1)
-			// {
-			// 	printf("color  R : %lf ", color.x);
-			// 	printf("color  G : %lf ", color.y);
-			// 	printf("color  B : %lf \n", color.z);
-			// }
-			color_chk = convert_color(color);
-			// printf("What's the wrong with you : %x\n", color_chk);
-			mlx->img.addr[WIN_W * (WIN_H - 1 - idx[Y]) +  idx[X]] = color_chk;
-			// my_mlx_pixel_put(&mlx->img, idx[X], WIN_H - 1 - idx[Y], color);
-
-			// my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);
-
+			my_mlx_pixel_put(&mlx->img, idx[X], (WIN_H - 1 - idx[Y]), color);
 			idx[X]++;
 		}
 		idx[Y]--;
 	}
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2, WIN_H / 2 + i, vec_init(255, 0, 0));
-	// }
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2 + i, WIN_H / 2, vec_init(255, 0, 0));
-	// }
 }
 
 void	main_loop(t_info *info, t_mlx *mlx, int key)
@@ -475,27 +451,23 @@ void	main_loop(t_info *info, t_mlx *mlx, int key)
 	// print_cam(info->camera);
 	mlx->img.img_ptr = mlx_new_image(mlx->ptr, WIN_W, WIN_H);
 	mlx->img.addr = (int *)mlx_get_data_addr(mlx->img.img_ptr, \
-		&(mlx->img.bits_per_pixel), &(mlx->img.line_length), \
-		&(mlx->img.endian));
-
+		&(mlx->img.bits_per_pixel), &(mlx->img.line_length), &(mlx->img.endian));
 	if (key == 8)
 		info->camera = info->camera->next;
 	ft_draw(info, mlx);
-	// my_mlx_pixel_put(&(mlx->img), 50, 50, vec_init(255, 255, 255));
-	// mlx_string_put(mlx->ptr, mlx->win, 50, 50, 0xFFFFFF, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-	mlx_put_image_to_window(mlx->ptr, mlx->win, \
-			mlx->img.img_ptr, 0, 0);
+	mlx_put_image_to_window(mlx->ptr, mlx->win, mlx->img.img_ptr, 0, 0);
 }
 
-int	key_press(int keycode, t_info *info)
+int	key_press(int keycode, void *param)
 {
-	(void)info;
+	t_info *const	info = param;
+
 	if (keycode == KEY_ESC)
 		exit(0);
 	else if (keycode == 8)
 	{
 		printf("C clicked\n");
-		main_loop(info, info->mlx, keycode);
+		main_loop(info, &info->mlx, keycode);
 	}
 	return (0);
 }
@@ -503,49 +475,32 @@ int	key_press(int keycode, t_info *info)
 int main(int argc, char **argv)
 {
 	t_info	info;
-	t_mlx	mlx;
-	int		idx[2];
-	double	vdx[2];
 
-	ft_memset(&info, 0, sizeof(t_info));
 	if (argc != 2)
 		ft_strerror("인자 잘못넣음");
-	info = info_init(info, argv[1]);
-	// print_obj(info.obj);
-	mlx.ptr = mlx_init();
-	mlx.win = mlx_new_window(mlx.ptr, WIN_W, WIN_H, "HojinySesiMinsukiR2");
-	mlx.img.img_ptr = mlx_new_image(mlx.ptr, IMG_W, IMG_H);
-	mlx.img.addr = (int *)mlx_get_data_addr(mlx.img.img_ptr, \
-		&(mlx.img.bits_per_pixel), &(mlx.img.line_length), &(mlx.img.endian));
-	// print_cam(info.camera);
-	idx[Y] = WIN_H - 1;
-	t_color color; // 지워야함 
-	while (idx[Y] >= 0)
-	{
-		idx[X] = 0;
-		while (idx[X] < WIN_W)
-		{
-			vdx[U] = (double)idx[X] / (WIN_W - 1);
-			vdx[V] = (double)idx[Y] / (WIN_H - 1);
-			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);			
-			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
-			color = ray_color(&info);
-			// color_chk = convert_color(color);
+	ft_memset(&info, 0, sizeof(t_info));
+	info_init(&info, argv[1]);
+	info.mlx.ptr = mlx_init();
+	info.mlx.win = mlx_new_window(info.mlx.ptr, WIN_W, WIN_H, "HojinySesiMinsukiR2");
 
-			// if (idx[Y] == WIN_H - 1)
-			// {
-			// 	printf("color  R : %lf ", color.x);
-			// 	printf("color  G : %lf ", color.y);
-			// 	printf("color  B : %lf \n", color.z);
-			// }
-			my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);
-			idx[X]++;
-		}
-		idx[Y]--;
-	}
-	mlx_put_image_to_window(mlx.ptr, mlx.win, mlx.img.img_ptr, 0, 0);
-	info.mlx = &mlx;
-	mlx_hook(mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
-	mlx_loop(mlx.ptr);
+	info.mlx.img.img_ptr = mlx_new_image(info.mlx.ptr, IMG_W, IMG_H);
+
+	info.mlx.img.addr = (int *)mlx_get_data_addr(info.mlx.img.img_ptr, \
+											&(info.mlx.img.bits_per_pixel), \
+											&(info.mlx.img.line_length), \
+											&(info.mlx.img.endian));
+	ft_draw(&info, &info.mlx);
+	mlx_put_image_to_window(info.mlx.ptr, info.mlx.win, info.mlx.img.img_ptr, 0, 0);
+	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
+	mlx_loop(info.mlx.ptr);
 	return (0);
 }
+
+	// for (int i = 0; i < 100; i++)
+	// {
+	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2, WIN_H / 2 + i, vec_init(255, 0, 0));
+	// }
+	// for (int i = 0; i < 100; i++)
+	// {
+	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2 + i, WIN_H / 2, vec_init(255, 0, 0));
+	// }

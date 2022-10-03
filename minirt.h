@@ -37,8 +37,8 @@
 # define IMG_H 720
 # define IMG_W 1280
 
-# define WIN_H 30
-# define WIN_W 20
+# define WIN_H 720
+# define WIN_W 1280
 
 enum e_material_type
 {
@@ -179,7 +179,7 @@ typedef struct  s_light
 
 typedef struct s_info
 {
-	t_mlx			*mlx;
+	t_mlx			mlx;
     t_camera		*camera;
     t_object		*obj;
     t_light			*light;
