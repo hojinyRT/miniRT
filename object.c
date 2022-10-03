@@ -13,7 +13,7 @@ t_hit_record record_init(void)
 {
     t_hit_record    record;
 
-	// ft_memset(&record, 0, sizeof(t_hit_record));
+	ft_memset(&record, 0, sizeof(t_hit_record));
     record.tmin = EPSILON;
     record.tmax = 10000;
     return (record);

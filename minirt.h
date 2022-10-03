@@ -119,6 +119,7 @@ typedef struct s_camera
 	t_point	start_point;
 	int		fov;
 	t_vec	normal;
+	void            *next;
 }			    t_camera;
 
 typedef struct s_sphere
@@ -178,7 +179,7 @@ typedef struct  s_light
 
 typedef struct s_info
 {
-    t_camera		camera;
+    t_camera		*camera;
     t_object		*obj;
     t_light			*light;
     t_color			ambient;

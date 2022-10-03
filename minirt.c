@@ -45,27 +45,59 @@ void	put_a(t_info *info, char **argv)
 	info->ambient = vec_multi_double(color, brightness);
 }
 
+t_camera    *camera_init(t_point coor, t_vec normal, int fov)
+{
+    t_camera    *init;
+
+    if (!(init = (t_camera *)calloc(1, sizeof(t_camera))))
+        return (NULL);
+	init->orig = coor;
+	init->normal = normal;
+	init->viewport_w = tan((double)fov / 2 * M_PI / 180) * 2;
+	init->viewport_h = init->viewport_w * WIN_H / WIN_W;
+	init->horizontal = vec_init(init->viewport_w, 0, 0);
+	init->vertical = vec_init(0, init->viewport_h, 0);
+	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
+                                vec_div_double(init->vertical, 2)), normal);
+    return (init);
+}
+
+void    camera_add(t_camera **list, t_camera *new)
+{
+    t_camera    *cur;
+
+    if (list == NULL)
+        return ;
+    if (*list == NULL)
+    {
+        *list = new;
+		(*list)->next = *list;
+        return ;
+    }
+    cur = *list;
+    while (cur->next && cur->next != *list)
+        cur = cur->next;
+    cur->next = new;
+	new->next = *list;
+}
+
 void	put_c(t_info *info, char **argv)
 {
 	t_point	coor;
 	t_vec	normal;
 	int		fov;
+	t_camera *tmp;
 
 	coor = ft_atovec(argv[1], XYZ);
-	normal = ft_atovec(argv[2], UNIT);
+	normal = vec_multi_double(ft_atovec(argv[2], UNIT), -1);
 	fov = ft_atoi(argv[3]);
 	if (fov < 0 || fov > 180)
 		ft_strerror("카메라 앵글 잘못됨"); //에러메시지 출력
-	info->camera.orig = coor;
-	info->camera.normal = normal;
-	info->camera.viewport_w = tan((double)fov / 2 * M_PI / 180) * 2;
-	info->camera.viewport_h = info->camera.viewport_w * WIN_H / WIN_W;
-	info->camera.horizontal = vec_init(info->camera.viewport_w, 0, 0);
-	info->camera.vertical = vec_init(0, info->camera.viewport_h, 0);
-	info->camera.start_point = vec_sub(vec_sub(vec_sub(info->camera.orig, vec_div_double(info->camera.horizontal, 2)),
-                                vec_div_double(info->camera.vertical, 2)), normal);
 
+	tmp = camera_init(coor, normal, fov);
+	camera_add(&(info->camera), tmp);
 }
+
 void	put_l(t_info *info, char **argv)
 {
 	t_light	*tmp;
@@ -224,13 +256,7 @@ t_info	info_init(t_info info, char *file)
 	return (info);
 }
 
-int	key_press(int keycode, t_info *info)
-{
-	(void)info;
-	if (keycode == KEY_ESC)
-		exit(0);
-	return (0);
-}
+
 
 void	print_obj(t_object *obj) // 지워야함
 {
@@ -285,6 +311,7 @@ void	print_obj(t_object *obj) // 지워야함
 	}
 	printf("==========print_obj end==========\n");
 }
+
 int	convert_color(t_vec clr)
 {
 	int tmp = ((int)clr.x * 16 * 16 * 16 * 16) + ((int)clr.y * 16 * 16) + (int)(clr.z);
@@ -296,13 +323,13 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 	img->addr[WIN_W * y + x] = convert_color(color);
 }
 
-t_ray	ray_primary(t_camera cam, double u, double v)
+t_ray	ray_primary(t_camera *cam, double u, double v)
 {
     t_ray	ray;
 
-    ray.orig = cam.orig;
+    ray.orig = cam->orig;
     // left_bottom + u * horizontal + v * vertical - origin 의 단위 벡터.
-    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam.start_point, vec_multi_double(cam.horizontal, u)), vec_multi_double(cam.vertical, v)), cam.orig));
+    ray.dir = vec_unit(vec_sub(vec_add(vec_add(cam->start_point, vec_multi_double(cam->horizontal, u)), vec_multi_double(cam->vertical, v)), cam->orig));
     return (ray);
 }
 
@@ -342,10 +369,77 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
     return ;
 }
 
+void	print_cam(t_camera *cam) // 지워야함
+{
+	t_camera	*curr;
+
+	curr = cam;
+	printf("==========print_cam start==========\n");
+	while (curr)
+	{
+		printf("-------CAM------\n");
+		printf("orign x : %lf ", (curr->orig.x));
+		printf("orign y : %lf ", (curr->orig.y));
+		printf("orign z : %lf \n", (curr->orig.z));
+		printf("viewport_w : %lf \n", (curr->viewport_w));
+		printf("viewport_h : %lf \n", (curr->viewport_h));
+		printf("normal x : %lf ", curr->normal.x);
+		printf("normal y : %lf ", curr->normal.y);
+		printf("normal z : %lf \n", curr->normal.z);
+		if (curr->next == cam)
+			break ;
+		curr = curr->next;
+	}
+	printf("==========print_cam end==========\n");
+}
+
+// void draw()
+// {
+// 	idx[Y] = WIN_H - 1;
+// 	while (idx[Y] >= 0)
+// 	{
+// 		idx[X] = 0;
+// 		while (idx[X] < WIN_W)
+// 		{
+// 			vdx[U] = (double)idx[X] / (WIN_W - 1);
+// 			vdx[V] = (double)idx[Y] / (WIN_H - 1);
+// 			info.ray = ray_primary(info.camera, vdx[U], vdx[V]);
+// 			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
+// 			color = ray_color(info);
+// 			my_mlx_pixel_put(&mlx.img, idx[X], WIN_H - 1 - idx[Y], color);
+// 			idx[X]++;
+// 		}
+// 		idx[Y]--;
+// 	}
+// }
+
+int	key_press(int keycode, t_info *info)
+{
+	(void)info;
+	if (keycode == KEY_ESC)
+		exit(0);
+	return (0);
+}
+
+// int	main_loop(t_mlx *mlx)
+// {
+// 	mlx_destroy_image(mlx->mlx, mlx->img->ptr);
+// 	mlx_clear_window(mlx->mlx, mlx->win);
+// 	mlx->img->ptr = mlx_new_image(mlx->mlx, WIN_W, WIN_H);
+// 	mlx->img->data = (int *)mlx_get_data_addr(mlx->img->ptr, \
+// 		&(mlx->img->bpp), &(mlx->img->size_l), \
+// 		&(mlx->img->endian));
+// 	draw_liner(fdf);
+// 	mlx_put_image_to_window(mlx->mlx, mlx->win, \
+// 			mlx->img->ptr, 0, 0);
+// 	return (0);
+// }
+
 int main(int argc, char **argv)
 {
 	t_info	info;
 	t_mlx	mlx;
+	t_color color; // 지워야함
 	int		idx[2];
 	double	vdx[2];
 
@@ -353,6 +447,7 @@ int main(int argc, char **argv)
 	if (argc != 2)
 		ft_strerror("인자 잘못넣음");
 	info = info_init(info, argv[1]);
+	print_cam(info.camera);
 	// print_obj(info.obj);
 	mlx.ptr = mlx_init();
 	mlx.win = mlx_new_window(mlx.ptr, WIN_W, WIN_H, "HojinySesiMinsukiR2");
@@ -360,8 +455,6 @@ int main(int argc, char **argv)
 	mlx.img.addr = (int *)mlx_get_data_addr(mlx.img.img_ptr, \
 		&(mlx.img.bits_per_pixel), &(mlx.img.line_length), &(mlx.img.endian));
 	idx[Y] = WIN_H - 1;
-
-	t_color color; // 지워야함
 	while (idx[Y] >= 0)
 	{
 		idx[X] = 0;
