@@ -71,6 +71,24 @@ void	put_a(t_info *info, char **argv)
 	info->ambient = vec_multi_double(color, brightness);
 }
 
+// t_camera    *camera_init(t_point coor, t_vec normal, int fov)
+// {
+//     t_camera    *init;
+
+//     if (!(init = (t_camera *)calloc(1, sizeof(t_camera))))
+//         return (NULL);
+// 	init->orig = coor;
+// 	init->normal = normal;
+// 	init->viewport_w = tan((double)fov / 2 * M_PI / 180) * 2;
+// 	init->viewport_h = init->viewport_w * WIN_H / WIN_W;
+// 	// init->horizontal = vec_init(init->viewport_w, 0, 0);
+// 	init->horizontal = vec_init(0, 0, init->viewport_w);
+// 	init->vertical = vec_init(0, init->viewport_h, 0);
+// 	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
+//                                 vec_div_double(init->vertical, 2)), normal);
+//     return (init);
+// }
+
 t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 {
     t_camera    *init;
@@ -81,8 +99,25 @@ t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 	init->normal = normal;
 	init->viewport_w = tan((double)fov / 2 * M_PI / 180) * 2;
 	init->viewport_h = init->viewport_w * WIN_H / WIN_W;
-	init->horizontal = vec_init(init->viewport_w, 0, 0);
-	init->vertical = vec_init(0, init->viewport_h, 0);
+	// init->horizontal =  vec_multi_double(vec_unit(vec_cross(vec_add(vec_init(normal.x, 0, 0), vec_init(0, 0, normal.z)), vec_init(0, 1, 0))), init->viewport_w);
+	// init->vertical =  vec_multi_double(vec_unit(vec_cross(vec_init(1, 0, 0), vec_add(vec_init(normal.x, 0, 0), vec_add(vec_init(0, normal.y, 0), vec_init(0, 0, normal.z))))), init->viewport_h);
+	// // init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, vec_init(1, 0, 0))), init->viewport_h);
+	// printf("========================================\n");
+	// printf("our view port : %lf %lf\n", vec_len(init->horizontal), vec_len(init->vertical));
+	// printf("our normal x : %lf ", init->horizontal.x);
+	// printf("our normal y : %lf ", init->horizontal.y);
+	// printf("our normal z : %lf \n", init->horizontal.z);
+
+	// printf("========================================\n");
+	if (normal.y == 1 || normal.y == -1)
+		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(1, 0, 0))), init->viewport_w);
+	else
+		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w);
+	init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, normal)), init->viewport_h);
+	// printf("their view port : %lf %lf\n", vec_len(init->horizontal), vec_len(init->vertical));
+	// printf("their normal x : %lf ", init->horizontal.x);
+	// printf("their normal y : %lf ", init->horizontal.y);
+	// printf("their normal z : %lf \n", init->horizontal.z);
 	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
                                 vec_div_double(init->vertical, 2)), normal);
     return (init);
@@ -115,6 +150,7 @@ void	put_c(t_info *info, char **argv)
 	t_camera *tmp;
 
 	coor = ft_atovec(argv[1], XYZ);
+	// normal = ft_atovec(argv[2], UNIT);
 	normal = vec_multi_double(ft_atovec(argv[2], UNIT), -1);
 	fov = ft_atoi(argv[3]);
 	if (fov < 0 || fov > 180)
