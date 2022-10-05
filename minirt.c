@@ -107,9 +107,9 @@ t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 	init->viewport_h = init->viewport_w * WIN_H / WIN_W;
 	if (normal.y == 1 || normal.y == -1)
 		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 0, -1))), init->viewport_w);
-		// init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0.25, 0, -1))), init->viewport_w); // RT파일에서 불가능한 회전
 	else
-		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w);
+		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w); // RT파일에서 불가능한 회전
+		// init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w);
 	init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, normal)), init->viewport_h);
 	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
                                 vec_div_double(init->vertical, 2)), normal);
@@ -194,6 +194,7 @@ void	put_pl(t_info *info, char **argv)
 	color = ft_atovec(argv[3], RGB);
 
 	tmp = object_init(PL, plane_init(origin, normal, 0), vec_div_double(color, 255));
+	tmp->info = info;
 	obj_add(&(info->obj), tmp);
 }
 
@@ -534,7 +535,7 @@ void	get_bump(t_info *info)
 	char	*dst;
 
 	ft_bzero(idx, sizeof(idx));
-	info->bump.img_ptr = mlx_png_file_to_image(info->mlx.ptr, "wall.png" , &format[0], &format[1]);
+	info->bump.img_ptr = mlx_png_file_to_image(info->mlx.ptr, "sdf.png" , &format[0], &format[1]);
 	info->bump.addr = mlx_get_data_addr(info->bump.img_ptr, \
 											&(info->bump.bits_per_pixel), \
 											&(info->bump.line_length), \

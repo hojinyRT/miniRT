@@ -147,13 +147,14 @@ typedef struct s_cylinder
 }			t_cylinder;
 
 typedef t_cylinder	t_cone;
-
+typedef struct s_info t_info;
 typedef struct  s_object
 {
     t_object_type   type;
     void            *element;
     void            *next;
 	t_color			albedo;
+	t_info			*info;
 }                   t_object;
 
 typedef struct s_hit_record
@@ -168,6 +169,8 @@ typedef struct s_hit_record
 	t_vec		albedo;
 	double		u;
 	double		v;
+	t_vec		e1;
+	t_vec		e2;
 }				t_hit_record;
 
 typedef struct  s_light
@@ -240,5 +243,7 @@ void    set_face_normal(t_ray ray, t_hit_record *rec);
 // ---------tmp--------//
 void	print_obj(t_object *obj);
 
+t_vec	convert_color_to_normal(int	color);
+void debugPrintVec(char *str, t_vec *vector);
 
 #endif
