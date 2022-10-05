@@ -29,6 +29,23 @@ int in_shadow(t_object *objs, t_ray light_ray, double light_len)
     return (FALSE);
 }
 
+void	get_cylinder_uv(t_hit_record *rec, t_point center, double size)
+{
+	const t_vec		p = vec_sub(rec->p, center);
+	const t_vec		n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
+
+	e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
+	if (e1.x == 0 && e1.y == 0 && e1.z == 0)
+		e1 = vec_unit(vec_cross(n, vec_init(1, 1, 0)));
+	e2 = vec_unit(vec_cross(n, e1));
+	rec->u = vec_dot(e1, p) / size;
+	rec->v = vec_dot(e2, p) / size;
+	rec->u = (rec->u + 1) / 2;
+	rec->v = (rec->v + 1) / 2;
+}
+
 int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_cylinder	*cy;
@@ -75,72 +92,22 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
     return (FALSE);
 }
 
-// int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)  //illusion catalyst function
-// {
-// 	t_cylinder	*cy;
-// 	t_vec		oc;
-// 	double		a;
-// 	double		half_b;
-// 	double		c;
-// 	double		dis;
-// 	double		sqrtd;
-// 	double		root;
-// 	t_vec cp, cq;
-// 	double	cq_val;
-// 	double	m;
-// 	t_vec	w;
-// 	t_vec	v;
-// 	t_vec	h;
-// 	t_point	h_point;
+void	get_cone_uv(t_hit_record *rec, t_point center, double size)
+{
+	const t_vec		p = vec_sub(rec->p, center);
+	const t_vec		n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
 
-// 	cy = (t_cylinder *)obj->element;
-// 	h_point = vec_add(vec_multi_double(cy->normal, cy->height), cy->center);
-// 	w = vec_sub(ray.orig, h_point);
-// 	m = cy->radius2 / (cy->height * cy->height);
-// 	oc = vec_sub(rec->p, cy->center);
-//     h = vec_multi_double(cy->normal, -1);
-// 	a = vec_dot(ray.dir, ray.dir) - ((m + 1) * vec_dot(ray.dir, h) * vec_dot(ray.dir, h));
-// 	half_b = vec_dot(ray.dir, w) - ((m + 1) * (vec_dot(ray.dir, h) * vec_dot(w, h)));
-// 	c = vec_dot(w, w) - ((m + 1) * (vec_dot(w, h)) * (vec_dot(w, h)));
-// 	printf("a = %lf || b = %lf || c = %lf\n", a, half_b, c);
-// 	dis = half_b * half_b - a * c;
-// 	if (dis < 0)
-// 		return (FALSE);
-// 	sqrtd = sqrt(dis);
-// 	root = (-half_b - sqrtd) / a;
-// 	rec->t = root;
-// 	rec->p = ray_at(ray, root);
-// 	if (vec_dot(vec_sub(rec->p, h_point), h) < 0 
-//         || vec_dot(vec_sub(rec->p, h_point), h) > cy->height)
-// 	{
-// 		root = (-half_b + sqrtd) / a;
-// 		if (root < rec->tmin || rec->tmax < root)
-// 			return (FALSE);
-// 		rec->t = root;
-// 		rec->p = ray_at(ray, root);
-// 	}
-//     if (root < rec->tmin || rec->tmax < root)
-// 		return (FALSE);
-// 	// t_vec h = vec_add(cy->center, vec_multi_double(cy->normal, cy->height));
-// 	cp = vec_sub(rec->p, h);
-// 	// cq_val = vec_dot(cp, cy->normal);
-// 	// cq = vec_multi_double(cy->normal, cq_val);
-// 	// v = vec_multi_double(cy->normal, -1);
-// 	v = vec_unit(vec_sub(cy->center, h));
-// 	double  a_c = cy->height - ((vec_len_sqr(vec_sub(rec->p, h_point))) / (cy->height - vec_dot(vec_sub(rec->p, cy->center), cy->normal)));
-//     t_vec   ac_vec = vec_multi_double(cy->normal, a_c);
-// 	rec->normal = vec_unit(vec_sub(rec->p, vec_add(ac_vec, cy->center)));
-// 	// printf("x : %lf ", rec->normal.x);
-// 	// printf("y : %lf ", rec->normal.y);
-// 	// printf("z : %lf ", rec->normal.z);
-// 	// printf("h : %lf\n", vec_dot(vec_sub(rec->p, h_point), h));
-// 	rec->albedo = obj->albedo;
-// 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-// 	if (0 <= vec_dot(vec_sub(rec->p, h_point), h) && \
-//         vec_dot(vec_sub(rec->p, h_point), h) <= cy->height)
-// 		return (TRUE);
-//     return (FALSE);
-// }
+	e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
+	if (e1.x == 0 && e1.y == 0 && e1.z == 0)
+		e1 = vec_unit(vec_cross(n, vec_init(1, 1, 0)));
+	e2 = vec_unit(vec_cross(n, e1));
+	rec->u = vec_dot(e1, p) / size;
+	rec->v = vec_dot(e2, p) / size;
+	rec->u = (rec->u + 1) / 2;
+	rec->v = (rec->v + 1) / 2;
+}
 
 int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)   // our function
 {
@@ -274,12 +241,28 @@ void	get_plane_uv(t_hit_record *rec, t_point center, double size)
 
 	e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
 	if (e1.x == 0 && e1.y == 0 && e1.z == 0)
-		e1 = vec_unit(vec_cross(n, vec_init(1, 1, 0)));
+		e1 = vec_unit(vec_cross(n, vec_init(0, 1, 0)));
 	e2 = vec_unit(vec_cross(n, e1));
 	rec->u = vec_dot(e1, p) / size;
 	rec->v = vec_dot(e2, p) / size;
 	rec->u = (rec->u + 1) / 2;
 	rec->v = (rec->v + 1) / 2;
+	// printf("rec u : %lf, v : %lf\n", rec->u, rec->v);
+}
+
+void	get_another_plane_uv(t_hit_record *rec, t_point center)
+{
+	const t_vec		p = vec_sub(rec->p, center);
+	const t_vec		n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
+
+	e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
+	if (e1.x == 0 && e1.y == 0 && e1.z == 0)
+		e1 = vec_unit(vec_cross(n, vec_init(1, 1, 0)));
+	e2 = vec_unit(vec_cross(n, e1));
+	rec->u = vec_dot(e1, p);
+	rec->v = vec_dot(e2, p);
 }
 
 int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -301,7 +284,7 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
-	get_plane_uv(rec, pl->center, 1);
+	get_plane_uv(rec, pl->center, 0.1);
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
 }

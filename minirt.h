@@ -6,7 +6,7 @@
 # include <math.h>
 # include <fcntl.h>
 # include "libft/libft.h"
-# include "mlx/mlx.h"
+# include "mlx2/mlx.h"
 
 # define EVENT_KEY_PRESS 2
 # define EVENT_MOUSE_CLICK 4
@@ -75,9 +75,9 @@ typedef struct s_texture
 {
 	int				type;
 	t_color			color;
-	char			*file_name;
 	void			*image;
-	void			*addr;
+	char			*file_name;
+	char			*addr;
 	int				height;
 	int				width;
 	int				bits_per_pixel;
@@ -88,7 +88,7 @@ typedef struct s_texture
 typedef struct  s_img
 {
 	void	*img_ptr;
-	int		*addr;
+	char	*addr;
 	int		bits_per_pixel;
 	int		line_length;
 	int		endian;
@@ -164,6 +164,7 @@ typedef struct s_hit_record
     double		tmax;
     double		t;
     int			front_face;
+	int			type;
 	t_vec		albedo;
 	double		u;
 	double		v;
@@ -180,6 +181,7 @@ typedef struct  s_light
 typedef struct s_info
 {
 	t_mlx			mlx;
+	t_img			bump;
     t_camera		*camera;
     t_object		*obj;
     t_light			*light;

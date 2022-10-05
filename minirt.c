@@ -1,6 +1,12 @@
 
 #include "minirt.h"
 
+void debugPrintVec(char *str, t_vec *vector)
+{
+	printf("%s : x = %lf ",  str, vector->x);
+	printf("%s : y = %lf ",  str, vector->y);
+	printf("%s : z = %lf\n", str, vector->z);
+}
 
 void	print_cam(t_camera *cam) // 지워야함
 {
@@ -99,25 +105,12 @@ t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 	init->normal = normal;
 	init->viewport_w = tan((double)fov / 2 * M_PI / 180) * 2;
 	init->viewport_h = init->viewport_w * WIN_H / WIN_W;
-	// init->horizontal =  vec_multi_double(vec_unit(vec_cross(vec_add(vec_init(normal.x, 0, 0), vec_init(0, 0, normal.z)), vec_init(0, 1, 0))), init->viewport_w);
-	// init->vertical =  vec_multi_double(vec_unit(vec_cross(vec_init(1, 0, 0), vec_add(vec_init(normal.x, 0, 0), vec_add(vec_init(0, normal.y, 0), vec_init(0, 0, normal.z))))), init->viewport_h);
-	// // init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, vec_init(1, 0, 0))), init->viewport_h);
-	// printf("========================================\n");
-	// printf("our view port : %lf %lf\n", vec_len(init->horizontal), vec_len(init->vertical));
-	// printf("our normal x : %lf ", init->horizontal.x);
-	// printf("our normal y : %lf ", init->horizontal.y);
-	// printf("our normal z : %lf \n", init->horizontal.z);
-
-	// printf("========================================\n");
 	if (normal.y == 1 || normal.y == -1)
-		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(1, 0, 0))), init->viewport_w);
+		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 0, -1))), init->viewport_w);
+		// init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0.25, 0, -1))), init->viewport_w); // RT파일에서 불가능한 회전
 	else
 		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w);
 	init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, normal)), init->viewport_h);
-	// printf("their view port : %lf %lf\n", vec_len(init->horizontal), vec_len(init->vertical));
-	// printf("their normal x : %lf ", init->horizontal.x);
-	// printf("their normal y : %lf ", init->horizontal.y);
-	// printf("their normal z : %lf \n", init->horizontal.z);
 	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
                                 vec_div_double(init->vertical, 2)), normal);
     return (init);
@@ -373,6 +366,21 @@ void	print_obj(t_object *obj) // 지워야함
 	printf("==========print_obj end==========\n");
 }
 
+
+t_vec	convert_color_to_normal(int	color)
+{
+	t_vec	res;
+
+	res.x = color >> 16 & 0xFF;
+	res.y = color >> 8 & 0xFF;
+	res.z = color & 0xFF;
+	if (res.x == 0 && res.y == 0 && res.z == 0)
+		ft_strerror("범프맵 이상함");
+	res = vec_unit(res);
+	res = vec_sub(vec_multi_double(res, 2), vec_init(1, 1, 1));
+	return (res);
+}
+
 int	convert_color(t_vec clr)
 {
 	int tmp = ((int)clr.x * 16 * 16 * 16 * 16) + ((int)clr.y * 16 * 16) + (int)(clr.z);
@@ -381,7 +389,12 @@ int	convert_color(t_vec clr)
 
 void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 {
-	img->addr[WIN_W * y + x] = convert_color(color);
+	char	*dst;
+
+	// *(unsigned int *)(img->addr + y * img->line_length + x * (img->bits_per_pixel / 8)) = convert_color(color);
+	dst = img->addr +  y * img->line_length + x * (img->bits_per_pixel / 8);
+	*(unsigned int *)dst = convert_color(color);
+
 }
 //win_W 5
 //win_H 2
@@ -486,7 +499,7 @@ void	main_loop(t_info *info, t_mlx *mlx, int key)
 	mlx_clear_window(mlx->ptr, mlx->win);
 	// print_cam(info->camera);
 	mlx->img.img_ptr = mlx_new_image(mlx->ptr, WIN_W, WIN_H);
-	mlx->img.addr = (int *)mlx_get_data_addr(mlx->img.img_ptr, \
+	mlx->img.addr = mlx_get_data_addr(mlx->img.img_ptr, \
 		&(mlx->img.bits_per_pixel), &(mlx->img.line_length), &(mlx->img.endian));
 	if (key == 8)
 		info->camera = info->camera->next;
@@ -508,10 +521,44 @@ int	key_press(int keycode, void *param)
 	return (0);
 }
 
+// void	ae()
+// {
+// 	system("leaks miniRT");
+// }
+
+void	get_bump(t_info *info)
+{
+	t_vec	tmp;
+	int		format[2];
+	int		idx[2];
+	char	*dst;
+
+	ft_bzero(idx, sizeof(idx));
+	info->bump.img_ptr = mlx_png_file_to_image(info->mlx.ptr, "wall.png" , &format[0], &format[1]);
+	info->bump.addr = mlx_get_data_addr(info->bump.img_ptr, \
+											&(info->bump.bits_per_pixel), \
+											&(info->bump.line_length), \
+											&(info->bump.endian));
+	while (idx[0] < format[1])
+	{
+		idx[1] = 0;
+		while (idx[1] < format[0])
+		{
+			dst = info->bump.addr + (idx[0] * info->bump.line_length + idx[1] * (info->bump.bits_per_pixel / 8));
+			tmp = convert_color_to_normal(*(unsigned int *)dst);
+			idx[1]++;
+		}
+		idx[0]++;
+	}
+	// for (int i = 0; i < 100; ++i)
+	// 	printf("idx : %d .  val : %#x\n", i, ((int *)info->bump.addr)[i]);
+}
+
 int main(int argc, char **argv)
 {
 	t_info	info;
 
+	// atexit(ae);
 	if (argc != 2)
 		ft_strerror("인자 잘못넣음");
 	ft_memset(&info, 0, sizeof(t_info));
@@ -521,10 +568,11 @@ int main(int argc, char **argv)
 
 	info.mlx.img.img_ptr = mlx_new_image(info.mlx.ptr, IMG_W, IMG_H);
 
-	info.mlx.img.addr = (int *)mlx_get_data_addr(info.mlx.img.img_ptr, \
+	info.mlx.img.addr = mlx_get_data_addr(info.mlx.img.img_ptr, \
 											&(info.mlx.img.bits_per_pixel), \
 											&(info.mlx.img.line_length), \
 											&(info.mlx.img.endian));
+	get_bump(&info);
 	ft_draw(&info, &info.mlx);
 	mlx_put_image_to_window(info.mlx.ptr, info.mlx.win, info.mlx.img.img_ptr, 0, 0);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
