@@ -540,7 +540,7 @@ void	get_bump(t_info *info)
 	char	*dst;
 
 	ft_bzero(idx, sizeof(idx));
-	info->bump.img_ptr = mlx_png_file_to_image(info->mlx.ptr, "sdf.png" , &format[0], &format[1]);
+	info->bump.img_ptr = mlx_png_file_to_image(info->mlx.ptr, "coor.png" , &format[0], &format[1]);
 	info->bump.addr = mlx_get_data_addr(info->bump.img_ptr, \
 											&(info->bump.bits_per_pixel), \
 											&(info->bump.line_length), \
@@ -565,6 +565,7 @@ int main(int argc, char **argv)
 	t_info	info;
 
 	// atexit(ae);
+
 	if (argc != 2)
 		ft_strerror("인자 잘못넣음");
 	ft_memset(&info, 0, sizeof(t_info));

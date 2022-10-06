@@ -223,17 +223,25 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	root = (-half_b - sqrtd) / a;
 	if (root < rec->tmin || rec->tmax < root)
 	{
+		// printf("small root : %lf\n", root);
 		root = (-half_b + sqrtd) / a;
 		if (root < rec->tmin || rec->tmax < root)
+		{
+			// printf("root : %lf\n", root);
 			return (FALSE);
+		}
 	}
-    if (root < rec->tmin || rec->tmax < root)
-		return (FALSE);
+    // if (root < rec->tmin || rec->tmax < root)
+	// {
+	// 	// printf("root : %lf\n", root);
+	// 	return (FALSE);
+	// }
 	rec->albedo = obj->albedo;
+	// printf("root : %lf\n", root);
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	rec->normal = vec_div_double(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius); // 정규화된 법선 벡터.
-	// set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 
 	return (TRUE);
 }
@@ -272,16 +280,19 @@ void	get_plane_uv(t_hit_record *rec, t_point center, double size)
 	t_vec			e1;
 	t_vec			e2;
 
-	e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
+	e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
 	if (e1.x == 0 && e1.y == 0 && e1.z == 0)
-		e1 = vec_unit(vec_cross(n, vec_init(0, 1, 0)));
+		e1 = vec_unit(vec_cross(n, vec_init(1, 0, 0)));
 	e2 = vec_unit(vec_cross(n, e1));
 	rec->e1 = e1;
 	rec->e2 = e2;
 	rec->u = fmod(vec_dot(e1, p), size) / size;
 	rec->v = fmod(vec_dot(e2, p), size) / size;
-	rec->u = (rec->u + 1) / 2;
-	rec->v = (rec->v + 1) / 2;
+	rec->u += rec->v < 0;
+	rec->u += rec->u < 0;
+	rec->v = 1 - rec->v;
+	// rec->u = (rec->u + 1) / 2;
+	// rec->v = (rec->v + 1) / 2;
 	// printf("u : %lf , v : %lf\n", rec->u, rec->v);
 }
 
@@ -294,8 +305,8 @@ t_vec	bump_normal(t_info info, t_hit_record rec)
 	t_vec ul, vl, zl;
 
 // Local = t * UL + b * VL + n * ZL
-	x = (int)(rec.u * 1024.);
-	y = (int)(rec.v * 1024.);
+	x = (int)(rec.u * 224.);
+	y = (int)(rec.v * 224.);
 	tmp = convert_color_to_normal(*(unsigned int *)(info.bump.addr + info.bump.line_length * y + x * info.bump.bits_per_pixel / 8));
 	ul = vec_multi_double(rec.e1, tmp.x);
 	vl = vec_multi_double(rec.e2, tmp.y);
@@ -325,7 +336,7 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
-	get_plane_uv(rec, pl->center, 5);
+	get_plane_uv(rec, pl->center, 10);
 	rec->normal = bump_normal(*obj->info, *rec);
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	return (TRUE);
@@ -400,8 +411,8 @@ t_vec        point_light_get(t_info *info, t_light *light)
     light_dir = vec_sub(light->origin, info->rec.p);
     light_len = vec_len(light_dir);
     light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
-    if (in_shadow(info->obj, light_ray, light_len))
-        return (vec_init(0,0,0));
+    // if (in_shadow(info->obj, light_ray, light_len))
+        // return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
     // 추가끝
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
