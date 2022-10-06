@@ -94,7 +94,6 @@ void	put_a(t_info *info, char **argv)
 //                                 vec_div_double(init->vertical, 2)), normal);
 //     return (init);
 // }
-
 t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 {
     t_camera    *init;
@@ -105,14 +104,19 @@ t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 	init->normal = normal;
 	init->viewport_w = tan((double)fov / 2 * M_PI / 180) * 2;
 	init->viewport_h = init->viewport_w * WIN_H / WIN_W;
-	if (normal.y == 1 || normal.y == -1)
+	if ((normal.x == 0 && normal.y == 1 && normal.z == 0))
+		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 0, 1))), init->viewport_w);
+	else if((normal.x == 0 && normal.y == -1 && normal.z == 0))
 		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 0, -1))), init->viewport_w);
 	else
 		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w); // RT파일에서 불가능한 회전
-		// init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w);
+	debugPrintVec("hor", &init->horizontal);
 	init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, normal)), init->viewport_h);
+	debugPrintVec("ver", &init->vertical);
+	// init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
+    //                             vec_div_double(init->vertical, 2)), normal);
 	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
-                                vec_div_double(init->vertical, 2)), normal);
+                                vec_div_double(init->vertical, 2)), vec_multi_double(vec_multi_double(normal, -1),1));
     return (init);
 }
 
@@ -144,7 +148,7 @@ void	put_c(t_info *info, char **argv)
 
 	coor = ft_atovec(argv[1], XYZ);
 	// normal = ft_atovec(argv[2], UNIT);
-	normal = vec_multi_double(ft_atovec(argv[2], UNIT), -1);
+	normal = ft_atovec(argv[2], UNIT);
 	fov = ft_atoi(argv[3]);
 	if (fov < 0 || fov > 180)
 		ft_strerror("카메라 앵글 잘못됨"); //에러메시지 출력
@@ -404,9 +408,10 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 void	ray_primary(t_ray *ray, t_camera *cam, double u, double v)
 {
     ray->orig = cam->orig;
-    ray->dir = vec_unit(vec_sub(vec_add(vec_add(cam->start_point, \
+    ray->dir =  vec_unit(vec_sub(vec_add(vec_add(cam->start_point, \
 							vec_multi_double(cam->horizontal, u)), \
 							vec_multi_double(cam->vertical, v)), cam->orig));
+
 }
 // left_bottom + u * horizontal + v * vertical - origin 의 단위 벡터.
 

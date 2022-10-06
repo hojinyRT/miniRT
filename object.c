@@ -447,7 +447,7 @@ t_vec	phong_lighting(t_info *info)
 {
     t_color		light_color;
     t_light		*lights;
-	t_color		color;
+	// t_color		color;
 
 	// printf("rec rec rec : tmax %lf tmin %lf\n", info->rec.tmax, info->rec.tmin);
     light_color = vec_init(0, 0, 0); //광원이 하나도 없다면, 빛의 양은 (0, 0, 0)일 것이다.
@@ -462,6 +462,7 @@ t_vec	phong_lighting(t_info *info)
 	// printf("%lf,%lf,%lf\n", light_color.x, light_color.y, light_color.z);
 	// color = checkerboard_value((info->rec));
 	// color = bump_value(*info, info->rec);
-    return (vec_multi_double(vec_min(vec_multi(light_color, color), vec_init(1, 1, 1)), 255));
+    // return (vec_multi_double(vec_min(vec_multi(light_color, color), vec_init(1, 1, 1)), 255));
+    return (vec_multi_double(vec_min(vec_multi(light_color, info->rec.albedo), vec_init(1, 1, 1)), 255));
     //모든 광원에 의한 빛의 양을 구한 후, 오브젝트의 반사율과 곱해준다. 그 값이 (1, 1, 1)을 넘으면 (1, 1, 1)을 반환한다.
 }
