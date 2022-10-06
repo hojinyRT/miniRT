@@ -161,6 +161,7 @@ typedef struct s_hit_record
 {
     t_point		p;
     t_vec		normal;
+    t_vec		normal2;
     double		tmin;
     double		tmax;
     double		t;
@@ -245,5 +246,6 @@ void	print_obj(t_object *obj);
 
 t_vec	convert_color_to_normal(int	color);
 void debugPrintVec(char *str, t_vec *vector);
+void    set_face_normal2(t_ray ray, t_hit_record *rec);
 
 #endif

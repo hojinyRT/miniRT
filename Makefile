@@ -6,14 +6,14 @@
 #    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/10/05 20:43:00 by jinypark         ###   ########.fr        #
+#    Updated: 2022/10/06 17:55:42 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC 			=	cc
 NAME		=	miniRT
 RM 			=	rm -rvf
-CFLAGS 		=	-Wall -Wextra -Werror # -g3 -fsanitize=address
+CFLAGS 		=	-Wall -Wextra -Werror -g3 -fsanitize=address
 LIBFT_DIR 	=	libft
 MLX_DIR 	=	mlx
 
