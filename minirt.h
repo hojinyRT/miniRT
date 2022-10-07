@@ -76,11 +76,11 @@ typedef struct s_img
 	void			*img_ptr;
 	char			*file_name;
 	char			*addr;
-	int				height;
-	int				width;
 	int				bits_per_pixel;
 	int				line_length;
 	int				endian;
+	int				width;
+	int				height;
 }	t_img;
 
 typedef struct	s_mlx
@@ -248,6 +248,21 @@ void	put_cy(t_info *info, char **argv, int cnt);
 void	put_cn(t_info *info, char **argv, int cnt);
 int 	check_format(char *format);
 void	put_info(t_info *info, char **argv);
+void	get_bump_addr(t_object *obj, t_mlx *mlx);
+
+// ---------minirt.c--------//
+void info_init(t_info *info, char *file);
+t_vec	convert_color_to_normal(int	color);
+int	convert_color(t_vec clr);
+void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color);
+void	ray_primary(t_ray *ray, t_camera *cam, double u, double v);
+t_color    ray_color(t_info *info);
+t_ray	ray_init(t_point orig, t_vec dir);
+void    set_face_normal(t_ray ray, t_hit_record *rec);
+void ft_draw(t_info *info, t_mlx *mlx);
+void	main_loop(t_info *info, t_mlx *mlx, int key);
+int	key_press(int keycode, void *param);
+
 
 // ---------tmp--------//
 void	print_obj(t_object *obj);

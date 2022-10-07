@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 17:34:28 by jinypark          #+#    #+#             */
-/*   Updated: 2022/09/27 13:36:04 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/07 13:25:53 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ char	*trim_line(char **keep)
 		i++;
 	}
 	answer[i] = '\0';
-	tmp = ft_strdup(&((*keep)[i + 1]));
+	tmp = ft_strdup_g(&((*keep)[i + 1]));
 	free(*keep);
 	*keep = tmp;
 	return (answer);

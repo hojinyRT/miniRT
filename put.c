@@ -1,5 +1,34 @@
-
 #include "minirt.h"
+
+void	get_bump_addr(t_object *obj, t_mlx *mlx)
+{
+	t_vec	tmp;
+	int		format[2];
+	int		idx[2];
+	char	*dst;
+
+	ft_bzero(idx, sizeof(idx));
+	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, &format[0], &format[1]);
+	if (!obj->bump->img_ptr)
+		ft_strerror("없는 파일임");
+	obj->bump->addr = mlx_get_data_addr(obj->bump->img_ptr, \
+											&(obj->bump->bits_per_pixel), \
+											&(obj->bump->line_length), \
+											&(obj->bump->endian));
+	obj->bump->width = format[0];
+	obj->bump->height = format[1];
+	while (idx[0] < format[1])
+	{
+		idx[1] = 0;
+		while (idx[1] < format[0])
+		{
+			dst = obj->bump->addr + (idx[0] * obj->bump->line_length + idx[1] * (obj->bump->bits_per_pixel / 8));
+			tmp = convert_color_to_normal(*(unsigned int *)dst);
+			idx[1]++;
+		}
+		idx[0]++;
+	}
+}
 
 void    obj_add(t_object **list, t_object *new)
 {
@@ -144,8 +173,12 @@ void	put_sp(t_info *info, char **argv, int cnt)
 		radius = ft_atod(argv[2]) / 2;
 		color = ft_atovec(argv[3], RGB);
 		tmp = object_init(SP, sphere_init(origin, radius), vec_div_double(color, 255), checker);
+		tmp->bump = ft_calloc(1, sizeof(t_img));
 		if (cnt == 5)
-			tmp->bump->file_name = argv[4];
+		{
+			tmp->bump->file_name = ft_strdup(argv[4]);
+			get_bump_addr(tmp, &info->mlx);
+		}
 		obj_add(&(info->obj), tmp);
 	}
 	else
@@ -167,8 +200,12 @@ void	put_pl(t_info *info, char **argv, int cnt)
 		color = ft_atovec(argv[3], RGB);
 
 		tmp = object_init(PL, plane_init(origin, normal, 0), vec_div_double(color, 255), checker);
+		tmp->bump = ft_calloc(1, sizeof(t_img));
 		if (cnt == 5)
-				tmp->bump->file_name = argv[4];
+		{
+			tmp->bump->file_name = ft_strdup(argv[4]);
+			get_bump_addr(tmp, &info->mlx);
+		}
 		obj_add(&(info->obj), tmp);
 	}
 	else

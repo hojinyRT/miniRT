@@ -153,34 +153,6 @@ int	key_press(int keycode, void *param)
 	return (0);
 }
 
-void	get_bump(t_info *info)
-{
-	t_vec	tmp;
-	int		format[2];
-	int		idx[2];
-	char	*dst;
-
-	ft_bzero(idx, sizeof(idx));
-	info->bump.img_ptr = mlx_png_file_to_image(info->mlx.ptr, "img/coor.png" , &format[0], &format[1]);
-	if (!info->bump.img_ptr)
-		ft_strerror("없는 파일임");
-	info->bump.addr = mlx_get_data_addr(info->bump.img_ptr, \
-											&(info->bump.bits_per_pixel), \
-											&(info->bump.line_length), \
-											&(info->bump.endian));
-	while (idx[0] < format[1])
-	{
-		idx[1] = 0;
-		while (idx[1] < format[0])
-		{
-			dst = info->bump.addr + (idx[0] * info->bump.line_length + idx[1] * (info->bump.bits_per_pixel / 8));
-			tmp = convert_color_to_normal(*(unsigned int *)dst);
-			idx[1]++;
-		}
-		idx[0]++;
-	}
-}
-
 int main(int argc, char **argv)
 {
 	t_info	info;
@@ -189,7 +161,6 @@ int main(int argc, char **argv)
 	if (argc != 2)
 		ft_strerror("인자 잘못넣음");
 	ft_memset(&info, 0, sizeof(t_info));
-	info_init(&info, argv[1]);
 	info.mlx.ptr = mlx_init();
 	info.mlx.win = mlx_new_window(info.mlx.ptr, WIN_W, WIN_H, "HojinySesiMinsukiR2");
 
@@ -199,7 +170,7 @@ int main(int argc, char **argv)
 											&(info.mlx.img.bits_per_pixel), \
 											&(info.mlx.img.line_length), \
 											&(info.mlx.img.endian));
-	get_bump(&info);
+	info_init(&info, argv[1]);
 	ft_draw(&info, &info.mlx);
 	mlx_put_image_to_window(info.mlx.ptr, info.mlx.win, info.mlx.img.img_ptr, 0, 0);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42seoul.>       +#+  +:+       +#+        */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/07 15:07:04 by jinypark          #+#    #+#             */
-/*   Updated: 2022/04/19 17:15:27 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/07 13:26:08 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ char	*ft_strcat(char *dest, char const *src)
 	return (dest);
 }
 
-char	*ft_strdup(const char *s1)
+char	*ft_strdup_g(const char *s1)
 {
 	char	*new;
 	size_t	i;
@@ -85,7 +85,7 @@ char	*ft_strjoin(char *s1, char *s2)
 	if (s2 == NULL)
 		return (NULL);
 	if (s1 == NULL)
-		s1 = ft_strdup("");
+		s1 = ft_strdup_g("");
 	len = ft_strchr(s1, '\0') + ft_strchr(s2, '\0');
 	arr = (char *)malloc(sizeof(char) * (len + 1));
 	if (arr == NULL)

@@ -1,5 +1,24 @@
 #include "minirt.h"
 
+t_vec	bump_normal(t_object *obj, t_hit_record *rec)
+{
+	int x;
+	int y;
+	t_vec tmp;
+	t_vec ul, vl, zl;
+
+	// Local = t * UL + b * VL + n * ZL
+	x = (int)(rec->u * (double)obj->bump->width);
+	y = (int)(rec->v * (double)obj->bump->height);
+	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
+	ul = vec_multi_double(rec->e1, tmp.x);
+	vl = vec_multi_double(rec->e2, tmp.y);
+	zl = vec_multi_double(rec->normal, tmp.z);
+	tmp = vec_add(vec_add(ul, vl), zl);
+	tmp = vec_unit(tmp);
+	return (tmp);
+}
+
 t_point	ray_at(t_ray ray, double t)
 {
 	t_point at;
@@ -22,9 +41,7 @@ int in_shadow(t_object *objs, t_ray light_ray, double light_len)
     rec.tmin = 0;
     rec.tmax = light_len;
     if (hit(objs, light_ray, &rec))
-    {
         return (TRUE);
-    }
     return (FALSE);
 }
 
@@ -125,6 +142,36 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
     return (FALSE);
 }
 
+void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
+{
+	// const t_vec		p = vec_sub(rec->p, center);
+	// const t_vec		n = rec->normal;
+	double			phi;
+	double			theta;
+	// t_vec			e1;
+	// t_vec			e2;
+	(void)size;
+	(void)center;
+
+	theta = atan2(rec->p.x, rec->p.z);
+	phi = acos(rec->p.y / 5.);
+	// if ((n.x == 0 && n.y == 1 && n.z == 0))
+	// 	e1 = vec_unit(vec_cross(vec_init(0, 0, -1), n));
+	// else if ((n.x == 0 && n.y == -1 && n.z == 0))
+	// 	e1 = vec_unit(vec_cross(vec_init(0, 0, 1), n));
+	// else
+	// 	e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
+	// e2 = vec_unit(vec_cross(n, e1));
+	// rec->e1 = e1;
+	// rec->e2 = e2;
+	rec->u = 1. - (theta / (2 * M_PI) + 0.5);
+	rec->v = 1. - (phi / M_PI);
+	// printf("u : %lf, v: %lf\n", rec->u, rec->v);
+	// rec->u += rec->u < 0;
+	// rec->v += rec->v < 0;
+	// rec->v = 1 - rec->v;
+}
+
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_sphere	*sp;
@@ -153,8 +200,11 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->albedo = obj->albedo;
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	rec->normal = vec_div_double(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius); // 정규화된 법선 벡터.
-
+	rec->normal = vec_div_double(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius);
+	get_sphere_uv(rec, sp->center, 10); //조정 바람
+	if (obj->bump->file_name)
+		rec->normal = bump_normal(obj, rec);
+	rec->type = SP;
 	return (TRUE);
 }
 
@@ -207,30 +257,6 @@ void	get_plane_uv(t_hit_record *rec, t_point center, double size)
 	rec->v = 1 - rec->v;
 }
 
-
-t_vec	bump_normal(t_info info, t_hit_record rec)
-{
-	int x;
-	int y;
-	t_vec tmp;
-	t_vec ul, vl, zl;
-
-	(void)info;
-// Local = t * UL + b * VL + n * ZL
-	x = (int)(rec.u * 224.);
-	y = (int)(rec.v * 224.);
-	tmp = convert_color_to_normal(*(unsigned int *)(info.bump.addr + info.bump.line_length * y + x * info.bump.bits_per_pixel / 8));
-	// tmp = convert_color_to_normal(0x8080FF);
-	// debugPrintVec("no", &tmp);
-	ul = vec_multi_double(rec.e1, tmp.x);
-	vl = vec_multi_double(rec.e2, tmp.y);
-	zl = vec_multi_double(rec.normal, tmp.z);
-	tmp = vec_add(vec_add(ul, vl), zl);
-	// debugPrintVec("normal", &tmp);
-	// tmp = vec_unit(tmp);
-	return (tmp);
-}
-
 int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_plane	*pl;
@@ -250,8 +276,9 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
-	get_plane_uv(rec, pl->center, 100);
-	// rec->normal2 = bump_normal(*obj->info, *rec);
+	get_plane_uv(rec, pl->center, 10); //조정 바람
+	if (obj->bump->file_name)
+		rec->normal = bump_normal(obj, rec);
 	set_face_normal(ray, rec);
 	return (TRUE);
 }
@@ -334,7 +361,7 @@ t_vec        point_light_get(t_info *info, t_light *light)
     view_dir = vec_unit(vec_multi_double(info->ray.dir, -1));
     reflect_dir = reflect(vec_multi_double(light_dir, -1), info->rec.normal);
     ksn = 64; // shininess value
-    ks = 0.3; // specular strength 강도 계수
+    ks = 0.1; // specular strength 강도 계수
     spec = pow(fmax(vec_dot(view_dir, reflect_dir), 0.0), ksn);
     specular = vec_multi_double(vec_multi_double(light->light_color, ks), spec);
     brightness = light->brightness * LUMEN; // 기준 광속/광량을 정의한 매크로
@@ -343,11 +370,18 @@ t_vec        point_light_get(t_info *info, t_light *light)
 
 t_color	checkerboard_value(t_hit_record rec)
 {
-	const int		width = 10;
-	const int		height = 10;
+	const int		width = 16;
+	const int		height = 16;
 	const double	u2 = floor(rec.u * width);
 	const double	v2 = floor(rec.v * height);
-
+	// if (rec.type == SP)
+	// {
+	// 	double sines = sin(10 * rec.p.x) * sin(10 * rec.p.y) * sin(10 * rec.p.z);
+	// 	if (sines < 0)
+	// 		return (rec.albedo);
+	// 	else
+	// 		return (vec_init(1, 1, 1));
+	// }
 	if (fmod(u2 + v2, 2.) == 0)
 		return (rec.albedo);
 	return (vec_init(1, 1, 1));
