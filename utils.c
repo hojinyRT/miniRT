@@ -94,6 +94,8 @@ void	check_unit(double *x, double *y, double *z, int flag)
 			ft_strerror("좌표 범위 초과");
 		if (flag == UNIT)
 		{
+			if (*x == 0 && *y == 0 && *z == 0)
+				ft_strerror("영벡터임");
 			tmp = vec_unit(vec_init(*x, *y, *z));
 			*x = tmp.x;
 			*y = tmp.y;

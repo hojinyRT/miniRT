@@ -71,11 +71,9 @@ typedef struct s_vec
 typedef t_vec	t_color;
 typedef t_vec	t_point;
 
-typedef struct s_texture
+typedef struct s_img
 {
-	int				type;
-	t_color			color;
-	void			*image;
+	void			*img_ptr;
 	char			*file_name;
 	char			*addr;
 	int				height;
@@ -83,23 +81,13 @@ typedef struct s_texture
 	int				bits_per_pixel;
 	int				line_length;
 	int				endian;
-}	t_texture;
-
-typedef struct  s_img
-{
-	void	*img_ptr;
-	char	*addr;
-	int		bits_per_pixel;
-	int		line_length;
-	int		endian;
-}			t_img;
+}	t_img;
 
 typedef struct	s_mlx
 {
 	void		*ptr;
 	void		*win;
 	t_img		img;
-	t_texture	texture;
 }			t_mlx;
 
 typedef struct s_ray
@@ -117,8 +105,8 @@ typedef struct s_camera
 	t_vec	vertical;
 	double	focal_len;
 	t_point	start_point;
-	int		fov;
 	t_vec	normal;
+	int		fov;
 	void            *next;
 }			    t_camera;
 
@@ -147,14 +135,15 @@ typedef struct s_cylinder
 }			t_cylinder;
 
 typedef t_cylinder	t_cone;
-typedef struct s_info t_info;
+
 typedef struct  s_object
 {
     t_object_type   type;
     void            *element;
     void            *next;
 	t_color			albedo;
-	t_info			*info;
+	t_img			*bump;
+	int				checker;
 }                   t_object;
 
 typedef struct s_hit_record
@@ -172,6 +161,7 @@ typedef struct s_hit_record
 	double		v;
 	t_vec		e1;
 	t_vec		e2;
+	int			checker;
 }				t_hit_record;
 
 typedef struct  s_light
@@ -209,7 +199,7 @@ t_vec	vec_unit(t_vec u);
 t_vec	vec_init(double x, double y, double z);
 
 
-t_object    *object_init(t_object_type type, void *element, t_vec albedo);
+t_object    *object_init(t_object_type type, void *element, t_vec albedo, int checker);
 t_sphere	*sphere_init(t_point center, double radius);
 t_plane		*plane_init(t_point center, t_vec normal, double radius);
 t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal);
@@ -240,12 +230,29 @@ int				in_shadow(t_object *objs, t_ray light_ray, double light_len);
 t_ray			ray_init(t_point orig, t_vec dir);
 
 void    set_face_normal(t_ray ray, t_hit_record *rec);
+t_vec	convert_color_to_normal(int	color);
+
+
+// ---------put.c--------//
+void    obj_add(t_object **list, t_object *new);
+void    light_add(t_light **list, t_light *new);
+void	put_a(t_info *info, char **argv, int cnt);
+t_camera    *camera_init(t_point coor, t_vec normal, int fov);
+void    camera_add(t_camera **list, t_camera *new);
+void	put_c(t_info *info, char **argv, int cnt);
+void	put_l(t_info *info, char **argv, int cnt);
+void	put_sp(t_info *info, char **argv, int cnt);
+void	put_pl(t_info *info, char **argv, int cnt);
+t_point	get_cap_point(t_point center, double height, t_vec normal, double sign);
+void	put_cy(t_info *info, char **argv, int cnt);
+void	put_cn(t_info *info, char **argv, int cnt);
+int 	check_format(char *format);
+void	put_info(t_info *info, char **argv);
 
 // ---------tmp--------//
 void	print_obj(t_object *obj);
-
-t_vec	convert_color_to_normal(int	color);
+void	print_cam(t_camera *cam);
 void debugPrintVec(char *str, t_vec *vector);
-void    set_face_normal2(t_ray ray, t_hit_record *rec);
+void	ae();
 
 #endif

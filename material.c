@@ -1,6 +1,6 @@
 #include "minirt.h"
 
-t_object    *object_init(t_object_type type, void *element, t_vec albedo)
+t_object    *object_init(t_object_type type, void *element, t_vec albedo, int checker)
 {
     t_object    *new;
 
@@ -9,6 +9,7 @@ t_object    *object_init(t_object_type type, void *element, t_vec albedo)
     new->type = type;
     new->element = element;
     new->albedo = albedo;
+    new->checker = checker;
     new->next = NULL;
     return (new);
 }

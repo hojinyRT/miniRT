@@ -6,7 +6,7 @@
 #    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/10/06 17:55:42 by jinypark         ###   ########.fr        #
+#    Updated: 2022/10/07 09:55:02 by jinypark         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,7 @@ CFLAGS 		=	-Wall -Wextra -Werror -g3 -fsanitize=address
 LIBFT_DIR 	=	libft
 MLX_DIR 	=	mlx
 
-MANDA_SRCS 	=	minirt.c vector.c material.c utils.c object.c
+MANDA_SRCS 	=	minirt.c vector.c material.c utils.c object.c put.c remove.c
 BONUS_SRCS 	=	minirt.c vector.c
 
 OBJS_MANDA 	=	$(MANDA_SRCS:.c=.o)
