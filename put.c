@@ -2,10 +2,9 @@
 
 void	get_bump_addr(t_object *obj, t_mlx *mlx)
 {
-	t_vec	tmp;
 	int		format[2];
 	int		idx[2];
-	char	*dst;
+	// char	*dst;
 
 	ft_bzero(idx, sizeof(idx));
 	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, &format[0], &format[1]);
@@ -17,17 +16,17 @@ void	get_bump_addr(t_object *obj, t_mlx *mlx)
 											&(obj->bump->endian));
 	obj->bump->width = format[0];
 	obj->bump->height = format[1];
-	while (idx[0] < format[1])
-	{
-		idx[1] = 0;
-		while (idx[1] < format[0])
-		{
-			dst = obj->bump->addr + (idx[0] * obj->bump->line_length + idx[1] * (obj->bump->bits_per_pixel / 8));
-			tmp = convert_color_to_normal(*(unsigned int *)dst);
-			idx[1]++;
-		}
-		idx[0]++;
-	}
+	// while (idx[0] < format[1])
+	// {
+	// 	idx[1] = 0;
+	// 	while (idx[1] < format[0])
+	// 	{
+	// 		dst = obj->bump->addr + (idx[0] * obj->bump->line_length + idx[1] * (obj->bump->bits_per_pixel / 8));
+	// 		idx[1]++;
+	// 		// obj->bump->addr = dst;
+	// 	}
+	// 	idx[0]++;
+	// }
 }
 
 void    obj_add(t_object **list, t_object *new)
@@ -198,7 +197,6 @@ void	put_pl(t_info *info, char **argv, int cnt)
 		origin = ft_atovec(argv[1], XYZ);
 		normal = ft_atovec(argv[2], UNIT);
 		color = ft_atovec(argv[3], RGB);
-
 		tmp = object_init(PL, plane_init(origin, normal, 0), vec_div_double(color, 255), checker);
 		tmp->bump = ft_calloc(1, sizeof(t_img));
 		if (cnt == 5)

@@ -144,29 +144,45 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 
 void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
 {
-	// const t_vec		p = vec_sub(rec->p, center);
-	// const t_vec		n = rec->normal;
 	double			phi;
 	double			theta;
-	// t_vec			e1;
-	// t_vec			e2;
-	(void)size;
-	(void)center;
+	const t_vec		n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
 
-	theta = atan2(rec->p.x, rec->p.z);
-	phi = acos(rec->p.y / 5.);
-	// if ((n.x == 0 && n.y == 1 && n.z == 0))
-	// 	e1 = vec_unit(vec_cross(vec_init(0, 0, -1), n));
-	// else if ((n.x == 0 && n.y == -1 && n.z == 0))
-	// 	e1 = vec_unit(vec_cross(vec_init(0, 0, 1), n));
-	// else
-	// 	e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
-	// e2 = vec_unit(vec_cross(n, e1));
+	if ((n.x == 0 && n.y == 1 && n.z == 0))
+		e1 = vec_unit(vec_cross(vec_init(0, 0, -1), n));
+	else if ((n.x == 0 && n.y == -1 && n.z == 0))
+		e1 = vec_unit(vec_cross(vec_init(0, 0, 1), n));
+	else
+		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
+	e2 = vec_unit(vec_cross(n, e1));
+	rec->e1 = e1;
+	rec->e2 = e2;
+	theta = atan2(fabs(rec->p.x - center.x), fabs(rec->p.z - center.z));
+	phi = acos(fabs(rec->p.y - center.y) / vec_len(vec_sub(rec->p, center)));
+	// rec->u = fmod(1. - (rec->u + 0.5), size)/ size;
+	// rec->v = fmod(1. - fabs(phi / M_PI), size)/ size;
+	// rec->u = ((theta / M_PI + 1)) / 2 * size * 2;
+	// rec->v = (phi / M_PI) * size;
+	(void)size;
+	// rec->u = (1 - (theta / (2 * M_PI) + 0.5));
+	// rec->u = fmod(rec->u, rec->u / size);
+	// rec->v = (1 - phi / M_PI);
+	// rec->v = fmod(rec->v, rec->v / size);
+	rec->u  = fabs(cos(theta / 2));
+	rec->v = fabs(cos(phi / 4));
+	// rec->u += rec->u < 0;
+	// rec->v += rec->v < 0;
+
+	// rec->v = 1 - rec->v;
+	// rec->u = 1 - rec->u;
+	// rec->v = 1 - rec->v;
+	// printf("%lf, %lf\n", rec->u, rec->v);
 	// rec->e1 = e1;
 	// rec->e2 = e2;
-	rec->u = 1. - (theta / (2 * M_PI) + 0.5);
-	rec->v = 1. - (phi / M_PI);
-	// printf("u : %lf, v: %lf\n", rec->u, rec->v);
+	// rec->u = fmod(vec_dot(e1, p), size) / size;
+	// rec->v = fmod(vec_dot(e2, p), size) / size;
 	// rec->u += rec->u < 0;
 	// rec->v += rec->v < 0;
 	// rec->v = 1 - rec->v;
@@ -201,10 +217,10 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	rec->normal = vec_div_double(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius);
-	get_sphere_uv(rec, sp->center, 10); //조정 바람
+	get_sphere_uv(rec, sp->center, 20); //조정 바람
 	if (obj->bump->file_name)
 		rec->normal = bump_normal(obj, rec);
-	rec->type = SP;
+	set_face_normal(ray, rec);
 	return (TRUE);
 }
 
@@ -349,10 +365,10 @@ t_vec        point_light_get(t_info *info, t_light *light)
 
     light_dir = vec_sub(light->origin, info->rec.p);
     light_len = vec_len(light_dir);
-    light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
-    // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
+    // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
+    light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
     // if (in_shadow(info->obj, light_ray, light_len))
-        // return (vec_init(0,0,0));
+    //     return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
     // 추가끝
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
@@ -371,12 +387,12 @@ t_vec        point_light_get(t_info *info, t_light *light)
 t_color	checkerboard_value(t_hit_record rec)
 {
 	const int		width = 16;
-	const int		height = 16;
+	const int		height = 8;
 	const double	u2 = floor(rec.u * width);
 	const double	v2 = floor(rec.v * height);
 	// if (rec.type == SP)
 	// {
-	// 	double sines = sin(10 * rec.p.x) * sin(10 * rec.p.y) * sin(10 * rec.p.z);
+	// 	double sines = sin(1 * rec.p.x) * sin(1 * rec.p.y) * sin(1 * rec.p.z);
 	// 	if (sines < 0)
 	// 		return (rec.albedo);
 	// 	else
