@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 17:34:28 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/07 13:25:53 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/09 14:10:56 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,7 +123,7 @@ char	*get_next_line(int fd)
 	while (r > 0)
 	{
 		buffer[r] = '\0';
-		fd_node->content = ft_strjoin(fd_node->content, buffer);
+		fd_node->content = ft_strjoin_g(fd_node->content, buffer);
 		if (ft_strchr(fd_node->content, '\n') >= 0)
 			return (trim_line(&(fd_node->content)));
 		r = read(fd, buffer, BUFFER_SIZE);

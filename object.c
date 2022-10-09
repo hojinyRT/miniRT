@@ -1,5 +1,28 @@
 #include "minirt.h"
 
+t_vec	convert_int_to_rgb(int	color)
+{
+	t_vec	res;
+
+	res.x = color >> 16 & 0xFF;
+	res.y = color >> 8 & 0xFF;
+	res.z = color & 0xFF;
+	return (res);
+}
+
+t_vec	tex_rgb(t_object *obj, t_hit_record *rec)
+{
+	int x;
+	int y;
+	t_vec tmp;
+
+	x = (int)(rec->u * 512);
+	y = (int)(rec->v * 512);
+	tmp = convert_int_to_rgb(*(unsigned int *)(obj->tex->addr + obj->tex->line_length * y + x * obj->tex->bits_per_pixel / 8));
+	tmp = vec_div_double(tmp, 255);
+	return (tmp);
+}
+
 t_vec	bump_normal(t_object *obj, t_hit_record *rec)
 {
 	int x;
@@ -119,7 +142,7 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	root = (-half_b - sqrtd) / a;
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	if (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0 
+	if (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0
         || vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
 	{
 		root = (-half_b + sqrtd) / a;
@@ -159,33 +182,14 @@ void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
 	e2 = vec_unit(vec_cross(n, e1));
 	rec->e1 = e1;
 	rec->e2 = e2;
-	theta = atan2(fabs(rec->p.x - center.x), fabs(rec->p.z - center.z));
-	phi = acos(fabs(rec->p.y - center.y) / vec_len(vec_sub(rec->p, center)));
-	// rec->u = fmod(1. - (rec->u + 0.5), size)/ size;
-	// rec->v = fmod(1. - fabs(phi / M_PI), size)/ size;
-	// rec->u = ((theta / M_PI + 1)) / 2 * size * 2;
-	// rec->v = (phi / M_PI) * size;
-	(void)size;
-	// rec->u = (1 - (theta / (2 * M_PI) + 0.5));
-	// rec->u = fmod(rec->u, rec->u / size);
-	// rec->v = (1 - phi / M_PI);
-	// rec->v = fmod(rec->v, rec->v / size);
-	rec->u  = fabs(cos(theta / 2));
-	rec->v = fabs(cos(phi / 4));
-	// rec->u += rec->u < 0;
-	// rec->v += rec->v < 0;
-
-	// rec->v = 1 - rec->v;
-	// rec->u = 1 - rec->u;
-	// rec->v = 1 - rec->v;
-	// printf("%lf, %lf\n", rec->u, rec->v);
-	// rec->e1 = e1;
-	// rec->e2 = e2;
-	// rec->u = fmod(vec_dot(e1, p), size) / size;
-	// rec->v = fmod(vec_dot(e2, p), size) / size;
-	// rec->u += rec->u < 0;
-	// rec->v += rec->v < 0;
-	// rec->v = 1 - rec->v;
+	theta = atan2((rec->p.x - center.x), (rec->p.z - center.z));
+	phi = acos((rec->p.y - center.y) / vec_len(vec_sub(rec->p, center)));
+	rec->u = (theta / (M_PI));
+	rec->v = phi / M_PI;
+	if (rec->u < 0)
+		rec->u += 1;
+	rec->u = fmod(rec->u, 1 / size) / (1/size);
+	rec->v = fmod(rec->v, 1 / size) / (1/size);
 }
 
 int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -217,9 +221,12 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	rec->normal = vec_div_double(vec_sub(rec->p, ((t_sphere*)obj->element)->center), ((t_sphere*)obj->element)->radius);
-	get_sphere_uv(rec, sp->center, 20); //조정 바람
+	get_sphere_uv(rec, sp->center, 1); //조정 바람
 	if (obj->bump->file_name)
+	{
+		rec->albedo = tex_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
+	}
 	set_face_normal(ray, rec);
 	return (TRUE);
 }
@@ -367,8 +374,8 @@ t_vec        point_light_get(t_info *info, t_light *light)
     light_len = vec_len(light_dir);
     // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
     light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
-    // if (in_shadow(info->obj, light_ray, light_len))
-    //     return (vec_init(0,0,0));
+    if (in_shadow(info->obj, light_ray, light_len))
+        return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
     // 추가끝
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
@@ -386,36 +393,14 @@ t_vec        point_light_get(t_info *info, t_light *light)
 
 t_color	checkerboard_value(t_hit_record rec)
 {
-	const int		width = 16;
-	const int		height = 8;
+	const int		width = 10;
+	const int		height = 10;
 	const double	u2 = floor(rec.u * width);
 	const double	v2 = floor(rec.v * height);
-	// if (rec.type == SP)
-	// {
-	// 	double sines = sin(1 * rec.p.x) * sin(1 * rec.p.y) * sin(1 * rec.p.z);
-	// 	if (sines < 0)
-	// 		return (rec.albedo);
-	// 	else
-	// 		return (vec_init(1, 1, 1));
-	// }
 	if (fmod(u2 + v2, 2.) == 0)
 		return (rec.albedo);
 	return (vec_init(1, 1, 1));
 }
-
-// t_color	bump_value(t_info info, t_hit_record rec)
-// {
-// 	int x;
-// 	int y;
-// 	t_color tmp;
-
-// 	x = (int)(rec.u * 1024.);
-// 	y = (int)(rec.v * 1024.);
-// 	tmp = convert_color_to_normal(*(unsigned int *)(info.bump.addr + info.bump.line_length * y + x * info.bump.bits_per_pixel / 8));
-// 	// debugPrintVec("color", &tmp);
-// 	tmp = vec_unit(tmp);
-// 	return (tmp);
-// }
 
 t_vec	phong_lighting(t_info *info)
 {

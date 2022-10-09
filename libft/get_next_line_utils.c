@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line_utils.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/07 15:07:04 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/07 13:26:08 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/09 14:11:04 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ char	*ft_strdup_g(const char *s1)
 	return (new);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin_g(char *s1, char *s2)
 {
 	char	*arr;
 	size_t	len;

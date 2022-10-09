@@ -143,6 +143,7 @@ typedef struct  s_object
     void            *next;
 	t_color			albedo;
 	t_img			*bump;
+	t_img			*tex;
 	int				checker;
 }                   t_object;
 

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/04/05 17:59:58 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/07 13:26:00 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/09 14:11:11 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ t_list	*ft_lstnew(int fd);
 int		ft_strchr(const char *s, int c);
 char	*ft_strcat(char *dest, char const *src);
 char	*ft_strdup_g(const char *s1);
-char	*ft_strjoin(char *s1, char *s2);
+char	*ft_strjoin_g(char *s1, char *s2);
 char	*trim_line(char **keep);
 t_list	*find_node(t_list **node, int fd);
 void	lstclear(t_list **keep, t_list **node);

@@ -1,10 +1,29 @@
 #include "minirt.h"
 
+void	get_texture_addr(t_object *obj, t_mlx *mlx)
+{
+	int		format[2];
+	int		idx[2];
+	char	*texture;
+
+	ft_bzero(idx, sizeof(idx));
+	texture = ft_strjoin("t", obj->bump->file_name);
+	obj->tex->img_ptr = mlx_png_file_to_image(mlx->ptr, texture, &format[0], &format[1]);
+	if (!obj->tex->img_ptr)
+		ft_strerror("없는 파일임");
+	obj->tex->addr = mlx_get_data_addr(obj->tex->img_ptr, \
+											&(obj->tex->bits_per_pixel), \
+											&(obj->tex->line_length), \
+											&(obj->tex->endian));
+	obj->tex->width = format[0];
+	obj->tex->height = format[1];
+	free(texture);
+}
+
 void	get_bump_addr(t_object *obj, t_mlx *mlx)
 {
 	int		format[2];
 	int		idx[2];
-	// char	*dst;
 
 	ft_bzero(idx, sizeof(idx));
 	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, &format[0], &format[1]);
@@ -16,17 +35,6 @@ void	get_bump_addr(t_object *obj, t_mlx *mlx)
 											&(obj->bump->endian));
 	obj->bump->width = format[0];
 	obj->bump->height = format[1];
-	// while (idx[0] < format[1])
-	// {
-	// 	idx[1] = 0;
-	// 	while (idx[1] < format[0])
-	// 	{
-	// 		dst = obj->bump->addr + (idx[0] * obj->bump->line_length + idx[1] * (obj->bump->bits_per_pixel / 8));
-	// 		idx[1]++;
-	// 		// obj->bump->addr = dst;
-	// 	}
-	// 	idx[0]++;
-	// }
 }
 
 void    obj_add(t_object **list, t_object *new)
@@ -164,7 +172,7 @@ void	put_sp(t_info *info, char **argv, int cnt)
 	double		radius;
 	t_color		color;
 	int			checker;
-	
+
 	if (cnt == 4 || cnt == 5)
 	{
 		checker = (ft_strlen(argv[0]) == 5);
@@ -173,10 +181,12 @@ void	put_sp(t_info *info, char **argv, int cnt)
 		color = ft_atovec(argv[3], RGB);
 		tmp = object_init(SP, sphere_init(origin, radius), vec_div_double(color, 255), checker);
 		tmp->bump = ft_calloc(1, sizeof(t_img));
+		tmp->tex = ft_calloc(1, sizeof(t_img));
 		if (cnt == 5)
 		{
 			tmp->bump->file_name = ft_strdup(argv[4]);
 			get_bump_addr(tmp, &info->mlx);
+			get_texture_addr(tmp, &info->mlx);
 		}
 		obj_add(&(info->obj), tmp);
 	}
@@ -249,7 +259,7 @@ void	put_cy(t_info *info, char **argv, int cnt)
 		obj_add(&(info->obj), tmp);
 	}
 	else
-		ft_strerror("cy인자 개수 안맞음");	
+		ft_strerror("cy인자 개수 안맞음");
 }
 
 void	put_cn(t_info *info, char **argv, int cnt)
