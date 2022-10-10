@@ -192,7 +192,10 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	set_face_normal(ray, rec);
 	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) &&
     	vec_dot(vec_sub(rec->p, cy->center), cy->normal) <= cy->height)
+	{
+		get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
 		return (TRUE);
+	}
     return (FALSE);
 }
 
