@@ -447,30 +447,6 @@ void    set_face_normal(t_ray ray, t_hit_record *rec)
     return ;
 }
 
-// void ft_draw(t_info *info)
-// {
-// 	int		idx[2];
-// 	int		vdx[2];
-// 	t_color	color;
-
-// 	idx[Y] = WIN_H - 1;
-// 	while (idx[Y] >= 0)
-// 	{
-// 		idx[X] = 0;
-// 		while (idx[X] < WIN_W)
-// 		{
-// 			vdx[U] = (double)idx[X] / (WIN_W - 1);
-// 			vdx[V] = (double)idx[Y] / (WIN_H - 1);
-// 			info->ray = ray_primary(info->camera, vdx[U], vdx[V]);
-// 			// color = vec_init(((double)idx[Y] / (WIN_H - 1)) * 255 , ((double)idx[X] / (WIN_W - 1)) * 255, 0.25 * 255);
-// 			color = ray_color(*info);
-// 			my_mlx_pixel_put(&(info->mlx.img), idx[X], WIN_H - 1 - idx[Y], color);
-// 			idx[X]++;
-// 		}
-// 		idx[Y]--;
-// 	}
-// }
-
 void ft_draw(t_info *info, t_mlx *mlx)
 {
 	int			idx[2];
@@ -522,11 +498,6 @@ int	key_press(int keycode, void *param)
 	return (0);
 }
 
-// void	ae()
-// {
-// 	system("leaks miniRT");
-// }
-
 void	get_bump(t_info *info)
 {
 	t_vec	tmp;
@@ -559,7 +530,6 @@ int main(int argc, char **argv)
 {
 	t_info	info;
 
-	// atexit(ae);
 	if (argc != 2)
 		ft_strerror("인자 잘못넣음");
 	ft_memset(&info, 0, sizeof(t_info));
@@ -580,12 +550,3 @@ int main(int argc, char **argv)
 	mlx_loop(info.mlx.ptr);
 	return (0);
 }
-
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2, WIN_H / 2 + i, vec_init(255, 0, 0));
-	// }
-	// for (int i = 0; i < 100; i++)
-	// {
-	// 	my_mlx_pixel_put(&(mlx->img), WIN_W / 2 + i, WIN_H / 2, vec_init(255, 0, 0));
-	// }
