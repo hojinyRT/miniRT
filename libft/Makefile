@@ -6,7 +6,7 @@
 #    By: jinypark <jinypark@student.42seoul.kr>     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/09/29 13:45:16 by jinypark         ###   ########.fr        #
+#    Updated: 2022/10/10 11:46:15 by minsuki2         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,10 +55,10 @@ bonus:
 	make BONUS_FLAG=1 all
 
 clean:
-	rm -f $(OBJS) $(OBJS_BONUS)
+	@rm -vf $(OBJS) $(OBJS_BONUS)
 
 fclean: clean
-	rm -f $(NAME)
+	@rm -vf $(NAME)
 
 re: fclean all
 

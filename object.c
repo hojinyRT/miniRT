@@ -461,7 +461,8 @@ t_vec	phong_lighting(t_info *info)
     light_color = vec_add(light_color, info->ambient);
 	// printf("%lf,%lf,%lf\n", light_color.x, light_color.y, light_color.z);
 	// color = checkerboard_value((info->rec));
-	// color = bump_value(*info, info->rec);
+	color = bump_value(*info, info->rec);
+	// color = rec.albedo;
     return (vec_multi_double(vec_min(vec_multi(light_color, color), vec_init(1, 1, 1)), 255));
     //모든 광원에 의한 빛의 양을 구한 후, 오브젝트의 반사율과 곱해준다. 그 값이 (1, 1, 1)을 넘으면 (1, 1, 1)을 반환한다.
 }
