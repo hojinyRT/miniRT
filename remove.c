@@ -71,6 +71,20 @@ void	print_obj(t_object *obj) // 지워야함
 			printf("color  G : %lf ", curr->albedo.y);
 			printf("color  B : %lf \n", curr->albedo.z);
 		}
+		else if (curr->type == CAP)
+		{
+			printf("-------type CAP------\n");
+			printf("x : %lf ", ((t_plane *)curr->element)->center.x);
+			printf("y : %lf ", ((t_plane *)curr->element)->center.y);
+			printf("z : %lf \n", ((t_plane *)curr->element)->center.z);
+			printf("normal x : %lf ", ((t_plane *)curr->element)->normal.x);
+			printf("normal y : %lf ", ((t_plane *)curr->element)->normal.y);
+			printf("normal z : %lf \n", ((t_plane *)curr->element)->normal.z);
+			printf("color  R : %lf ", curr->albedo.x);
+			printf("color  G : %lf ", curr->albedo.y);
+			printf("color  B : %lf \n", curr->albedo.z);
+		}
+
 		else if (curr->type == CY)
 		{
 			printf("-------type CY------\n");

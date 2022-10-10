@@ -171,6 +171,7 @@ int main(int argc, char **argv)
 											&(info.mlx.img.line_length), \
 											&(info.mlx.img.endian));
 	info_init(&info, argv[1]);
+	// print_obj(info.obj);
 	ft_draw(&info, &info.mlx);
 	mlx_put_image_to_window(info.mlx.ptr, info.mlx.win, info.mlx.img.img_ptr, 0, 0);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);

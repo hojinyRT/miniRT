@@ -68,16 +68,14 @@ int in_shadow(t_object *objs, t_ray light_ray, double light_len)
     return (FALSE);
 }
 
-void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double size, double h)
+void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double size, double r)
 {
 	double			theta;
-	t_vec			n = rec->normal;
 	t_vec			e1;
 	t_vec			e2;
 	double			p_e1;
 	double			p_e2;
 
-	(void)n;
 	if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == 1))
 		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), normal));
 	else if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == -1))
@@ -89,7 +87,7 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	p_e2 = vec_dot(vec_sub(rec->p, center), e2);
 	theta = atan2(p_e2, p_e1);
 	rec->u = (theta / (M_PI));
-	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / h, 1);
+	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * 2), 1);
 	if (rec->u < 0)
 		rec->u += 1;
 	// debugPrintVec("rec", &rec->p);
@@ -141,7 +139,7 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) && vec_dot(vec_sub(rec->p, cy->center), cy->normal) < cy->height)
 	{
-		get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->height);
+		get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
 		return (TRUE);
 	}
     return (FALSE);
@@ -264,6 +262,35 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	return (TRUE);
 }
 
+void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size)
+{
+	double			theta;
+	t_vec			n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
+	double			p_e1;
+	double			p_e2;
+
+	(void)n;
+	if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == 1))
+		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), normal));
+	else if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == -1))
+		e1 = vec_unit(vec_cross(vec_init(0, -1, 0), normal));
+	else
+		e1 = vec_unit(vec_cross(vec_init(0, 0, 1), normal));
+	e2 = vec_unit(vec_cross(normal, e1));
+	p_e1 = vec_dot(vec_sub(rec->p, center), e1);
+	p_e2 = vec_dot(vec_sub(rec->p, center), e2);
+	theta = atan2(p_e2, p_e1);
+	rec->u = (theta / (M_PI));
+	if (rec->u < 0)
+		rec->u += 1;
+	// debugPrintVec("rec", &rec->p);
+	// debugPrintDouble("u", "v", rec->u, rec->v);
+	rec->u = fmod(rec->u, size) / size;
+	rec->v = 1;
+}
+
 int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_plane	*pl;
@@ -273,26 +300,21 @@ int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
 
 	pl = (t_plane *)obj->element;
 	denominator = vec_dot(ray.dir, pl->normal);
-	// printf("1\n");
 	if (fabs(denominator) < EPSILON)
 		return (FALSE);
-	// printf("2\n");
 	numrator = vec_dot(vec_sub(pl->center, ray.orig), pl->normal);
 	root = numrator / denominator;
-	// printf("root is %lf\n", root);
 	if (root < rec->tmin || rec->tmax < root)
 		return (FALSE);
-	// printf("3\n");
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
-	set_face_normal(ray, rec);
+	// debugPrintVec("pl center", &pl->center);
     t_vec pcv = vec_sub(rec->p, pl->center);
-	debugPrintDouble("vec_len_2", "r_square", vec_dot(pcv, pcv), pow(pl->radius, 2));
     if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
         return (FALSE);
-	// printf("4\n");
+	get_cap_uv(rec, pl->center, pl->normal, 1);
 	return (TRUE);
 }
 
