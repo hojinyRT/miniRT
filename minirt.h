@@ -270,5 +270,7 @@ void	print_obj(t_object *obj);
 void	print_cam(t_camera *cam);
 void debugPrintVec(char *str, t_vec *vector);
 void	ae();
+void debugPrintDouble(char *str1, char *str2, double a, double b);
+
 
 #endif

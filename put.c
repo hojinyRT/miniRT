@@ -253,7 +253,7 @@ void	put_cy(t_info *info, char **argv, int cnt)
 		if (cnt == 7)
 				tmp->bump->file_name = argv[6];
 		obj_add(&(info->obj), tmp);
-		tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255), checker);
+		tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, 1), normal, format[0]), vec_div_double(color, 255), checker);
 		if (cnt == 7)
 				tmp->bump->file_name = argv[6];
 		obj_add(&(info->obj), tmp);
