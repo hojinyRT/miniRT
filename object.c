@@ -87,7 +87,7 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	p_e2 = vec_dot(vec_sub(rec->p, center), e2);
 	theta = atan2(p_e2, p_e1);
 	rec->u = (theta / (M_PI));
-	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * 2), 1);
+	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
 	if (rec->u < 0)
 		rec->u += 1;
 	// debugPrintVec("rec", &rec->p);
