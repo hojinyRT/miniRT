@@ -36,14 +36,22 @@ void    light_add(t_light **list, t_light *new)
 
 void	put_a(t_info *info, char **argv, int cnt)
 {
-	double	brightness;
-	t_color	color;
+	double		brightness;
+	static int	count;
+	t_color	*color;
 
+	if (count > 0)
+		ft_strerror("Error : multiple ambients in .rt file");
 	if (cnt != 3)
-		ft_strerror("a 인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(ambient)");
 	brightness = ft_atod(argv[1]);
-	color = vec_div_double(ft_atovec(argv[2], RGB), 255);
-	info->ambient = vec_multi_double(color, brightness);
+	color = ft_calloc(1, sizeof(t_color));
+	if (color == NULL)
+		ft_strerror("memory allocation failed");
+	*color = vec_div_double(ft_atovec(argv[2], RGB), 255);
+	*color = vec_multi_double(*color, brightness);
+	info->ambient = color;
+	++count;
 }
 
 t_camera    *camera_init(t_point coor, t_vec normal, int fov)
@@ -62,9 +70,7 @@ t_camera    *camera_init(t_point coor, t_vec normal, int fov)
 		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 0, -1))), init->viewport_w);
 	else
 		init->horizontal = vec_multi_double(vec_unit(vec_cross(normal, vec_init(0, 1, 0))), init->viewport_w); // RT파일에서 불가능한 회전
-	debugPrintVec("hor", &init->horizontal);
 	init->vertical =  vec_multi_double(vec_unit(vec_cross(init->horizontal, normal)), init->viewport_h);
-	debugPrintVec("ver", &init->vertical);
 	// init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
     //                             vec_div_double(init->vertical, 2)), normal);
 	init->start_point = vec_sub(vec_sub(vec_sub(init->orig, vec_div_double(init->horizontal, 2)),
@@ -99,14 +105,12 @@ void	put_c(t_info *info, char **argv, int cnt)
 	t_camera *tmp;
 
 	if (cnt != 4)
-		ft_strerror("c인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(camera)");
 	coor = ft_atovec(argv[1], XYZ);
-	// normal = ft_atovec(argv[2], UNIT);
 	normal = ft_atovec(argv[2], UNIT);
 	fov = ft_atoi(argv[3]); //잘못들어오면 exit해야함
 	if (fov < 0 || fov > 180)
-		ft_strerror("카메라 앵글 잘못됨"); //에러메시지 출력
-
+		ft_strerror("Error : invalid fov");
 	tmp = camera_init(coor, normal, fov);
 	camera_add(&(info->camera), tmp);
 }
@@ -119,11 +123,10 @@ void	put_l(t_info *info, char **argv, int cnt)
 	t_color	color;
 
 	if (cnt != 4)
-		ft_strerror("l인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(light)");
 	origin = ft_atovec(argv[1], XYZ);
 	brightness = ft_atod(argv[2]);
 	color = vec_div_double(ft_atovec(argv[3], RGB), 255);
-
 	tmp = light_init(origin, color, brightness); // 더미 albedo
 	light_add(&(info->light), tmp);
 }
@@ -154,7 +157,7 @@ void	put_sp(t_info *info, char **argv, int cnt)
 		obj_add(&(info->obj), tmp);
 	}
 	else
-		ft_strerror("sp인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(sphere)");
 }
 void	put_pl(t_info *info, char **argv, int cnt)
 {
@@ -180,7 +183,7 @@ void	put_pl(t_info *info, char **argv, int cnt)
 		obj_add(&(info->obj), tmp);
 	}
 	else
-		ft_strerror("pl인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(plane)");
 }
 
 t_point	get_cap_point(t_point center, double height, t_vec normal, double sign)
@@ -235,7 +238,7 @@ void	put_cy(t_info *info, char **argv, int cnt)
 		obj_add(&(info->obj), tmp);
 	}
 	else
-		ft_strerror("cy인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(cylinder)");
 }
 
 void	put_cn(t_info *info, char **argv, int cnt)
@@ -272,7 +275,7 @@ void	put_cn(t_info *info, char **argv, int cnt)
 		obj_add(&(info->obj), tmp);
 	}
 	else
-		ft_strerror("cn인자 개수 안맞음");
+		ft_strerror("Error : invalid argument count(cone)");
 }
 
 int 	check_format(char *format)
@@ -291,10 +294,10 @@ int 	check_format(char *format)
 		return (A);
 	else if (!ft_strncmp(format, "C", 2))
 		return (C);
-	else if (!ft_strncmp(format, "L", 2)) //맨대토리 따로 작성 L
+	else if (!ft_strncmp(format, "L", 2))
 		return (L);
 	else
-		ft_strerror("포맷 잘못받음");
+		ft_strerror("Error : invalid type in .rt file");
 	return (-1);
 }
 

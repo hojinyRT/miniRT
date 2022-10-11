@@ -9,8 +9,6 @@ void	get_texture_addr(t_object *obj, t_mlx *mlx)
 	ft_bzero(idx, sizeof(idx));
 	texture = ft_strjoin("t", obj->bump->file_name);
 	obj->tex->img_ptr = mlx_png_file_to_image(mlx->ptr, texture, &format[0], &format[1]);
-	if (!obj->tex->img_ptr)
-		ft_strerror("없는 파일임");
 	obj->tex->addr = mlx_get_data_addr(obj->tex->img_ptr, \
 											&(obj->tex->bits_per_pixel), \
 											&(obj->tex->line_length), \
@@ -28,7 +26,7 @@ void	get_bump_addr(t_object *obj, t_mlx *mlx)
 	ft_bzero(idx, sizeof(idx));
 	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, &format[0], &format[1]);
 	if (!obj->bump->img_ptr)
-		ft_strerror("없는 파일임");
+		ft_strerror("Error : no such file or directory");
 	obj->bump->addr = mlx_get_data_addr(obj->bump->img_ptr, \
 											&(obj->bump->bits_per_pixel), \
 											&(obj->bump->line_length), \

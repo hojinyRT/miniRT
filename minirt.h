@@ -180,7 +180,7 @@ typedef struct s_info
     t_camera		*camera;
     t_object		*obj;
     t_light			*light;
-    t_color			ambient;
+    t_color			*ambient;
     t_ray			ray;
     t_hit_record	rec;
 }					t_info;

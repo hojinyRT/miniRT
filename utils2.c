@@ -8,7 +8,7 @@ t_vec	convert_color_to_normal(int	color)
 	res.y = color >> 8 & 0xFF;
 	res.z = color & 0xFF;
 	if ((res.x == 0 && res.y == 0 && res.z == 0))
-		ft_strerror("범프맵 이상함");
+		ft_strerror("Error : invalid bump map");
 	res = vec_div_double(res, 255);
 	res = vec_sub(vec_multi_double(res, 2), vec_init(1, 1, 1));
 	return (res);
