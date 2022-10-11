@@ -236,6 +236,7 @@ void	put_cy(t_info *info, char **argv, int cnt)
 	double		format[2];
 	t_color		color;
 	int			checker;
+	t_object	*tmp_obj;
 
 	if (cnt == 6 || cnt == 7)
 	{
@@ -255,14 +256,20 @@ void	put_cy(t_info *info, char **argv, int cnt)
 			// get_texture_addr(tmp, &info->mlx);
 		}
 		obj_add(&(info->obj), tmp);
+		tmp_obj = tmp;
 		// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255), checker);
 		// // if (cnt == 7)
 		// // 		tmp->bump->file_name = argv[6];
+		
 		// obj_add(&(info->obj), tmp);
-		// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, 1), normal, format[0]), vec_div_double(color, 255), checker);
-		// // if (cnt == 7)
-		// // 		tmp->bump->file_name = argv[6];
-		// obj_add(&(info->obj), tmp);
+		tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, 1), normal, format[0]), vec_div_double(color, 255), checker);
+		if (cnt == 7)
+		{
+			// tmp->bump->file_name = argv[6];
+			tmp->bump = tmp_obj->bump;
+			printf("%s\n", tmp->bump->file_name);
+		}
+		obj_add(&(info->obj), tmp);
 	}
 	else
 		ft_strerror("cy인자 개수 안맞음");

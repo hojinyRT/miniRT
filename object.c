@@ -33,8 +33,12 @@ t_vec	bump_normal(t_object *obj, t_hit_record *rec)
 	// Local = t * UL + b * VL + n * ZL
 	x = (int)(rec->u * (double)obj->bump->width);
 	y = (int)(rec->v * (double)obj->bump->height);
+	// x = 1;
+	// y = 1;
 	// debugPrintDouble("x", "y", x, y);
+	printf("num : %d\n", *(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
 	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
+	// debugPrintVec("tmp", &tmp);
 	ul = vec_multi_double(rec->e1, tmp.x);
 	vl = vec_multi_double(rec->e2, tmp.y);
 	zl = vec_multi_double(rec->normal, tmp.z);
@@ -88,9 +92,11 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	p_e1 = vec_dot(vec_sub(rec->p, center), e1);
 	p_e2 = vec_dot(vec_sub(rec->p, center), e2);
 	theta = atan2(p_e2, p_e1);
+	rec->e1 = e1;
+	rec->e2 = e2;
 	rec->u = (theta / (M_PI));
-	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
-	// rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / 1500, 1);
+	// rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
+	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / 1500, 1);
 	if (rec->u < 0)
 		rec->u += 1;
 	// debugPrintVec("rec", &rec->p);
@@ -98,7 +104,6 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	rec->v = 1 - rec->v;
 	rec->u = fmod(rec->u, size) / size;
 	rec->v = fmod(rec->v, size) / size;
-	// debugPrintDouble("u", "v", rec->u, rec->v);
 }
 
 int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -124,34 +129,44 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 		return (FALSE);
 	sqrtd = sqrt(dis);
 	root = (-half_b - sqrtd) / a;
-	rec->t = root;
-	rec->p = ray_at(ray, root);
-	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0))
+	t_hit_record tmp;
+	tmp.t = root;
+	tmp.p = ray_at(ray, root);
+	// rec->t = root;
+	// rec->p = ray_at(ray, root);
+	if ((vec_dot(vec_sub(tmp.p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(tmp.p, cy->center), cy->normal) < 0) || (root < rec->tmin || rec->tmax < root))
 	{
 		root = (-half_b + sqrtd) / a;
 		if (root < rec->tmin || rec->tmax < root)
 			return (FALSE);
-		rec->t = root;
-		rec->p = ray_at(ray, root);
+		tmp.t = root;
+		tmp.p = ray_at(ray, root);
 	}
     if (root < rec->tmin || rec->tmax < root)
 		return (FALSE);
-	cp = vec_sub(rec->p, cy->center);
+	cp = vec_sub(tmp.p, cy->center);
 	cq_val = vec_dot(cp, cy->normal);
 	cq = vec_multi_double(cy->normal, cq_val);
-	rec->normal = vec_unit(vec_sub(cp, cq));
-	rec->albedo = obj->albedo;
-	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	// printf("q : %lf\n", vec_dot(vec_sub(rec->p, cy->center), cy->normal));
-	if (0 > vec_dot(vec_sub(rec->p, cy->center), cy->normal) || vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
+	if ((vec_dot(vec_sub(tmp.p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(tmp.p, cy->center), cy->normal) < 0) || (root < rec->tmin || rec->tmax < root))
 		return (FALSE);
+	// if (0 > vec_dot(vec_sub(tmp.p, cy->center), cy->normal) || vec_dot(vec_sub(tmp.p, cy->center), cy->normal) > cy->height)
+	// 	return (FALSE);
+	rec->albedo = obj->albedo;
+	rec->normal = vec_unit(vec_sub(cp, cq));
+	rec->t = root;
+	rec->p = ray_at(ray, root);
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
+	// printf("cy %s\n", obj->bump->file_name);
 	if (obj->bump->file_name)
 	{
-		// rec->albedo = tex_rgb(obj, rec);
+		printf("asdasd\n");
+		if (obj->tex->img_ptr)
+			rec->albedo = tex_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
 	}
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	printf("cy true\n");
     return (TRUE);
 }
 
@@ -184,7 +199,8 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	if (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0
-        || vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
+        || vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height
+		|| (root < rec->tmin || rec->tmax < root))
 	{
 		root = (-half_b + sqrtd) / a;
 		if (root < rec->tmin || rec->tmax < root)
@@ -201,9 +217,18 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->albedo = obj->albedo;
 	set_face_normal(ray, rec);
 	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) &&
-    	vec_dot(vec_sub(rec->p, cy->center), cy->normal) <= cy->height)
+    	vec_dot(vec_sub(rec->p, cy->center), cy->normal) <= cy->height && (root >= rec->tmin || rec->tmax >= root))
 	{
 		get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
+		if (obj->bump->file_name)
+		{
+			// printf("asdasd\n");
+			// rec->albedo = tex_rgb(obj, rec);
+			if (obj->tex->img_ptr)
+				rec->albedo = tex_rgb(obj, rec);
+			rec->normal = bump_normal(obj, rec);
+			set_face_normal(ray, rec);
+		}
 		return (TRUE);
 	}
     return (FALSE);
@@ -269,6 +294,8 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	if (obj->bump->file_name)
 	{
 		// rec->albedo = tex_rgb(obj, rec);
+		if (obj->tex->img_ptr)
+			rec->albedo = tex_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
 	}
 	set_face_normal(ray, rec);
@@ -284,24 +311,28 @@ void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size)
 	double			p_e1;
 	double			p_e2;
 
-	(void)n;
-	if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == 1))
+	if ((n.x == 0 && n.y == 0 && n.z == 1))
 		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), normal));
-	else if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == -1))
+	else if ((n.x == 0 && n.y == 0 && n.z == -1))
 		e1 = vec_unit(vec_cross(vec_init(0, -1, 0), normal));
 	else
 		e1 = vec_unit(vec_cross(vec_init(0, 0, 1), normal));
 	e2 = vec_unit(vec_cross(normal, e1));
+	rec->e1 = e1;
+	rec->e2 = e2;
 	p_e1 = vec_dot(vec_sub(rec->p, center), e1);
 	p_e2 = vec_dot(vec_sub(rec->p, center), e2);
+	// debugPrintVec("e1", &e1);
+	// debugPrintVec("e2", &e);
+	// debugPrintDouble("p1", "p2", p_e1, p_e2);
 	theta = atan2(p_e2, p_e1);
 	rec->u = (theta / (M_PI));
 	if (rec->u < 0)
 		rec->u += 1;
 	// debugPrintVec("rec", &rec->p);
-	// debugPrintDouble("u", "v", rec->u, rec->v);
 	rec->u = fmod(rec->u, size) / size;
 	rec->v = 1;
+	debugPrintDouble("u", "v", rec->u, rec->v);
 }
 
 int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -321,13 +352,20 @@ int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
 		return (FALSE);
 	rec->t = root;
 	rec->p = ray_at(ray, root);
-	rec->albedo = obj->albedo;
-	rec->normal = pl->normal;
 	// debugPrintVec("pl center", &pl->center);
     t_vec pcv = vec_sub(rec->p, pl->center);
     if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
         return (FALSE);
+	rec->albedo = obj->albedo;
+	rec->normal = pl->normal;
 	get_cap_uv(rec, pl->center, pl->normal, 1);
+	if (obj->bump->file_name)
+	{
+		// if (obj->tex->img_ptr)
+		// 	rec->albedo = tex_rgb(obj, rec);
+		rec->normal = bump_normal(obj, rec);
+	}
+	set_face_normal(ray, rec);
 	return (TRUE);
 }
 
@@ -375,7 +413,11 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->normal = pl->normal;
 	get_plane_uv(rec, pl->center, 10); //조정 바람
 	if (obj->bump->file_name)
+	{
+		// if (obj->tex->img_ptr)
+		// 	rec->albedo = tex_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
+	}
 	set_face_normal(ray, rec);
 	return (TRUE);
 }
@@ -407,7 +449,7 @@ int hit(t_object *obj, t_ray ray, t_hit_record *rec)
     hit_anything = FALSE;
     t_object *tmp = obj;
     while(tmp)
-    {
+    {	
         if (hit_obj(tmp, ray, &temp_rec))
         {
             hit_anything = TRUE;
@@ -448,8 +490,8 @@ t_vec        point_light_get(t_info *info, t_light *light)
     light_len = vec_len(light_dir);
     // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
     light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
-    if (in_shadow(info->obj, light_ray, light_len))
-        return (vec_init(0,0,0));
+    // if (in_shadow(info->obj, light_ray, light_len))
+        // return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
     // 추가끝
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
@@ -494,5 +536,6 @@ t_vec	phong_lighting(t_info *info)
 		color = checkerboard_value((info->rec));
 	else
 		color = info->rec.albedo;
+	// info->rec.normal == vec_init(0,0,0);
     return (vec_multi_double(vec_min(vec_multi(light_color, color), vec_init(1, 1, 1)), 255));
 }

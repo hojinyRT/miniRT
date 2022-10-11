@@ -249,7 +249,7 @@ void	put_cy(t_info *info, char **argv, int cnt);
 void	put_cn(t_info *info, char **argv, int cnt);
 int 	check_format(char *format);
 void	put_info(t_info *info, char **argv);
-void	get_bump_addr(t_object *obj, t_mlx *mlx);
+void	get_bump_addr(t_object *bump, t_mlx *mlx);
 
 // ---------minirt.c--------//
 void info_init(t_info *info, char *file);
