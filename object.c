@@ -31,12 +31,12 @@ t_vec	bump_normal(t_object *obj, t_hit_record *rec)
 	t_vec ul, vl, zl;
 
 	// Local = t * UL + b * VL + n * ZL
-	x = (int)(rec->u * (double)obj->bump->width);
-	y = (int)(rec->v * (double)obj->bump->height);
+	x = (int)(rec->u * (double)(obj->bump->width - 1));
+	y = (int)(rec->v * (double)(obj->bump->height - 1));
 	// x = 1;
 	// y = 1;
 	// debugPrintDouble("x", "y", x, y);
-	printf("num : %d\n", *(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
+	// printf("num : %d\n", *(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
 	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
 	// debugPrintVec("tmp", &tmp);
 	ul = vec_multi_double(rec->e1, tmp.x);
@@ -96,7 +96,7 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	rec->e2 = e2;
 	rec->u = (theta / (M_PI));
 	// rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
-	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / 1500, 1);
+	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
 	if (rec->u < 0)
 		rec->u += 1;
 	// debugPrintVec("rec", &rec->p);
@@ -157,16 +157,13 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, root);
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
-	// printf("cy %s\n", obj->bump->file_name);
 	if (obj->bump->file_name)
 	{
-		printf("asdasd\n");
 		if (obj->tex->img_ptr)
 			rec->albedo = tex_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
 	}
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	printf("cy true\n");
     return (TRUE);
 }
 
@@ -302,7 +299,7 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	return (TRUE);
 }
 
-void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size)
+void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size, double r)
 {
 	double			theta;
 	t_vec			n = rec->normal;
@@ -329,10 +326,11 @@ void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size)
 	rec->u = (theta / (M_PI));
 	if (rec->u < 0)
 		rec->u += 1;
+	rec->v =  vec_len(vec_sub(rec->p, center)) / r;
 	// debugPrintVec("rec", &rec->p);
 	rec->u = fmod(rec->u, size) / size;
-	rec->v = 1;
-	debugPrintDouble("u", "v", rec->u, rec->v);
+	rec->v = fmod(rec->v, size) / size;
+	// debugPrintDouble("u", "v", rec->u, rec->v);
 }
 
 int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -358,7 +356,7 @@ int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
         return (FALSE);
 	rec->albedo = obj->albedo;
 	rec->normal = pl->normal;
-	get_cap_uv(rec, pl->center, pl->normal, 1);
+	get_cap_uv(rec, pl->center, pl->normal, 1, pl->radius);
 	if (obj->bump->file_name)
 	{
 		// if (obj->tex->img_ptr)
