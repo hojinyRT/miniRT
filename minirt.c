@@ -30,26 +30,6 @@ void info_init(t_info *info, char *file)
 	}
 }
 
-t_vec	convert_color_to_normal(int	color)
-{
-	t_vec	res;
-
-	res.x = color >> 16 & 0xFF;
-	res.y = color >> 8 & 0xFF;
-	res.z = color & 0xFF;
-	if ((res.x == 0 && res.y == 0 && res.z == 0))
-		ft_strerror("범프맵 이상함");
-	res = vec_div_double(res, 255);
-	res = vec_sub(vec_multi_double(res, 2), vec_init(1, 1, 1));
-	return (res);
-}
-
-int	convert_color(t_vec clr)
-{
-	int tmp = ((int)clr.x * 16 * 16 * 16 * 16) + ((int)clr.y * 16 * 16) + (int)(clr.z);
-	return (tmp);
-}
-
 void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 {
 	char	*dst;
@@ -58,49 +38,6 @@ void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 	dst = img->addr +  y * img->line_length + x * (img->bits_per_pixel / 8);
 	*(unsigned int *)dst = convert_color(color);
 
-}
-
-void	ray_primary(t_ray *ray, t_camera *cam, double u, double v)
-{
-    ray->orig = cam->orig;
-    ray->dir =  vec_unit(vec_sub(vec_add(vec_add(cam->start_point, \
-							vec_multi_double(cam->horizontal, u)), \
-							vec_multi_double(cam->vertical, v)), cam->orig));
-
-}
-
-t_color    ray_color(t_info *info)
-{
-    double			t;
-
-	record_init(&(info->rec));
-	if (hit(info->obj, info->ray, &(info->rec)))
-	{
-		return (phong_lighting(info));
-	}
-	else
-	{
-		t = 0.5 * (info->ray.dir.y + 1.0);
-		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), vec_multi_double(vec_init(128, 178, 255), t)));
-	}
-}
-
-t_ray	ray_init(t_point orig, t_vec dir)
-{
-	t_ray init;
-
-	init.orig = orig;
-	init.dir = vec_unit(dir);
-	return (init);
-}
-
-void    set_face_normal(t_ray ray, t_hit_record *rec)
-{
-    rec->front_face = vec_dot(ray.dir, rec->normal) < 0;
-	if (rec->front_face == 0)
-		rec->normal = vec_multi_double(rec->normal, -1);
-	//front_face를 현재 쓰는 곳이 없음 리팩토링할 때 판단하기 바람.
-    return ;
 }
 
 void ft_draw(t_info *info, t_mlx *mlx)

@@ -185,84 +185,102 @@ typedef struct s_info
     t_hit_record	rec;
 }					t_info;
 
-t_vec 	vec_min(t_vec vec1, t_vec vec2);
-t_vec	vec_add(t_vec u, t_vec v);
-t_vec	vec_sub(t_vec u, t_vec v);
-t_vec	vec_multi(t_vec u, t_vec v);
-t_vec	vec_div(t_vec u, t_vec v);
-t_vec	vec_multi_double(t_vec u, double n);
-t_vec	vec_div_double(t_vec u, double n);
-double	vec_dot(t_vec u, t_vec v);
-t_vec	vec_cross(t_vec u, t_vec v);
-double	vec_len(t_vec u);
-double	vec_len_sqr(t_vec u);
-t_vec	vec_unit(t_vec u);
-t_vec	vec_init(double x, double y, double z);
-
-
+// ---------object_init.c--------//
 t_object    *object_init(t_object_type type, void *element, t_vec albedo, int checker);
 t_sphere	*sphere_init(t_point center, double radius);
 t_plane		*plane_init(t_point center, t_vec normal, double radius);
 t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal);
-t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness);
 t_cone		*cone_init(t_point center, double radius, double height, t_vec normal);
 
-
-
-// ---------utils.c---------//
-void	is_sign(char *str, int *idx, double *sign);
-double	ft_atod(char *str);
-void	check_unit(double *x, double *y, double *z, int flag);
-t_vec	ft_atovec(char *str, int flag);
-void	ft_strerror(char *err);
-void	split_free(char **split);
-
-
-// ---------object.c--------//
-void			record_init(t_hit_record *rec);
-int				hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
-int				hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
-int				hit(t_object *obj, t_ray ray, t_hit_record *rec);
-t_vec			point_light_get(t_info *info, t_light *light);
+// ---------light.c--------//
+t_light	*light_init(t_vec light_origin, t_vec light_color, double brightness);
+t_vec	reflect(t_vec v, t_vec n);
 t_vec	phong_lighting(t_info *info);
-t_point			ray_at(t_ray ray, double t);
-int				hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
-int				in_shadow(t_object *objs, t_ray light_ray, double light_len);
-t_ray			ray_init(t_point orig, t_vec dir);
+t_vec	point_light_get(t_info *info, t_light *light);
 
-void    set_face_normal(t_ray ray, t_hit_record *rec);
-t_vec	convert_color_to_normal(int	color);
+// ---------hit.c--------//
+void record_init(t_hit_record *rec);
+int in_shadow(t_object *objs, t_ray light_ray, double light_len);
+int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
+int hit(t_object *obj, t_ray ray, t_hit_record *rec);
 
+// ---------cone.c--------////
+int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec);
 
-// ---------put.c--------//
-void    obj_add(t_object **list, t_object *new);
-void    light_add(t_light **list, t_light *new);
-void	put_a(t_info *info, char **argv, int cnt);
-t_camera    *camera_init(t_point coor, t_vec normal, int fov);
-void    camera_add(t_camera **list, t_camera *new);
-void	put_c(t_info *info, char **argv, int cnt);
-void	put_l(t_info *info, char **argv, int cnt);
-void	put_sp(t_info *info, char **argv, int cnt);
-void	put_pl(t_info *info, char **argv, int cnt);
-t_point	get_cap_point(t_point center, double height, t_vec normal, double sign);
+// ---------cylinder.c--------////
+void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double size, double r);
+int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec);
+
+// ---------plane.c--------////
+void	get_plane_uv(t_hit_record *rec, t_point center, double size);
+int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
+void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size, double r);
+int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec);
+
+// ---------put.c--------////
+void		obj_add(t_object **list, t_object *new);
+void		light_add(t_light **list, t_light *new);
+void		put_a(t_info *info, char **argv, int cnt);
+t_camera	*camera_init(t_point coor, t_vec normal, int fov);
+void		camera_add(t_camera **list, t_camera *new);
+void		put_c(t_info *info, char **argv, int cnt);
+void		put_l(t_info *info, char **argv, int cnt);
+void		put_sp(t_info *info, char **argv, int cnt);
+void		put_pl(t_info *info, char **argv, int cnt);
+t_point		get_cap_point(t_point center, double height, t_vec normal, double sign);
 void	put_cy(t_info *info, char **argv, int cnt);
 void	put_cn(t_info *info, char **argv, int cnt);
 int 	check_format(char *format);
 void	put_info(t_info *info, char **argv);
-void	get_bump_addr(t_object *bump, t_mlx *mlx);
 
-// ---------minirt.c--------//
-void info_init(t_info *info, char *file);
-t_vec	convert_color_to_normal(int	color);
-int	convert_color(t_vec clr);
-void  my_mlx_pixel_put(t_img *img, int x, int y, t_color color);
+// ---------ray.c--------////
+t_ray	ray_init(t_point orig, t_vec dir);
+t_point	ray_at(t_ray ray, double t);
 void	ray_primary(t_ray *ray, t_camera *cam, double u, double v);
 t_color    ray_color(t_info *info);
-t_ray	ray_init(t_point orig, t_vec dir);
-void    set_face_normal(t_ray ray, t_hit_record *rec);
-void ft_draw(t_info *info, t_mlx *mlx);
-void	main_loop(t_info *info, t_mlx *mlx, int key);
-int	key_press(int keycode, void *param);
+
+// ---------sphere.c--------////
+void	get_sphere_uv(t_hit_record *rec, t_point center, double size);
+int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec);
+
+// ---------texture.c--------////
+void	get_texture_addr(t_object *obj, t_mlx *mlx);
+void	get_bump_addr(t_object *obj, t_mlx *mlx);
+t_color	checkerboard_value(t_hit_record rec);
+t_vec	bump_normal(t_object *obj, t_hit_record *rec);
+
+// ---------utils.c--------////
+void	split_free(char **split);
+void	ft_strerror(char *err);
+void	is_sign(char *str, int *idx, double *sign);
+double	ft_atod(char *str);
+void	check_unit(double *x, double *y, double *z, int flag);
+t_vec	ft_atovec(char *str, int flag);
+
+// ---------utils2.c--------////
+t_vec	convert_color_to_normal(int	color);
+int		convert_color(t_vec clr);
+void	set_face_normal(t_ray ray, t_hit_record *rec);
+t_vec	convert_int_to_rgb(int	color);
+t_vec	tex_rgb(t_object *obj, t_hit_record *rec);
+
+// ---------vector.c--------////
+t_vec	vec_init(double x, double y, double z);
+t_vec	vec_add(t_vec u, t_vec v);
+t_vec	vec_sub(t_vec u, t_vec v);
+t_vec	vec_multi(t_vec u, t_vec v);
+t_vec	vec_multi_double(t_vec u, double n);
+
+// ---------vector2.c--------////
+t_vec	vec_div_double(t_vec u, double n);
+t_vec 	vec_min(t_vec vec1, t_vec vec2);
+double	vec_dot(t_vec u, t_vec v);
+t_vec	vec_cross(t_vec u, t_vec v);
+double	vec_len(t_vec u);
+
+// ---------vector3.c--------////
+double	vec_len_sqr(t_vec u);
+t_vec	vec_unit(t_vec u);
 
 
 // ---------tmp--------//

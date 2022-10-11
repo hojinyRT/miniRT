@@ -69,16 +69,3 @@ t_cone	*cone_init(t_point center, double radius, double height, t_vec normal)
     printf("%lf %lf %lf\n", center.x, center.y, center.z);
 	return (init);
 }
-
-t_light     *light_init(t_vec light_origin, t_vec light_color, double brightness)
-{
-    t_light *light;
-
-    if(!(light = (t_light *)malloc(sizeof(t_light))))
-        return (NULL);
-    light->origin = light_origin;
-    light->light_color = light_color;
-    light->brightness = brightness;
-    light->next = 0;
-    return (light);
-}
