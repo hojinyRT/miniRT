@@ -16,8 +16,8 @@ t_vec	tex_rgb(t_object *obj, t_hit_record *rec)
 	int y;
 	t_vec tmp;
 
-	x = (int)(rec->u * 512);
-	y = (int)(rec->v * 512);
+	x = (int)(rec->u * obj->tex->width);
+	y = (int)(rec->v * obj->tex->height);
 	tmp = convert_int_to_rgb(*(unsigned int *)(obj->tex->addr + obj->tex->line_length * y + x * obj->tex->bits_per_pixel / 8));
 	tmp = vec_div_double(tmp, 255);
 	return (tmp);
@@ -33,6 +33,7 @@ t_vec	bump_normal(t_object *obj, t_hit_record *rec)
 	// Local = t * UL + b * VL + n * ZL
 	x = (int)(rec->u * (double)obj->bump->width);
 	y = (int)(rec->v * (double)obj->bump->height);
+	// debugPrintDouble("x", "y", x, y);
 	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
 	ul = vec_multi_double(rec->e1, tmp.x);
 	vl = vec_multi_double(rec->e2, tmp.y);
@@ -54,7 +55,7 @@ void record_init(t_hit_record *rec)
 {
 	ft_memset(rec, 0, sizeof(t_hit_record));
     rec->tmin = EPSILON;
-    rec->tmax = 10000;
+    rec->tmax = 10000000;
 }
 
 int in_shadow(t_object *objs, t_ray light_ray, double light_len)
@@ -76,6 +77,7 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	double			p_e1;
 	double			p_e2;
 
+	(void)r;
 	if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == 1))
 		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), normal));
 	else if ((rec->p.x == 0 && rec->p.y == 0 && rec->p.z == -1))
@@ -88,12 +90,15 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	theta = atan2(p_e2, p_e1);
 	rec->u = (theta / (M_PI));
 	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
+	// rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / 1500, 1);
 	if (rec->u < 0)
 		rec->u += 1;
 	// debugPrintVec("rec", &rec->p);
 	// debugPrintDouble("u", "v", rec->u, rec->v);
+	rec->v = 1 - rec->v;
 	rec->u = fmod(rec->u, size) / size;
 	rec->v = fmod(rec->v, size) / size;
+	// debugPrintDouble("u", "v", rec->u, rec->v);
 }
 
 int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -137,12 +142,17 @@ int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->normal = vec_unit(vec_sub(cp, cq));
 	rec->albedo = obj->albedo;
 	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
-	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) && vec_dot(vec_sub(rec->p, cy->center), cy->normal) < cy->height)
+	// printf("q : %lf\n", vec_dot(vec_sub(rec->p, cy->center), cy->normal));
+	if (0 > vec_dot(vec_sub(rec->p, cy->center), cy->normal) || vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
+		return (FALSE);
+	get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
+	if (obj->bump->file_name)
 	{
-		get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
-		return (TRUE);
+		// rec->albedo = tex_rgb(obj, rec);
+		rec->normal = bump_normal(obj, rec);
 	}
-    return (FALSE);
+	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+    return (TRUE);
 }
 
 int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -203,19 +213,19 @@ void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
 {
 	double			phi;
 	double			theta;
-	// const t_vec		n = rec->normal;
-	// t_vec			e1;
-	// t_vec			e2;
+	const t_vec		n = rec->normal;
+	t_vec			e1;
+	t_vec			e2;
 
-	// if ((rec->x == 0 && n.y == 1 && n.z == 0))
-	// 	e1 = vec_unit(vec_cross(vec_init(0, 0, -1), n));
-	// else if ((n.x == 0 && n.y == -1 && n.z == 0))
-	// 	e1 = vec_unit(vec_cross(vec_init(0, 0, 1), n));
-	// else
-	// 	e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
-	// e2 = vec_unit(vec_cross(n, e1));
-	// rec->e1 = e1;
-	// rec->e2 = e2;
+	if ((n.x == 0 && n.y == 1 && n.z == 0))
+		e1 = vec_unit(vec_cross(vec_init(0, 0, -1), n));
+	else if ((n.x == 0 && n.y == -1 && n.z == 0))
+		e1 = vec_unit(vec_cross(vec_init(0, 0, 1), n));
+	else
+		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
+	e2 = vec_unit(vec_cross(n, e1));
+	rec->e1 = e1;
+	rec->e2 = e2;
 	theta = atan2((rec->p.x - center.x), (rec->p.z - center.z));
 	phi = acos((rec->p.y - center.y) / vec_len(vec_sub(rec->p, center)));
 	rec->u = (theta / (M_PI));
@@ -258,7 +268,7 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	get_sphere_uv(rec, sp->center, 1); //조정 바람
 	if (obj->bump->file_name)
 	{
-		rec->albedo = tex_rgb(obj, rec);
+		// rec->albedo = tex_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
 	}
 	set_face_normal(ray, rec);

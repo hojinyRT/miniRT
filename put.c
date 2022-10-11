@@ -186,7 +186,7 @@ void	put_sp(t_info *info, char **argv, int cnt)
 		{
 			tmp->bump->file_name = ft_strdup(argv[4]);
 			get_bump_addr(tmp, &info->mlx);
-			get_texture_addr(tmp, &info->mlx);
+			// get_texture_addr(tmp, &info->mlx);
 		}
 		obj_add(&(info->obj), tmp);
 	}
@@ -246,17 +246,23 @@ void	put_cy(t_info *info, char **argv, int cnt)
 		format[1] = ft_atod(argv[4]);
 		color = ft_atovec(argv[5], RGB);
 		tmp = object_init(CY, cylinder_init(get_cap_point(center, format[1], normal, -1), format[0], format[1], normal), vec_div_double(color, 255), checker);
+		tmp->bump = ft_calloc(1, sizeof(t_img));
+		tmp->tex = ft_calloc(1, sizeof(t_img));
 		if (cnt == 7)
-				tmp->bump->file_name = argv[6];
+		{
+			tmp->bump->file_name = ft_strdup(argv[6]);
+			get_bump_addr(tmp, &info->mlx);
+			// get_texture_addr(tmp, &info->mlx);
+		}
 		obj_add(&(info->obj), tmp);
-		tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255), checker);
-		if (cnt == 7)
-				tmp->bump->file_name = argv[6];
-		obj_add(&(info->obj), tmp);
-		tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, 1), normal, format[0]), vec_div_double(color, 255), checker);
-		if (cnt == 7)
-				tmp->bump->file_name = argv[6];
-		obj_add(&(info->obj), tmp);
+		// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, -1), normal, format[0]), vec_div_double(color, 255), checker);
+		// // if (cnt == 7)
+		// // 		tmp->bump->file_name = argv[6];
+		// obj_add(&(info->obj), tmp);
+		// tmp = object_init(CAP,plane_init(get_cap_point(center, format[1], normal, 1), normal, format[0]), vec_div_double(color, 255), checker);
+		// // if (cnt == 7)
+		// // 		tmp->bump->file_name = argv[6];
+		// obj_add(&(info->obj), tmp);
 	}
 	else
 		ft_strerror("cy인자 개수 안맞음");
