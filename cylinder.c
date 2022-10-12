@@ -26,70 +26,69 @@ void	get_cylinder_uv(t_hit_record *rec, t_point center, t_vec normal, double siz
 	rec->v = fmod(vec_dot(vec_sub(rec->p, center), normal) / (r * M_PI), 1);
 	if (rec->u < 0)
 		rec->u += 1;
-	// debugPrintVec("rec", &rec->p);
-	// debugPrintDouble("u", "v", rec->u, rec->v);
+
 	rec->v = 1 - rec->v;
 	rec->u = fmod(rec->u, size) / size;
 	rec->v = fmod(rec->v, size) / size;
 }
 
+static int	get_cylinder_root(t_formula *fo, t_ray ray, t_hit_record *rec, \
+			t_cylinder *cy)
+{
+	t_vec		oc;
+
+	oc = vec_sub(ray.orig, cy->center);
+	fo->a = vec_dot(ray.dir, ray.dir) - vec_dot(ray.dir, cy->normal) * \
+				vec_dot(ray.dir, cy->normal);
+	fo->half_b = vec_dot(oc, ray.dir) - ((vec_dot(ray.dir, cy->normal)) * \
+				vec_dot(oc, cy->normal));
+	fo->c = vec_len_sqr(oc) - vec_dot(oc, cy->normal) * \
+				vec_dot(oc, cy->normal) - (cy->radius) * (cy->radius);
+	fo->dis = fo->half_b * fo->half_b - fo->a * fo->c;
+	if (fo->dis < 0)
+		return (FALSE);
+	fo->sqrtd = sqrt(fo->dis);
+	fo->root = (-fo->half_b - fo->sqrtd) / fo->a;
+	rec->t = fo->root;
+	rec->p = ray_at(ray, fo->root);
+	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
+		|| (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0) 
+		|| (fo->root < rec->tmin || rec->tmax < fo->root))
+		fo->root = (-fo->half_b + fo->sqrtd) / fo->a;
+    if (fo->root < rec->tmin || rec->tmax < fo->root)
+		return (FALSE);
+	return (TRUE);
+}
+
 int	hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	t_cylinder	*cy;
-	t_vec		oc;
-	double		a;
-	double		half_b;
-	double		c;
-	double		dis;
-	double		sqrtd;
-	double		root;
-	t_vec		cp, cq;
+	t_formula	fo;
+	t_vec		cp;
+	t_vec		cq;
 	double		cq_val;
 
 	cy = (t_cylinder *)obj->element;
-	oc = vec_sub(ray.orig, cy->center);
-	a = vec_dot(ray.dir, ray.dir) - vec_dot(ray.dir, cy->normal) * vec_dot(ray.dir, cy->normal);
-	half_b = vec_dot(oc, ray.dir) - ((vec_dot(ray.dir, cy->normal)) *  vec_dot(oc, cy->normal));
-	c = vec_len_sqr(oc) - vec_dot(oc, cy->normal) * vec_dot(oc, cy->normal) - (cy->radius) * (cy->radius);
-	dis = half_b * half_b - a * c;
-	if (dis < 0)
+	if(!get_cylinder_root(&fo, ray, rec, cy))
 		return (FALSE);
-	sqrtd = sqrt(dis);
-	root = (-half_b - sqrtd) / a;
-	t_hit_record tmp;
-	tmp.t = root;
-	tmp.p = ray_at(ray, root);
-	// rec->t = root;
-	// rec->p = ray_at(ray, root);
-	if ((vec_dot(vec_sub(tmp.p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(tmp.p, cy->center), cy->normal) < 0) || (root < rec->tmin || rec->tmax < root))
-	{
-		root = (-half_b + sqrtd) / a;
-		if (root < rec->tmin || rec->tmax < root)
-			return (FALSE);
-		tmp.t = root;
-		tmp.p = ray_at(ray, root);
-	}
-    if (root < rec->tmin || rec->tmax < root)
-		return (FALSE);
-	cp = vec_sub(tmp.p, cy->center);
+	rec->p = ray_at(ray, fo.root);
+	cp = vec_sub(rec->p, cy->center);
 	cq_val = vec_dot(cp, cy->normal);
 	cq = vec_multi_double(cy->normal, cq_val);
-	if ((vec_dot(vec_sub(tmp.p, cy->center), cy->normal) > cy->height) || (vec_dot(vec_sub(tmp.p, cy->center), cy->normal) < 0) || (root < rec->tmin || rec->tmax < root))
+	if ((vec_dot(vec_sub(rec->p, cy->center), cy->normal) > cy->height)
+		|| (vec_dot(vec_sub(rec->p, cy->center), cy->normal) < 0)
+		|| (fo.root < rec->tmin || rec->tmax < fo.root))
 		return (FALSE);
-	// if (0 > vec_dot(vec_sub(tmp.p, cy->center), cy->normal) || vec_dot(vec_sub(tmp.p, cy->center), cy->normal) > cy->height)
-	// 	return (FALSE);
-	rec->albedo = obj->albedo;
+	rec->t = fo.root;
+	rec->color = obj->color;
 	rec->normal = vec_unit(vec_sub(cp, cq));
-	rec->t = root;
-	rec->p = ray_at(ray, root);
-	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
 	get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
-	if (obj->bump->file_name)
+	if (obj->bump)
 	{
-		if (obj->tex->img_ptr)
-			rec->albedo = tex_rgb(obj, rec);
+		if (obj->texture->img_ptr)
+			rec->color = texture_rgb(obj, rec);
 		rec->normal = bump_normal(obj, rec);
 	}
-	set_face_normal(ray, rec); // rec의 법선벡터와 광선의 방향벡터를 비교해서 앞면인지 뒷면인지 t_bool 값으로 저장.
+	set_face_normal(ray, rec);
     return (TRUE);
 }

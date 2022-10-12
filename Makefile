@@ -6,7 +6,7 @@
 #    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/10/12 11:09:40 by hchang           ###   ########.fr        #
+#    Updated: 2022/10/12 15:33:56 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,8 @@ CFLAGS 		=	-Wall -Wextra -Werror -g3 -fsanitize=address
 LIBFT_DIR 	=	libft
 MLX_DIR 	=	mlx
 
-MANDA_SRCS 	=	minirt.c cone.c cylinder.c hit.c light.c object_init.c plane.c put.c ray.c remove.c sphere.c texture.c utils.c utils2.c vector.c vector2.c vector3.c
+MANDA_SRCS 	=	minirt.c cone.c cylinder.c hit.c light.c object_init.c plane.c put.c put2.c ray.c remove.c sphere.c texture.c utils.c utils2.c utils3.c vector.c vector2.c vector3.c \
+				scene.c info_init.c
 BONUS_SRCS 	=	minirt.c vector.c
 
 OBJS_MANDA 	=	$(MANDA_SRCS:.c=.o)
@@ -54,6 +55,7 @@ fclean: clean
 	make clean -C $(MLX_DIR)
 	@make fclean -C $(LIBFT_DIR)
 	@$(RM) $(NAME)
+	@$(RM) libmlx.dylib
 
 re:
 	@make fclean

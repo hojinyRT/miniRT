@@ -6,6 +6,7 @@
         "atomic": "c",
         "unordered_map": "c",
         "utility": "c",
-        "cmath": "c"
+        "cmath": "c",
+        "algorithm": "c"
     }
 }

@@ -44,18 +44,16 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	double	denom = cy->height - vec_dot(vec_sub(rec->p, cy->center), cy->normal);
 	double	a_c = cy->height - (nom / denom);
 	rec->normal = vec_unit(vec_sub(rec->p, vec_add(cy->center, vec_multi_double(cy->normal, a_c))));
-	rec->albedo = obj->albedo;
+	rec->color = obj->color;
 	set_face_normal(ray, rec);
 	if (0 <= vec_dot(vec_sub(rec->p, cy->center), cy->normal) &&
-    	vec_dot(vec_sub(rec->p, cy->center), cy->normal) <= cy->height && (root >= rec->tmin || rec->tmax >= root))
+		vec_dot(vec_sub(rec->p, cy->center), cy->normal) <= cy->height && (root >= rec->tmin || rec->tmax >= root))
 	{
 		get_cylinder_uv(rec, cy->center, cy->normal, 1, cy->radius);
-		if (obj->bump->file_name)
+		if (obj->bump)
 		{
-			// printf("asdasd\n");
-			// rec->albedo = tex_rgb(obj, rec);
-			if (obj->tex->img_ptr)
-				rec->albedo = tex_rgb(obj, rec);
+			if (obj->texture->img_ptr)
+				rec->color = texture_rgb(obj, rec);
 			rec->normal = bump_normal(obj, rec);
 			set_face_normal(ray, rec);
 		}

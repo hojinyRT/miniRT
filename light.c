@@ -35,7 +35,7 @@ t_vec	phong_lighting(t_info *info)
 	if (info->rec.checker)
 		color = checkerboard_value((info->rec));
 	else
-		color = info->rec.albedo;
+		color = info->rec.color;
 	// info->rec.normal == vec_init(0,0,0);
     return (vec_multi_double(vec_min(vec_multi(light_color, color), vec_init(1, 1, 1)), 255));
 }

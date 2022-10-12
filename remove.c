@@ -54,9 +54,9 @@ void	print_obj(t_object *obj) // 지워야함
 			printf("z : %lf \n", ((t_sphere *)curr->element)->center.z);
 			printf("radius : %lf \n", ((t_sphere *)curr->element)->radius);
 			printf("radius2 : %lf \n", ((t_sphere *)curr->element)->radius2);
-			printf("color  R : %lf ", curr->albedo.x);
-			printf("color  G : %lf ", curr->albedo.y);
-			printf("color  B : %lf \n", curr->albedo.z);
+			printf("color  R : %lf ", curr->color.x);
+			printf("color  G : %lf ", curr->color.y);
+			printf("color  B : %lf \n", curr->color.z);
 		}
 		else if (curr->type == PL)
 		{
@@ -67,9 +67,9 @@ void	print_obj(t_object *obj) // 지워야함
 			printf("normal x : %lf ", ((t_plane *)curr->element)->normal.x);
 			printf("normal y : %lf ", ((t_plane *)curr->element)->normal.y);
 			printf("normal z : %lf \n", ((t_plane *)curr->element)->normal.z);
-			printf("color  R : %lf ", curr->albedo.x);
-			printf("color  G : %lf ", curr->albedo.y);
-			printf("color  B : %lf \n", curr->albedo.z);
+			printf("color  R : %lf ", curr->color.x);
+			printf("color  G : %lf ", curr->color.y);
+			printf("color  B : %lf \n", curr->color.z);
 		}
 		else if (curr->type == CAP)
 		{
@@ -80,9 +80,9 @@ void	print_obj(t_object *obj) // 지워야함
 			printf("normal x : %lf ", ((t_plane *)curr->element)->normal.x);
 			printf("normal y : %lf ", ((t_plane *)curr->element)->normal.y);
 			printf("normal z : %lf \n", ((t_plane *)curr->element)->normal.z);
-			printf("color  R : %lf ", curr->albedo.x);
-			printf("color  G : %lf ", curr->albedo.y);
-			printf("color  B : %lf \n", curr->albedo.z);
+			printf("color  R : %lf ", curr->color.x);
+			printf("color  G : %lf ", curr->color.y);
+			printf("color  B : %lf \n", curr->color.z);
 		}
 
 		else if (curr->type == CY)
@@ -97,9 +97,9 @@ void	print_obj(t_object *obj) // 지워야함
 			printf("radius : %lf \n", ((t_cylinder *)curr->element)->radius);
 			printf("radius2 : %lf \n", ((t_cylinder *)curr->element)->radius2);
 			printf("height : %lf \n", ((t_cylinder *)curr->element)->height);
-			printf("color  R : %lf ", curr->albedo.x);
-			printf("color  G : %lf ", curr->albedo.y);
-			printf("color  B : %lf \n", curr->albedo.z);
+			printf("color  R : %lf ", curr->color.x);
+			printf("color  G : %lf ", curr->color.y);
+			printf("color  B : %lf \n", curr->color.z);
 		}
 		curr = curr->next;
 	}

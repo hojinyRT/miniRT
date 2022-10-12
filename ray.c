@@ -32,12 +32,11 @@ t_color    ray_color(t_info *info)
 
 	record_init(&(info->rec));
 	if (hit(info->obj, info->ray, &(info->rec)))
-	{
 		return (phong_lighting(info));
-	}
 	else
 	{
 		t = 0.5 * (info->ray.dir.y + 1.0);
-		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), vec_multi_double(vec_init(128, 178, 255), t)));
+		return (vec_add(vec_multi_double(vec_init(255, 255, 255), 1.0 - t), \
+				vec_multi_double(vec_init(128, 178, 255), t)));
 	}
 }

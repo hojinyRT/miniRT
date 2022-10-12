@@ -1,71 +1,61 @@
 #include "minirt.h"
 
-t_object    *object_init(t_object_type type, void *element, t_vec albedo, int checker)
+t_object    *object_init(t_object_type type, void *element, int checker)
 {
-    t_object    *new;
+	t_object	*new;
 
-    if (!(new = (t_object *)calloc(1, sizeof(t_object))))
-        return (NULL);
-    new->type = type;
-    new->element = element;
-    new->albedo = albedo;
-    new->checker = checker;
-    new->next = NULL;
-    return (new);
+	new = (t_object *)my_calloc(1, sizeof(t_object));
+	new->type = type;
+	new->element = element;
+	new->checker = checker;
+	new->next = NULL;
+	return (new);
 }
 
 t_sphere	*sphere_init(t_point center, double radius)
 {
-	t_sphere *init;
+	t_sphere	*new;
 
-    if(!(init = (t_sphere *)malloc(sizeof(t_sphere))))
-        return (NULL);
-	init->center = center;
-	init->radius = radius;
-	init->radius2 = radius * radius;
-	return (init);
+	new = (t_sphere *)my_calloc(1, sizeof(t_sphere));
+	new->center = center;
+	new->radius = radius;
+	new->radius2 = radius * radius;
+	return (new);
 }
 
 t_plane	*plane_init(t_point center, t_vec normal, double radius)
 {
-	t_plane *init;
+	t_plane *new;
 
-    if(!(init = (t_plane *)malloc(sizeof(t_plane))))
-        return (NULL);
-
-	init->center = center;
-	init->normal = normal;
-    init->radius = radius;
-    printf("plane %lf %lf %lf\n", center.x, center.y, center.z);
-	return (init);
+	new = (t_plane *)my_calloc(1, sizeof(t_plane));
+	new->center = center;
+	new->normal = normal;
+	new->radius = radius;
+	return (new);
 }
 
 t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal)
 {
-	t_cylinder *init;
+	t_cylinder *new;
 
-    if(!(init = (t_cylinder *)malloc(sizeof(t_cylinder))))
-        return (NULL);
-	init->center = center;
-	init->radius = radius;
-    init->radius2 = radius * radius;
-	init->height = height;
-    init->normal = normal;
-    printf("%lf %lf %lf\n", center.x, center.y, center.z);
-	return (init);
+	new = (t_cylinder *)my_calloc(1, sizeof(t_cylinder));
+	new->center = center;
+	new->radius = radius;
+	new->radius2 = radius * radius;
+	new->height = height;
+	new->normal = normal;
+	return (new);
 }
 
 t_cone	*cone_init(t_point center, double radius, double height, t_vec normal)
 {
-	t_cone *init;
+	t_cone *new;
 
-    if(!(init = (t_cone *)malloc(sizeof(t_cone))))
-        return (NULL);
-	init->center = center;
-	init->radius = radius;
-    init->radius2 = radius * radius;
-	init->height = height;
-    init->normal = normal;
-    printf("%lf %lf %lf\n", center.x, center.y, center.z);
-	return (init);
+	new = (t_cone *)my_calloc(1, sizeof(t_cone));
+	new->center = center;
+	new->radius = radius;
+	new->radius2 = radius * radius;
+	new->height = height;
+	new->normal = normal;
+	return (new);
 }

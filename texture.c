@@ -7,14 +7,19 @@ void	get_texture_addr(t_object *obj, t_mlx *mlx)
 	char	*texture;
 
 	ft_bzero(idx, sizeof(idx));
-	texture = ft_strjoin("t", obj->bump->file_name);
-	obj->tex->img_ptr = mlx_png_file_to_image(mlx->ptr, texture, &format[0], &format[1]);
-	obj->tex->addr = mlx_get_data_addr(obj->tex->img_ptr, \
-											&(obj->tex->bits_per_pixel), \
-											&(obj->tex->line_length), \
-											&(obj->tex->endian));
-	obj->tex->width = format[0];
-	obj->tex->height = format[1];
+	texture = ft_strjoin("texture_", obj->bump->file_name);
+	obj->texture->img_ptr = mlx_png_file_to_image(mlx->ptr, texture, &format[0], &format[1]);
+	if (!obj->texture->img_ptr)
+	{
+		free(texture);
+		return ;
+	}
+	obj->texture->addr = mlx_get_data_addr(obj->texture->img_ptr, \
+											&(obj->texture->bits_per_pixel), \
+											&(obj->texture->line_length), \
+											&(obj->texture->endian));
+	obj->texture->width = format[0];
+	obj->texture->height = format[1];
 	free(texture);
 }
 
@@ -26,13 +31,22 @@ void	get_bump_addr(t_object *obj, t_mlx *mlx)
 	ft_bzero(idx, sizeof(idx));
 	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, &format[0], &format[1]);
 	if (!obj->bump->img_ptr)
-		ft_strerror("Error : no such file or directory");
+		ft_strerror("Error \nno such file or directory");
 	obj->bump->addr = mlx_get_data_addr(obj->bump->img_ptr, \
 											&(obj->bump->bits_per_pixel), \
 											&(obj->bump->line_length), \
 											&(obj->bump->endian));
 	obj->bump->width = format[0];
 	obj->bump->height = format[1];
+}
+
+void	get_image_addr(t_object *new, t_mlx *mlx, char *file)
+{
+	new->bump = my_calloc(1, sizeof(t_img));
+	new->bump->file_name = ft_strdup(file);
+	get_bump_addr(new, mlx);
+	new->texture = my_calloc(1, sizeof(t_img));
+	get_texture_addr(new, mlx);
 }
 
 t_color	checkerboard_value(t_hit_record rec)
@@ -42,7 +56,7 @@ t_color	checkerboard_value(t_hit_record rec)
 	const double	u2 = floor(rec.u * width);
 	const double	v2 = floor(rec.v * height);
 	if (fmod(u2 + v2, 2.) == 0)
-		return (rec.albedo);
+		return (rec.color);
 	return (vec_init(1, 1, 1));
 }
 

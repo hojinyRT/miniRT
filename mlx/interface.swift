@@ -36,7 +36,7 @@ let MLX_SYNC_WIN_CMD_COMPLETED = Int32(3)
 @_cdecl("mlx_init")
 public func mlx_init_swift() -> UnsafeRawPointer
 {
-	let mm = MlxMain()
+	let mm = MlxMain()	
 	return (_mlx_bridge_retained(obj:mm))
 }
 
@@ -200,7 +200,7 @@ public func mlx_sync_swift(_ what:Int32, _ param:UnsafeRawPointer) -> Int32
     switch what
     {
 	case MLX_SYNC_IMAGE_WRITABLE:
-		let img:MlxImg = _mlx_bridge(ptr:param); while img.onGPU > 0 {}
+		let img:MlxImg = _mlx_bridge(ptr:param); while img.onGPU > 0 {} 
 	case MLX_SYNC_WIN_FLUSH_CMD:
 		let win:MlxWin = _mlx_bridge(ptr:param); win.flushImages()
 	case MLX_SYNC_WIN_CMD_COMPLETED:
@@ -274,7 +274,7 @@ public func mlx_mouse_move_swift(_ winptr:UnsafeRawPointer, _ x:Int32, _ y:Int32
 ///	pt.y = sframe.size.y - frame.size.y - frame.origin.y + 1 + y
 	pt.y = frame.origin.y + frame.size.height - 1.0 - CGFloat(y)
 	CGWarpMouseCursorPosition(pt)
-	CGAssociateMouseAndMouseCursorPosition(1)
+	CGAssociateMouseAndMouseCursorPosition(UInt32(1))
 	return Int32(0);
 }
 
