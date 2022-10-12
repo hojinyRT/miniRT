@@ -60,9 +60,6 @@ enum e_material_type
 # define LUMEN 3
 
 typedef int			t_object_type;
-typedef t_cylinder	t_cone;
-typedef t_vec		t_color;
-typedef t_vec		t_point;
 
 typedef struct s_vec
 {
@@ -70,6 +67,9 @@ typedef struct s_vec
 	double	y;
 	double	z;
 }			t_vec;
+
+typedef t_vec		t_color;
+typedef t_vec		t_point;
 
 typedef struct s_img
 {
@@ -132,6 +132,8 @@ typedef struct s_cylinder
 	double	height;
 	t_vec	normal;
 }			t_cylinder;
+
+typedef t_cylinder	t_cone;
 
 typedef struct s_object
 {
