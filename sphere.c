@@ -1,6 +1,6 @@
 #include "minirt.h"
 
-static void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
+static void	get_sphere_uv(t_hit_record *rec, t_sphere *sp, double size)
 {
 	t_vec	n;
 	double	phi;
@@ -14,8 +14,9 @@ static void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
 	else
 		rec->e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
 	rec->e2 = vec_unit(vec_cross(n, rec->e1));
-	theta = atan2((rec->p.x - center.x), (rec->p.z - center.z));
-	phi = acos((rec->p.y - center.y) / vec_len(vec_sub(rec->p, center)));
+	theta = atan2((rec->p.x - sp->center.x), (rec->p.z - sp->center.z));
+	phi = acos((rec->p.y - sp->center.y) / \
+				vec_len(vec_sub(rec->p, sp->center)));
 	rec->u = (theta / (M_PI));
 	if (rec->u < 0)
 		rec->u += 1;
@@ -23,7 +24,8 @@ static void	get_sphere_uv(t_hit_record *rec, t_point center, double size)
 	rec->v = fmod(phi / M_PI, size) / size;
 }
 
-static int	get_sphere_root(t_formula *fo, t_ray ray, t_hit_record *rec, t_sphere *sp)
+static int	get_sphere_root(t_formula *fo, t_ray ray, \
+							t_hit_record *rec, t_sphere *sp)
 {
 	t_vec		oc;
 
@@ -55,7 +57,7 @@ int	hit_sphere(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->t = fo.root;
 	rec->p = ray_at(ray, fo.root);
 	rec->normal = vec_div_double(vec_sub(rec->p, sp->center), sp->radius);
-	get_sphere_uv(rec, sp->center, 1);
+	get_sphere_uv(rec, sp, 1);
 	if (obj->bump)
 	{
 		if (obj->texture->img_ptr)

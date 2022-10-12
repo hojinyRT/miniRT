@@ -230,8 +230,7 @@ int			hit(t_object *obj, t_ray ray, t_hit_record *rec);
 int			hit_cone(t_object *obj, t_ray ray, t_hit_record *rec);
 
 // ---------cylinder.c--------////
-void		get_cylinder_uv(t_hit_record *rec, t_point center, \
-						t_vec normal, double size, double r);
+void		get_cylinder_uv(t_hit_record *rec, t_cylinder *cy, double size);
 int			hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec);
 
 // ---------plane.c--------////
