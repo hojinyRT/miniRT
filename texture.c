@@ -56,12 +56,7 @@ t_vec	bump_normal(t_object *obj, t_hit_record *rec)
 	// Local = t * UL + b * VL + n * ZL
 	x = (int)(rec->u * (double)(obj->bump->width - 1));
 	y = (int)(rec->v * (double)(obj->bump->height - 1));
-	// x = 1;
-	// y = 1;
-	// debugPrintDouble("x", "y", x, y);
-	// printf("num : %d\n", *(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
 	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
-	// debugPrintVec("tmp", &tmp);
 	ul = vec_multi_double(rec->e1, tmp.x);
 	vl = vec_multi_double(rec->e2, tmp.y);
 	zl = vec_multi_double(rec->normal, tmp.z);

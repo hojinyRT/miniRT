@@ -1,10 +1,10 @@
 #include "minirt.h"
 
-void info_init(t_info *info, char *file)
+void	info_init(t_info *info, char *file)
 {
 	char		**split;
-	int			fd;
 	char		*line;
+	int			fd;
 
 	fd = open(file, O_RDONLY);
 	if (fd < 0)
@@ -12,7 +12,7 @@ void info_init(t_info *info, char *file)
 	line = get_next_line(fd);
 	if (line == NULL)
 		ft_strerror("Error : attempt to open empty file");
-	while(line)
+	while (line)
 	{
 		if (line[0] == '#')
 		{
@@ -86,7 +86,7 @@ int	key_press(int keycode, void *param)
 		exit(0);
 	else if (keycode == 8)
 	{
-		printf("C clicked\n");
+		printf("Camera Changed\n");
 		main_loop(info, &info->mlx, keycode);
 	}
 	return (0);
@@ -96,7 +96,6 @@ int main(int argc, char **argv)
 {
 	t_info	info;
 
-	// atexit(ae);
 	if (argc != 2)
 		ft_strerror("Error : invalid argument count(excute)");
 	ft_memset(&info, 0, sizeof(t_info));

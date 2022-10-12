@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
+#    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/10/11 17:36:30 by jinypark         ###   ########.fr        #
+#    Updated: 2022/10/12 10:36:15 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -33,10 +33,10 @@ all: $(NAME)
 
 $(NAME): $(OBJS)
 	@make -C $(LIBFT_DIR)
-	@echo "[$@] linking ..."
-#	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBFT_DIR)/libft.a $(MLX_DIR)/libmlx.a -framework openGL -framework AppKit 
+	@make -C $(MLX_DIR)
+	@mv $(MLX_DIR)/libmlx.dylib ./
 	@$(CC) $(CFLAGS) -o $@ $(OBJS) -L. -lmlx $(LIBFT_DIR)/libft.a -framework openGL -framework AppKit 
-# make -C $(MLX_DIR)
+	@./make.sh
 
 %.o : %.c
 	@echo [$<] compiling ...
@@ -49,10 +49,10 @@ clean:
 	make clean -C $(LIBFT_DIR)
 	@echo ">>>>>>deleted list<<<<<<<"
 	@$(RM) $(OBJS) $(OBJS_BONUS)
-# make clean -C $(MLX_DIR)
 
 fclean: clean
 	@echo ">>>>>>deleted list<<<<<<<"
+	make clean -C $(MLX_DIR)
 	@make fclean -C $(LIBFT_DIR)
 	@$(RM) $(NAME)
 
