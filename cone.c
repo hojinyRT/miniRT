@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 11:46:34 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 19:32:15 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/13 20:17:08 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,12 +80,13 @@ int	hit_cone_body(t_object *obj, t_ray ray, t_hit_record *rec)
 	rec->p = ray_at(ray, fo.root);
 	a_c = cn->height - (vec_len_sqr(vec_sub(vec_sub(rec->p, cn->center), \
 				vec_multi_double(cn->normal, cn->height))) / \
-				cn->height - vec_dot(vec_sub(rec->p, cn->center), cn->normal));
+				(cn->height - vec_dot(vec_sub(rec->p, cn->center), cn->normal)));
 	rec->normal = vec_unit(vec_sub(rec->p, vec_add(cn->center, \
 						vec_multi_double(cn->normal, a_c))));
 	rec->color = obj->color;
-	if ((0 > vec_dot(vec_sub(rec->p, cn->center), cn->normal)) ||
-		vec_dot(vec_sub(rec->p, cn->center), cn->normal) > cn->height || (fo.root < rec->tmin || rec->tmax < fo.root))
+	if ((0 > vec_dot(vec_sub(rec->p, cn->center), cn->normal))
+		|| vec_dot(vec_sub(rec->p, cn->center), cn->normal) > cn->height
+		|| (fo.root < rec->tmin || rec->tmax < fo.root))
 		return (FALSE);
 	get_cylinder_uv(rec, cn, 1);
 	set_face_normal(ray, rec);
@@ -109,7 +110,7 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	hit_anything = FALSE;
 	if (hit_cone_body(obj, ray, rec))
 		hit_anything = TRUE;
-	// if (hit_cap(cn->cap, ray, rec, obj))
-	// 	hit_anything = TRUE;
+	if (hit_cap(cn->cap, ray, rec, obj))
+		hit_anything = TRUE;
 	return (hit_anything);
 }
