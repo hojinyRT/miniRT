@@ -1,4 +1,24 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   put2.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:56:13 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 18:39:45 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
+
+t_point	get_cap_point(t_point center, double height, t_vec normal, double sign)
+{
+	t_vec	ccprime;
+
+	ccprime = vec_multi_double(vec_multi_double(normal, sign), height / 2);
+	return (vec_add(center, ccprime));
+}
 
 void	obj_add(t_object **list, t_object *new)
 {

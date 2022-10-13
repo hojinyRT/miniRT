@@ -1,15 +1,27 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   hit.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:59:36 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 16:00:36 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
-void record_init(t_hit_record *rec)
+void	record_init(t_hit_record *rec)
 {
 	ft_memset(rec, 0, sizeof(t_hit_record));
 	rec->tmin = EPSILON;
 	rec->tmax = INFINITY;
 }
 
-int in_shadow(t_object *objs, t_ray light_ray, double light_len)
+int	in_shadow(t_object *objs, t_ray light_ray, double light_len)
 {
-	t_hit_record rec;
+	t_hit_record	rec;
 
 	rec.tmin = EPSILON;
 	rec.tmax = light_len;
@@ -18,9 +30,9 @@ int in_shadow(t_object *objs, t_ray light_ray, double light_len)
 	return (FALSE);
 }
 
-int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
+int	hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
 {
-	int  hit_result;
+	int	hit_result;
 
 	hit_result = FALSE;
 	if (obj->type == SP)
@@ -34,16 +46,16 @@ int hit_obj(t_object *obj, t_ray ray, t_hit_record *rec)
 	return (hit_result);
 }
 
-int hit(t_object *obj, t_ray ray, t_hit_record *rec)
+int	hit(t_object *obj, t_ray ray, t_hit_record *rec)
 {
 	int				hit_anything;
-	t_hit_record    temp_rec;
+	t_hit_record	temp_rec;
 	t_object		*curr;
 
 	curr = obj;
 	temp_rec = *rec;
 	hit_anything = FALSE;
-	while(curr)
+	while (curr)
 	{	
 		if (hit_obj(curr, ray, &temp_rec))
 		{

@@ -45,14 +45,11 @@ t_vec        point_light_get(t_info *info, t_light *light)
     t_color    diffuse;
     t_vec      light_dir;
     double      kd; // diffuse의 강도
-
     t_color    specular;
     t_vec      view_dir;
     t_vec      reflect_dir;
-
     double       light_len;
     t_ray       light_ray;
-
     double      spec;
     double      ksn;
     double      ks;
@@ -63,8 +60,8 @@ t_vec        point_light_get(t_info *info, t_light *light)
     light_len = vec_len(light_dir);
     light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
     // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
-    if (in_shadow(info->obj, light_ray, light_len))
-        return (vec_init(0,0,0));
+    // if (in_shadow(info->obj, light_ray, light_len))
+    //     return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
     // cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
     kd = fmax(vec_dot(info->rec.normal, light_dir), 0.0);// (교점에서 출발하여 광원을 향하는 벡터)와 (교점에서의 법선벡터)의 내적값.

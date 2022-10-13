@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   object_init.c                                      :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:58:19 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 15:59:09 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
-t_object    *object_init(t_object_type type, void *element, int checker)
+t_object	*object_init(t_object_type type, void *element, int checker)
 {
 	t_object	*new;
 
@@ -25,7 +37,7 @@ t_sphere	*sphere_init(t_point center, double radius)
 
 t_plane	*plane_init(t_point center, t_vec normal, double radius)
 {
-	t_plane *new;
+	t_plane	*new;
 
 	new = (t_plane *)my_calloc(1, sizeof(t_plane));
 	new->center = center;
@@ -34,9 +46,10 @@ t_plane	*plane_init(t_point center, t_vec normal, double radius)
 	return (new);
 }
 
-t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec normal)
+t_cylinder	*cylinder_init(t_point center, double radius, \
+			double height, t_vec normal)
 {
-	t_cylinder *new;
+	t_cylinder	*new;
 
 	new = (t_cylinder *)my_calloc(1, sizeof(t_cylinder));
 	new->center = center;
@@ -49,7 +62,7 @@ t_cylinder	*cylinder_init(t_point center, double radius, double height, t_vec no
 
 t_cone	*cone_init(t_point center, double radius, double height, t_vec normal)
 {
-	t_cone *new;
+	t_cone	*new;
 
 	new = (t_cone *)my_calloc(1, sizeof(t_cone));
 	new->center = center;

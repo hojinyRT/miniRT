@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ray.c                                              :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:54:56 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 15:56:05 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
 t_ray	ray_init(t_point orig, t_vec dir)
 {
-	t_ray init;
+	t_ray	init;
 
 	init.orig = orig;
 	init.dir = vec_unit(dir);
@@ -11,7 +23,7 @@ t_ray	ray_init(t_point orig, t_vec dir)
 
 t_point	ray_at(t_ray ray, double t)
 {
-	t_point at;
+	t_point	at;
 
 	at = vec_add(ray.orig, vec_multi_double(ray.dir, t));
 	return (at);
@@ -19,16 +31,15 @@ t_point	ray_at(t_ray ray, double t)
 
 void	ray_primary(t_ray *ray, t_camera *cam, double u, double v)
 {
-    ray->orig = cam->orig;
-    ray->dir =  vec_unit(vec_sub(vec_add(vec_add(cam->start_point, \
+	ray->orig = cam->orig;
+	ray->dir = vec_unit(vec_sub(vec_add(vec_add(cam->start_point, \
 							vec_multi_double(cam->horizontal, u)), \
 							vec_multi_double(cam->vertical, v)), cam->orig));
-
 }
 
-t_color    ray_color(t_info *info)
+t_color	ray_color(t_info *info)
 {
-    double			t;
+	double	t;
 
 	record_init(&(info->rec));
 	if (hit(info->obj, info->ray, &(info->rec)))

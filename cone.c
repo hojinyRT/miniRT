@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 11:46:34 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 15:41:14 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/13 19:32:15 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,13 @@ int	check_validation(t_formula *fo, t_hit_record rec, \
 		fo->root = (-fo->half_b + fo->sqrtd) / fo->a;
 		if (!is_valid(fo, &rec, obj, 1))
 			return (FALSE);
+		rec.t = fo->root;
+		rec.p = ray_at(*ray, fo->root);
 	}
-	rec.p = ray_at(*ray, fo->root);
-	return (is_valid(fo, &rec, obj, 0));
+	return (is_valid(fo, &rec, obj, 1));
 }
 
-static int	get_cone_root(t_formula *fo, t_ray ray, t_hit_record rec, \
+static int	get_cone_root(t_formula *fo, t_ray ray, t_hit_record *rec, \
 			t_cone *cn)
 {
 	double	m;
@@ -61,8 +62,9 @@ static int	get_cone_root(t_formula *fo, t_ray ray, t_hit_record rec, \
 		return (FALSE);
 	fo->sqrtd = sqrt(fo->dis);
 	fo->root = (-fo->half_b - fo->sqrtd) / fo->a;
-	rec.p = ray_at(ray, fo->root);
-	return (check_validation(fo, rec, cn, &ray));
+	rec->t = fo->root;
+	rec->p = ray_at(ray, fo->root);
+	return (check_validation(fo, *rec, cn, &ray));
 }
 
 int	hit_cone_body(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -72,17 +74,21 @@ int	hit_cone_body(t_object *obj, t_ray ray, t_hit_record *rec)
 	double		a_c;
 
 	cn = (t_cone *)obj->element;
-	if (!get_cone_root(&fo, ray, *rec, cn))
+	if (!get_cone_root(&fo, ray, rec, cn))
 		return (FALSE);
 	rec->t = fo.root;
 	rec->p = ray_at(ray, fo.root);
 	a_c = cn->height - (vec_len_sqr(vec_sub(vec_sub(rec->p, cn->center), \
 				vec_multi_double(cn->normal, cn->height))) / \
 				cn->height - vec_dot(vec_sub(rec->p, cn->center), cn->normal));
-	rec->color = obj->color;
 	rec->normal = vec_unit(vec_sub(rec->p, vec_add(cn->center, \
 						vec_multi_double(cn->normal, a_c))));
+	rec->color = obj->color;
+	if ((0 > vec_dot(vec_sub(rec->p, cn->center), cn->normal)) ||
+		vec_dot(vec_sub(rec->p, cn->center), cn->normal) > cn->height || (fo.root < rec->tmin || rec->tmax < fo.root))
+		return (FALSE);
 	get_cylinder_uv(rec, cn, 1);
+	set_face_normal(ray, rec);
 	if (obj->bump)
 	{
 		if (obj->texture->img_ptr)
@@ -103,7 +109,7 @@ int	hit_cone(t_object *obj, t_ray ray, t_hit_record *rec)
 	hit_anything = FALSE;
 	if (hit_cone_body(obj, ray, rec))
 		hit_anything = TRUE;
-	if (hit_cap(cn->cap, ray, rec, obj))
-		hit_anything = TRUE;
+	// if (hit_cap(cn->cap, ray, rec, obj))
+	// 	hit_anything = TRUE;
 	return (hit_anything);
 }

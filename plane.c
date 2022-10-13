@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   plane.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:56:26 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 18:51:53 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
 static void	get_plane_uv(t_hit_record *rec, t_point center, double size)
@@ -17,7 +29,8 @@ static void	get_plane_uv(t_hit_record *rec, t_point center, double size)
 	rec->v = 1 - rec->v;
 }
 
-static int	get_plane_root(double *root, t_ray ray, t_hit_record *rec, t_plane *pl)
+static int	get_plane_root(double *root, t_ray ray, \
+			t_hit_record *rec, t_plane *pl)
 {
 	double	numrator;
 	double	denominator;
@@ -55,15 +68,17 @@ int	hit_plane(t_object *obj, t_ray ray, t_hit_record *rec)
 	return (TRUE);
 }
 
-static void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double size, double r)
+static void	get_cap_uv(t_hit_record *rec, t_point center, \
+			t_vec normal, double size, double r)
 {
 	double			theta;
-	t_vec			n = rec->normal;
+	t_vec			n;
 	t_vec			e1;
 	t_vec			e2;
 	double			p_e1;
 	double			p_e2;
 
+	n = rec->normal;
 	if ((n.x == 0 && n.y == 0 && n.z == 1))
 		e1 = vec_unit(vec_cross(vec_init(0, 1, 0), normal));
 	else if ((n.x == 0 && n.y == 0 && n.z == -1))
@@ -79,7 +94,7 @@ static void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double s
 	rec->u = (theta / (M_PI));
 	if (rec->u < 0)
 		rec->u += 1;
-	rec->v =  vec_len(vec_sub(rec->p, center)) / r;
+	rec->v = vec_len(vec_sub(rec->p, center)) / r;
 	rec->u = fmod(rec->u, size) / size;
 	rec->v = fmod(rec->v, size) / size;
 }
@@ -95,8 +110,8 @@ int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec, t_object *body)
 		return (FALSE);
 	rec->p = ray_at(ray, root);
 	pcv = vec_sub(rec->p, pl->center);
-    if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
-        return (FALSE);
+	if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
+		return (FALSE);
 	rec->t = root;
 	rec->p = ray_at(ray, root);
 	rec->color = obj->color;

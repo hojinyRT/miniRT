@@ -260,6 +260,8 @@ void		put_c(t_info *info, char **argv, int cnt);
 void		put_l(t_info *info, char **argv, int cnt);
 void		put_a(t_info *info, char **argv, int cnt);
 void		obj_add(t_object **list, t_object *new);
+t_point		get_cap_point(t_point center, double height, t_vec normal, \
+							double sign);
 
 
 // ---------ray.c--------////
@@ -279,7 +281,6 @@ t_color		checkerboard_value(t_hit_record rec);
 t_vec		bump_normal(t_object *obj, t_hit_record *rec);
 
 // ---------utils.c--------////
-void		split_free(char **split);
 void		is_sign(char *str, int *idx, double *sign);
 double		ft_atod(char *str);
 void		check_unit(double *x, double *y, double *z, int flag);
@@ -295,9 +296,8 @@ t_vec		texture_rgb(t_object *obj, t_hit_record *rec);
 // ---------utils3.c--------////
 void		*my_calloc(size_t count, size_t size);
 int			my_atoi(const char *str);
-t_point		get_cap_point(t_point center, double height, t_vec normal, \
-							double sign);
 void		ft_strerror(char *err);
+void		split_free(char **split);
 
 
 // ---------vector.c--------////

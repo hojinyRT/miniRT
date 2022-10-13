@@ -1,17 +1,16 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:46:19 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 18:49:37 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
-
-void	split_free(char **split)
-{
-	int		i;
-
-	i = 0;
-	while (split[i])
-	{
-		free(split[i]);
-		++i;
-	}
-	free(split);
-}
 
 void	is_sign(char *str, int *idx, double *sign)
 {
@@ -21,9 +20,36 @@ void	is_sign(char *str, int *idx, double *sign)
 	{
 		if (str[*idx] == '-')
 			*sign *= -1.0;
-        return ;
+		return ;
 	}
-    (*idx)--;
+	(*idx)--;
+}
+
+double	convert_decimal(char *str, double res, int idx, double sign)
+{
+	double	decimal;
+	int		flag;
+
+	flag = 0;
+	decimal = 0.1;
+	if (str[idx - 1] == '.' && !str[idx])
+		ft_strerror("Error \ninvalid number format");
+	while (str[idx])
+	{
+		if (!ft_isdigit(str[idx]))
+			ft_strerror("Error \ninvalid number format");
+		if (flag++ > 6)
+		{
+			idx++;
+			continue ;
+		}
+		res = res + (str[idx] - '0') * decimal;
+		decimal /= 10;
+		idx++;
+	}
+	if ((sign == -1 && res > 2147483648) || (sign == 1 && res > 2147483647))
+		ft_strerror("Error \ninvalid number scope");
+	return (sign * res);
 }
 
 double	ft_atod(char *str)
@@ -32,14 +58,14 @@ double	ft_atod(char *str)
 	int		flag;
 	double	sign;
 	double	res;
-	double	decimal;
-	
+
 	flag = 0;
-    res = 0.0;
+	res = 0.0;
 	is_sign(str, &idx, &sign);
 	while (str[++idx])
 	{
-		if ((flag++ == 0 && str[idx] == '.') || ((!ft_isdigit(str[idx]) && str[idx] != '.')))
+		if ((flag++ == 0 && str[idx] == '.')
+			|| ((!ft_isdigit(str[idx]) && str[idx] != '.')))
 			ft_strerror("Error \ninvalid number");
 		if (str[idx] == '.')
 		{
@@ -47,34 +73,15 @@ double	ft_atod(char *str)
 			break ;
 		}
 		res = (str[idx] - '0') + (res * 10);
-		if ((sign == 1 &&res > 2147483647) || (sign == -1 && res > 2147483648))
+		if ((sign == 1 && res > 2147483647) || (sign == -1 && res > 2147483648))
 			ft_strerror("Error \ninvalid number scope");
 	}
-	flag = 0;
-	decimal = 0.1;
-    if (str[idx - 1] == '.' && !str[idx])
-        ft_strerror("Error \ninvalid number format");
-	while(str[idx])
-	{
-		if (!ft_isdigit(str[idx]))
-			ft_strerror("Error \ninvalid number format");
-		if (flag++ > 6)
-        {
-            idx++;
-			continue ;
-        }
-		res = res + (str[idx] - '0') * decimal;
-		decimal /= 10;
-		idx++;
-	}
-    if ((sign == -1 && res > 2147483648) || (sign == 1 && res > 2147483647))
-        ft_strerror("Error \ninvalid number scope");
-	return (sign * res);
+	return (convert_decimal(str, res, idx, sign));
 }
 
 void	check_unit(double *x, double *y, double *z, int flag)
 {
-	t_vec tmp;
+	t_vec	tmp;
 
 	if (flag == RGB)
 	{
@@ -120,9 +127,7 @@ t_vec	ft_atovec(char *str, int flag)
 		;
 	if (i != 3)
 		ft_strerror("Error \ninvalid vector format");
-	res.x = ft_atod(vec[0]);
-	res.y = ft_atod(vec[1]);
-	res.z = ft_atod(vec[2]);
+	res = vec_init(ft_atod(vec[0]), ft_atod(vec[1]), ft_atod(vec[2]));
 	check_unit(&res.x, &res.y, &res.z, flag);
 	split_free(vec);
 	return (res);

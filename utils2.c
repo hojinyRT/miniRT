@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils2.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:49:40 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 15:50:20 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
 t_vec	convert_color_to_normal(int color)
@@ -26,7 +38,6 @@ int	convert_color(t_vec clr)
 
 void	set_face_normal(t_ray ray, t_hit_record *rec)
 {
-	
 	if (vec_dot(ray.dir, rec->normal) > 0)
 		rec->normal = vec_multi_double(rec->normal, -1);
 	return ;
@@ -51,7 +62,8 @@ t_vec	texture_rgb(t_object *obj, t_hit_record *rec)
 	x = (int)(rec->u * obj->texture->width);
 	y = (int)(rec->v * obj->texture->height);
 	tmp = convert_int_to_rgb(*(unsigned int *)(obj->texture->addr + \
-				obj->texture->line_length * y + x * obj->texture->bits_per_pixel / 8));
+				obj->texture->line_length * y + \
+				x * obj->texture->bits_per_pixel / 8));
 	tmp = vec_div_double(tmp, 255);
 	return (tmp);
 }

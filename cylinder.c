@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 11:46:09 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 15:34:35 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/13 19:18:24 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	get_cylinder_uv(t_hit_record *rec, t_cylinder *cy, double size)
 	rec->v = fmod(rec->v, size) / size;
 }
 
-static int	get_cylinder_root(t_formula *fo, t_ray ray, t_hit_record rec, \
+static int	get_cylinder_root(t_formula *fo, t_ray ray, t_hit_record *rec, \
 			t_cylinder *cy)
 {
 	t_vec		co;
@@ -52,8 +52,8 @@ static int	get_cylinder_root(t_formula *fo, t_ray ray, t_hit_record rec, \
 		return (FALSE);
 	fo->sqrtd = sqrt(fo->dis);
 	fo->root = (-fo->half_b - fo->sqrtd) / fo->a;
-	rec.p = ray_at(ray, fo->root);
-	return (check_validation(fo, rec, cy, &ray));
+	rec->p = ray_at(ray, fo->root);
+	return (check_validation(fo, *rec, cy, &ray));
 }
 
 int	hit_cylinder_body(t_object *obj, t_ray ray, t_hit_record *rec)
@@ -64,7 +64,7 @@ int	hit_cylinder_body(t_object *obj, t_ray ray, t_hit_record *rec)
 	t_vec		cq;
 
 	cy = (t_cylinder *)obj->element;
-	if (!get_cylinder_root(&fo, ray, *rec, cy))
+	if (!get_cylinder_root(&fo, ray, rec, cy))
 		return (FALSE);
 	rec->t = fo.root;
 	rec->p = ray_at(ray, fo.root);

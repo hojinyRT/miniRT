@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   texture.c                                          :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:51:48 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 15:54:33 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
 void	get_texture_addr(t_object *obj, t_mlx *mlx)
@@ -8,7 +20,8 @@ void	get_texture_addr(t_object *obj, t_mlx *mlx)
 
 	ft_bzero(idx, sizeof(idx));
 	texture = ft_strjoin("texture_", obj->bump->file_name);
-	obj->texture->img_ptr = mlx_png_file_to_image(mlx->ptr, texture, &format[0], &format[1]);
+	obj->texture->img_ptr = mlx_png_file_to_image(mlx->ptr, \
+		texture, &format[0], &format[1]);
 	if (!obj->texture->img_ptr)
 	{
 		free(texture);
@@ -29,7 +42,8 @@ void	get_bump_addr(t_object *obj, t_mlx *mlx)
 	int		idx[2];
 
 	ft_bzero(idx, sizeof(idx));
-	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, &format[0], &format[1]);
+	obj->bump->img_ptr = mlx_png_file_to_image(mlx->ptr, obj->bump->file_name, \
+							&format[0], &format[1]);
 	if (!obj->bump->img_ptr)
 		ft_strerror("Error \nno such file or directory");
 	obj->bump->addr = mlx_get_data_addr(obj->bump->img_ptr, \
@@ -55,6 +69,7 @@ t_color	checkerboard_value(t_hit_record rec)
 	const int		height = 10;
 	const double	u2 = floor(rec.u * width);
 	const double	v2 = floor(rec.v * height);
+
 	if (fmod(u2 + v2, 2.) == 0)
 		return (rec.color);
 	return (vec_init(1, 1, 1));
@@ -62,15 +77,17 @@ t_color	checkerboard_value(t_hit_record rec)
 
 t_vec	bump_normal(t_object *obj, t_hit_record *rec)
 {
-	int x;
-	int y;
-	t_vec tmp;
-	t_vec ul, vl, zl;
+	int		format[2];
+	t_vec	tmp;
+	t_vec	ul;
+	t_vec	vl;
+	t_vec	zl;
 
-	// Local = t * UL + b * VL + n * ZL
-	x = (int)(rec->u * (double)(obj->bump->width - 1));
-	y = (int)(rec->v * (double)(obj->bump->height - 1));
-	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + obj->bump->line_length * y + x * obj->bump->bits_per_pixel / 8));
+	format[X] = (int)(rec->u * (double)(obj->bump->width - 1));
+	format[Y] = (int)(rec->v * (double)(obj->bump->height - 1));
+	tmp = convert_color_to_normal(*(unsigned int *)(obj->bump->addr + \
+			obj->bump->line_length * format[Y] + \
+			format[X] * obj->bump->bits_per_pixel / 8));
 	ul = vec_multi_double(rec->e1, tmp.x);
 	vl = vec_multi_double(rec->e2, tmp.y);
 	zl = vec_multi_double(rec->normal, tmp.z);

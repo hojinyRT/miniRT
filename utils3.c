@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils3.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/13 15:50:37 by jinypark          #+#    #+#             */
+/*   Updated: 2022/10/13 18:40:42 by jinypark         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minirt.h"
 
 void	ft_strerror(char *err)
@@ -33,7 +45,7 @@ int	my_atoi(const char *str)
 	{
 		num = 0;
 		sign = 1;
-		i = check_sign((char*)str, &sign);
+		i = check_sign((char *)str, &sign);
 		while (str[i])
 		{
 			if (num > 214748364
@@ -49,9 +61,9 @@ int	my_atoi(const char *str)
 	return (result);
 }
 
-void    *my_calloc(size_t count, size_t size)
+void	*my_calloc(size_t count, size_t size)
 {
-	void    *new;
+	void	*new;
 
 	new = ft_calloc(count, size);
 	if (!new)
@@ -59,10 +71,15 @@ void    *my_calloc(size_t count, size_t size)
 	return (new);
 }
 
-t_point	get_cap_point(t_point center, double height, t_vec normal, double sign)
+void	split_free(char **split)
 {
-	t_vec	ccprime;
+	int	i;
 
-	ccprime = vec_multi_double(vec_multi_double(normal, sign), height / 2);
-	return (vec_add(center, ccprime));
+	i = 0;
+	while (split[i])
+	{
+		free(split[i]);
+		++i;
+	}
+	free(split);
 }
