@@ -84,7 +84,7 @@ static void	get_cap_uv(t_hit_record *rec, t_point center, t_vec normal, double s
 	rec->v = fmod(rec->v, size) / size;
 }
 
-int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
+int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec, t_object *body)
 {
 	t_plane	*pl;
 	double	root;
@@ -93,20 +93,22 @@ int	hit_cap(t_object *obj, t_ray ray, t_hit_record *rec)
 	pl = (t_plane *)obj->element;
 	if (!get_plane_root(&root, ray, rec, pl))
 		return (FALSE);
-	rec->t = root;
 	rec->p = ray_at(ray, root);
 	pcv = vec_sub(rec->p, pl->center);
     if (vec_dot(pcv, pcv) > pl->radius * pl->radius)
         return (FALSE);
+	rec->t = root;
+	rec->p = ray_at(ray, root);
 	rec->color = obj->color;
 	rec->normal = pl->normal;
 	get_cap_uv(rec, pl->center, pl->normal, 1, pl->radius);
-	if (obj->bump)
+	if (body->bump)
 	{
-		if (obj->texture->img_ptr)
-			rec->color = texture_rgb(obj, rec);
-		rec->normal = bump_normal(obj, rec);
+		if (body->texture->img_ptr)
+			rec->color = texture_rgb(body, rec);
+		rec->normal = bump_normal(body, rec);
 	}
+	rec->tmax = rec->t;
 	set_face_normal(ray, rec);
 	return (TRUE);
 }

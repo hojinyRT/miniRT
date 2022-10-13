@@ -61,8 +61,8 @@ t_vec        point_light_get(t_info *info, t_light *light)
 
     light_dir = vec_sub(light->origin, info->rec.p);
     light_len = vec_len(light_dir);
-    // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
-    light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
+    light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(light_dir, EPSILON)), light_dir);
+    // light_ray = ray_init(vec_add(info->rec.p, vec_multi_double(info->rec.normal, EPSILON)), light_dir);
     if (in_shadow(info->obj, light_ray, light_len))
         return (vec_init(0,0,0));
     light_dir = vec_unit(light_dir);
@@ -72,7 +72,7 @@ t_vec        point_light_get(t_info *info, t_light *light)
     view_dir = vec_unit(vec_multi_double(info->ray.dir, -1));
     reflect_dir = reflect(vec_multi_double(light_dir, -1), info->rec.normal);
     ksn = 64; // shininess value
-    ks = 0.1; // specular strength 강도 계수
+    ks = 0.5; // specular strength 강도 계수
     spec = pow(fmax(vec_dot(view_dir, reflect_dir), 0.0), ksn);
     specular = vec_multi_double(vec_multi_double(light->light_color, ks), spec);
     brightness = light->brightness * LUMEN; // 기준 광속/광량을 정의한 매크로

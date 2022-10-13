@@ -227,15 +227,20 @@ int			hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
 int			hit(t_object *obj, t_ray ray, t_hit_record *rec);
 
 // ---------cone.c--------////
+int			is_valid(t_formula *fo, t_hit_record *rec, \
+					t_cylinder *cy, int flag);
+int			check_validation(t_formula *fo, t_hit_record rec, \
+					t_cylinder *obj, t_ray *ray);
 int			hit_cone(t_object *obj, t_ray ray, t_hit_record *rec);
 
 // ---------cylinder.c--------////
+
 void		get_cylinder_uv(t_hit_record *rec, t_cylinder *cy, double size);
 int			hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec);
 
 // ---------plane.c--------////
 int			hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
-int			hit_cap(t_object *obj, t_ray ray, t_hit_record *rec);
+int			hit_cap(t_object *obj, t_ray ray, t_hit_record *rec, t_object *body);
 
 // ---------scene.c--------////
 void		light_add(t_light **list, t_light *new);
