@@ -1,6 +1,7 @@
 #ifndef MINIRT_H
 # define MINIRT_H
 
+# include <time.h>
 # include <stdio.h>
 # include <limits.h>
 # include <math.h>
@@ -324,5 +325,6 @@ void		print_cam(t_camera *cam);
 void		debugPrintVec(char *str, t_vec *vector);
 void		ae();
 void		debugPrintDouble(char *str1, char *str2, double a, double b);
+void	clock_end(char *str, clock_t start);
 
 #endif

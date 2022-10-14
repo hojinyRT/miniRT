@@ -110,3 +110,15 @@ void	ae()
 {
 	system("leaks miniRT");
 }
+
+/* *********************************지워야함*********************************** */
+void	clock_end(char *str, clock_t start)
+{
+	clock_t	end;
+
+	end = clock();
+	printf("%s func run time: %lf\n", str, \
+	(double)(end - start) / CLOCKS_PER_SEC);
+}
+
+/* ************************************************************************** */

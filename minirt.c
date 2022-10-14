@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 15:59:20 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 10:38:29 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ void	ft_render(t_info *info, t_mlx *mlx)
 	while (idx[Y] >= 0)
 	{
 		idx[X] = 0;
+		clock_t	st = clock();
 		while (idx[X] < WIN_W)
 		{
 			vdx[U] = (double)idx[X] / (WIN_W - 1);
@@ -40,6 +41,7 @@ void	ft_render(t_info *info, t_mlx *mlx)
 			idx[X]++;
 		}
 		idx[Y]--;
+		clock_end("pixel", st);
 	}
 	mlx_put_image_to_window(mlx->ptr, mlx->win, mlx->img.img_ptr, 0, 0);
 }
@@ -77,6 +79,7 @@ int	main(int argc, char **argv)
 {
 	t_info	info;
 
+	clock_t start = clock();
 	if (argc != 2)
 		ft_strerror("Error \ninvalid argument count(excute)");
 	ft_memset(&info, 0, sizeof(t_info));
@@ -88,7 +91,10 @@ int	main(int argc, char **argv)
 											&(info.mlx.img.line_length), \
 											&(info.mlx.img.endian));
 	info_init(&info, argv[1]);
+	clock_end("init", start);
+	start = clock();
 	ft_render(&info, &info.mlx);
+	clock_end("render", start);
 	mlx_pixel_put(info.mlx.ptr, info.mlx.win, 5, 5, 0xFFFFFF);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(info.mlx.ptr);
