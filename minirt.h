@@ -33,8 +33,6 @@
 # define Y 1
 # define U 0
 # define V 1
-# define RADIUS 0
-# define HEIGHT 1
 
 # define IMG_H 720
 # define IMG_W 1280
@@ -60,6 +58,8 @@ enum e_material_type
 
 # define EPSILON 1e-6
 # define LUMEN 3
+# define KSN 64
+# define KS 0.5
 
 typedef int			t_object_type;
 
@@ -222,7 +222,7 @@ t_vec		point_light_get(t_info *info, t_light *light);
 
 // ---------hit.c--------//
 void		record_init(t_hit_record *rec);
-int			in_shadow(t_object *objs, t_ray light_ray, double light_len);
+int			in_shadow(t_info *info, t_vec light_dir);
 int			hit_obj(t_object *obj, t_ray ray, t_hit_record *rec);
 int			hit(t_object *obj, t_ray ray, t_hit_record *rec);
 

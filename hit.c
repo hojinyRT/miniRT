@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:36 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 16:00:36 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 10:11:23 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,18 @@ void	record_init(t_hit_record *rec)
 	rec->tmax = INFINITY;
 }
 
-int	in_shadow(t_object *objs, t_ray light_ray, double light_len)
+int	in_shadow(t_info *info, t_vec light_dir)
 {
+	double			light_len;
+	t_ray			light_ray;
 	t_hit_record	rec;
 
+	light_len = vec_len(light_dir);
+	light_ray = ray_init(vec_add(info->rec.p, \
+				vec_multi_double(light_dir, EPSILON)), light_dir);
 	rec.tmin = EPSILON;
 	rec.tmax = light_len;
-	if (hit(objs, light_ray, &rec))
+	if (hit(info->obj, light_ray, &rec))
 		return (TRUE);
 	return (FALSE);
 }
