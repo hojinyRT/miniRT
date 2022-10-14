@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:24 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 15:59:33 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 19:12:52 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,6 +87,6 @@ void	put_info(t_info *info, char **argv)
 		return ;
 	argc = 0;
 	while (argv[argc])
-		argc++;
+		++argc;
 	run[type](info, argv, argc);
 }

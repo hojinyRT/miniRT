@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:46:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 18:49:37 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 20:00:36 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,12 @@ double	convert_decimal(char *str, double res, int idx, double sign)
 			ft_strerror("Error \ninvalid number format");
 		if (flag++ > 6)
 		{
-			idx++;
+			++idx;
 			continue ;
 		}
 		res = res + (str[idx] - '0') * decimal;
 		decimal /= 10;
-		idx++;
+		++idx;
 	}
 	if ((sign == -1 && res > 2147483648) || (sign == 1 && res > 2147483647))
 		ft_strerror("Error \ninvalid number scope");
@@ -69,7 +69,7 @@ double	ft_atod(char *str)
 			ft_strerror("Error \ninvalid number");
 		if (str[idx] == '.')
 		{
-			idx++;
+			++idx;
 			break ;
 		}
 		res = (str[idx] - '0') + (res * 10);
@@ -117,7 +117,7 @@ t_vec	ft_atovec(char *str, int flag)
 	while (str[++i])
 	{
 		if (str[i] == ',')
-			cnt++;
+			++cnt;
 	}
 	if (cnt != 2)
 		ft_strerror("Error \ninvalid vector format");

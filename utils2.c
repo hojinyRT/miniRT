@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:49:40 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 15:50:20 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 20:00:36 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,12 +28,7 @@ t_vec	convert_color_to_normal(int color)
 
 int	convert_color(t_vec clr)
 {
-	int	tmp;
-
-	tmp = ((int)clr.x * 16 * 16 * 16 * 16) + \
-			((int)clr.y * 16 * 16) + \
-			(int)(clr.z);
-	return (tmp);
+	return (((int)clr.x << 16) + ((int)clr.y << 8) + (int)clr.z);
 }
 
 void	set_face_normal(t_ray ray, t_hit_record *rec)

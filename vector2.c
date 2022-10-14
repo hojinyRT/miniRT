@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 18:41:39 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/13 18:41:39 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 20:00:36 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,5 +45,5 @@ t_vec	vec_cross(t_vec u, t_vec v)
 
 double	vec_len(t_vec u)
 {
-	return (sqrt(pow(u.x, 2.0) + pow(u.y, 2.0) + pow(u.z, 2.0)));
+	return (sqrt(u.x * u.x + u.y * u.y + u.z * u.z));
 }

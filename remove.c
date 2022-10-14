@@ -7,7 +7,7 @@ void debugPrintVec(char *str, t_vec *vector)
 	printf("%s : z = %lf\n", str, vector->z);
 }
 
-void debugPrintDouble(char *str1, char *str2, double a, double b)
+void debugPrintdouble(char *str1, char *str2, double a, double b)
 {
 	printf("%s = %lf ",  str1, a);
 	printf("%s = %lf\n", str2, b);

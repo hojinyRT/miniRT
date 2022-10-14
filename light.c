@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/14 09:39:18 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 10:17:35 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 20:28:26 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,28 +27,6 @@ t_light	*light_init(t_vec light_origin, t_vec light_color, double brightness)
 t_vec	reflect(t_vec v, t_vec n)
 {
 	return (vec_sub(v, vec_multi_double(n, vec_dot(v, n) * 2)));
-}
-
-t_vec	phong_lighting(t_info *info)
-{
-	t_color	light_color;
-	t_light	*lights;
-	t_color	color;
-
-	light_color = vec_init(0, 0, 0);
-	lights = info->light;
-	while (lights)
-	{
-		light_color = vec_add(light_color, point_light_get(info, lights));
-		lights = lights->next;
-	}
-	light_color = vec_add(light_color, *info->ambient);
-	if (info->rec.checker)
-		color = checkerboard_value((info->rec));
-	else
-		color = info->rec.color;
-	return (vec_multi_double(vec_min(vec_multi(light_color, color), \
-			vec_init(1, 1, 1)), 255));
 }
 
 t_color	get_specular(t_info *info, t_light *light, t_vec *light_dir)
@@ -82,4 +60,26 @@ t_vec	point_light_get(t_info *info, t_light *light)
 	specular = get_specular(info, light, &light_dir);
 	brightness = light->brightness * LUMEN;
 	return (vec_multi_double(vec_add(diffuse, specular), brightness));
+}
+
+t_vec	phong_lighting(t_info *info)
+{
+	t_color	light_color;
+	t_light	*lights;
+	t_color	color;
+
+	light_color = vec_init(0, 0, 0);
+	lights = info->light;
+	while (lights)
+	{
+		light_color = vec_add(light_color, point_light_get(info, lights));
+		lights = lights->next;
+	}
+	light_color = vec_add(light_color, *info->ambient);
+	if (info->rec.checker)
+		color = checkerboard_value((info->rec));
+	else
+		color = info->rec.color;
+	return (vec_multi_double(vec_min(vec_multi(light_color, color), \
+			vec_init(1, 1, 1)), 255));
 }

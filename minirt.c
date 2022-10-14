@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 10:38:29 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/14 21:02:12 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	my_mlx_pixel_put(t_img *img, int x, int y, t_color color)
 {
 	char	*dst;
 
-	dst = img->addr + y * img->line_length + x * (img->bits_per_pixel / 8);
+	dst = img->addr + y * img->line_length + x * (img->bits_per_pixel >> 3);
 	*(unsigned int *)dst = convert_color(color);
 }
 
@@ -26,11 +26,11 @@ void	ft_render(t_info *info, t_mlx *mlx)
 	double		vdx[2];
 	t_color		color;
 
+	clock_t st = clock();
 	idx[Y] = WIN_H - 1;
 	while (idx[Y] >= 0)
 	{
 		idx[X] = 0;
-		clock_t	st = clock();
 		while (idx[X] < WIN_W)
 		{
 			vdx[U] = (double)idx[X] / (WIN_W - 1);
@@ -38,17 +38,16 @@ void	ft_render(t_info *info, t_mlx *mlx)
 			ray_primary(&info->ray, info->camera, vdx[U], vdx[V]);
 			color = ray_color(info);
 			my_mlx_pixel_put(&mlx->img, idx[X], (WIN_H - 1 - idx[Y]), color);
-			idx[X]++;
+			++idx[X];
 		}
-		idx[Y]--;
-		clock_end("pixel", st);
+		--idx[Y];
 	}
+	clock_end("render", st);
 	mlx_put_image_to_window(mlx->ptr, mlx->win, mlx->img.img_ptr, 0, 0);
 }
 
 void	main_loop(t_info *info, t_mlx *mlx, int key)
 {
-	(void)info;
 	mlx_destroy_image(mlx->ptr, mlx->img.img_ptr);
 	mlx_clear_window(mlx->ptr, mlx->win);
 	mlx->img.img_ptr = mlx_new_image(mlx->ptr, WIN_W, WIN_H);
@@ -72,6 +71,12 @@ int	key_press(int keycode, void *param)
 		printf("Camera Changed\n");
 		main_loop(info, &info->mlx, keycode);
 	}
+	else if (keycode == KEY_R)
+	{
+		printf("EDIT MODE\n");
+		info->res_flag = ~info->res_flag;
+		main_loop(info, &info->mlx, keycode);
+	}
 	return (0);
 }
 
@@ -79,7 +84,6 @@ int	main(int argc, char **argv)
 {
 	t_info	info;
 
-	clock_t start = clock();
 	if (argc != 2)
 		ft_strerror("Error \ninvalid argument count(excute)");
 	ft_memset(&info, 0, sizeof(t_info));
@@ -91,11 +95,8 @@ int	main(int argc, char **argv)
 											&(info.mlx.img.line_length), \
 											&(info.mlx.img.endian));
 	info_init(&info, argv[1]);
-	clock_end("init", start);
-	start = clock();
 	ft_render(&info, &info.mlx);
-	clock_end("render", start);
-	mlx_pixel_put(info.mlx.ptr, info.mlx.win, 5, 5, 0xFFFFFF);
+	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(info.mlx.ptr);
 	return (0);

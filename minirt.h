@@ -141,13 +141,13 @@ typedef struct s_plane
 
 typedef struct s_object
 {
-	t_object_type	type;
 	void			*element;
 	void			*next;
 	t_color			color;
 	t_img			*bump;
 	t_img			*texture;
 	int				checker;
+	t_object_type	type;
 }					t_object;
 
 typedef struct s_cylinder
@@ -169,13 +169,13 @@ typedef struct s_hit_record
 	double	tmin;
 	double	tmax;
 	double	t;
-	int		front_face;
-	int		type;
 	t_vec	color;
 	double	u;
 	double	v;
 	t_vec	e1;
 	t_vec	e2;
+	int		front_face;
+	int		type;
 	int		checker;
 }			t_hit_record;
 
@@ -190,13 +190,13 @@ typedef struct s_light
 typedef struct s_info
 {
 	t_mlx			mlx;
-	t_img			bump;
 	t_camera		*camera;
 	t_object		*obj;
 	t_light			*light;
 	t_color			*ambient;
 	t_ray			ray;
 	t_hit_record	rec;
+	char			res_flag;
 }					t_info;
 
 // ---------info_init.c--------////
@@ -324,7 +324,7 @@ void		print_obj(t_object *obj);
 void		print_cam(t_camera *cam);
 void		debugPrintVec(char *str, t_vec *vector);
 void		ae();
-void		debugPrintDouble(char *str1, char *str2, double a, double b);
+void		debugPrintdouble(char *str1, char *str2, double a, double b);
 void	clock_end(char *str, clock_t start);
 
 #endif
