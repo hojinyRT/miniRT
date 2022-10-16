@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 21:02:12 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/16 17:15:28 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,6 @@ void	ft_render(t_info *info, t_mlx *mlx)
 
 void	main_loop(t_info *info, t_mlx *mlx, int key)
 {
-	mlx_destroy_image(mlx->ptr, mlx->img.img_ptr);
-	mlx_clear_window(mlx->ptr, mlx->win);
-	mlx->img.img_ptr = mlx_new_image(mlx->ptr, WIN_W, WIN_H);
-	mlx->img.addr = mlx_get_data_addr(mlx->img.img_ptr, \
-		&(mlx->img.bits_per_pixel), &(mlx->img.line_length), \
-		&(mlx->img.endian));
 	if (key == 8)
 		info->camera = info->camera->next;
 	ft_render(info, mlx);
@@ -77,6 +71,18 @@ int	key_press(int keycode, void *param)
 		info->res_flag = ~info->res_flag;
 		main_loop(info, &info->mlx, keycode);
 	}
+	else if (keycode == KEY_D)
+	{
+		printf("D\n");
+		info->camera->orig.x += 0.1;
+		main_loop(info, &info->mlx, keycode);
+	}
+	else if (keycode == KEY_A)
+	{
+		printf("D\n");
+		info->camera->orig.x -= 0.1;
+		main_loop(info, &info->mlx, keycode);
+	}
 	return (0);
 }
 
@@ -96,7 +102,6 @@ int	main(int argc, char **argv)
 											&(info.mlx.img.endian));
 	info_init(&info, argv[1]);
 	ft_render(&info, &info.mlx);
-	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(info.mlx.ptr);
 	return (0);
