@@ -41,6 +41,8 @@
 # define WIN_H 720
 # define WIN_W 1280
 
+# define THREAD_I 20
+
 enum e_material_type
 {
 	A,
@@ -196,7 +198,8 @@ typedef struct s_info
 	t_color			*ambient;
 	t_ray			ray;
 	t_hit_record	rec;
-	char			res_flag;
+	int				idx;
+	char			flag;
 }					t_info;
 
 // ---------info_init.c--------////

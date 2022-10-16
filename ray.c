@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:54:56 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 21:01:20 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/16 19:40:27 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ t_color	ray_color(t_info *info)
 	record_init(&(info->rec));
 	if (hit(info->obj, info->ray, &(info->rec)))
 	{
-		if (info->res_flag & 1)
+		if (info->flag & 1)
 			return (vec_multi_double(info->rec.color, 255));
 		else
 			return (phong_lighting(info));
