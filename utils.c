@@ -6,7 +6,7 @@
 /*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:46:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 20:00:36 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/16 16:07:59 by jinypark         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ void	is_sign(char *str, int *idx, double *sign)
 	*sign = 1.0;
 	if (str[++(*idx)] == '+' || str[*idx] == '-')
 	{
+		if (str[(*idx) + 1] == '\0')
+			ft_strerror("Error \ninvalid number format");
 		if (str[*idx] == '-')
 			*sign *= -1.0;
 		return ;
