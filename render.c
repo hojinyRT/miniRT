@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 15:25:42 by hchang            #+#    #+#             */
-/*   Updated: 2022/10/17 16:20:30 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/17 17:10:54 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,10 @@ void	ft_render(t_info *info, t_mlx *mlx)
 	{
 		tmp_info[i] = *info;
 		tmp_info[i].idx = i;
-		pthread_create(&tid[i], NULL, render_thread, (void *)&tmp_info[i]);
+		if (!(info->flag & 2))
+			pthread_create(&tid[i], NULL, render_thread, (void *)&tmp_info[i]);
+		else
+			pthread_create(&tid[i], NULL, render_thread_anti, (void *)&tmp_info[i]);
 		++i;
 	}
 	i = 0;

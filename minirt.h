@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minirt.h                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/10/17 17:39:22 by hchang            #+#    #+#             */
+/*   Updated: 2022/10/17 18:07:00 by hchang           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINIRT_H
 # define MINIRT_H
 
@@ -44,7 +56,8 @@
 # define WIN_H 720
 # define WIN_W 1280
 
-# define THREAD_I 100
+# define THREAD_I 10
+# define SAMPLE_PER_PIXEL 50
 
 enum e_material_type
 {
@@ -141,8 +154,6 @@ typedef struct s_plane
 	t_vec	normal;
 	double	radius;
 }			t_plane;
-
-
 
 typedef struct s_object
 {
@@ -247,7 +258,8 @@ int			hit_cylinder(t_object *obj, t_ray ray, t_hit_record *rec);
 
 // ---------plane.c--------////
 int			hit_plane(t_object *obj, t_ray ray, t_hit_record *rec);
-int			hit_cap(t_object *obj, t_ray ray, t_hit_record *rec, t_object *body);
+int			hit_cap(t_object *obj, t_ray ray, t_hit_record *rec, \
+					t_object *body);
 
 // ---------scene.c--------////
 void		light_add(t_light **list, t_light *new);
@@ -261,7 +273,6 @@ void		put_cy(t_info *info, char **argv, int cnt);
 void		put_cn(t_info *info, char **argv, int cnt);
 void		put_cap(t_object **new, t_cylinder *obj, int type);
 
-
 // ---------put2.c--------////
 void		put_c(t_info *info, char **argv, int cnt);
 void		put_l(t_info *info, char **argv, int cnt);
@@ -269,7 +280,6 @@ void		put_a(t_info *info, char **argv, int cnt);
 void		obj_add(t_object **list, t_object *new);
 t_point		get_cap_point(t_point center, double height, t_vec normal, \
 							double sign);
-
 
 // ---------ray.c--------////
 t_ray		ray_init(t_point orig, t_vec dir);
@@ -306,7 +316,6 @@ int			my_atoi(const char *str);
 void		ft_strerror(char *err);
 void		split_free(char **split);
 
-
 // ---------vector.c--------////
 t_vec		vec_init(double x, double y, double z);
 t_vec		vec_add(t_vec u, t_vec v);
@@ -330,13 +339,19 @@ int			get_thread_index(int i, int idx[2]);
 void		*render_thread(void *param);
 void		ft_render(t_info *info, t_mlx *mlx);
 
+// ---------anti.c--------////
+double		random_double(void);
+void		*render_thread_anti(void *param);
+void		change_mode(int keycode, t_info *info);
+
+
 // ---------tmp--------//
 void		print_obj(t_object *obj);
 void		print_cam(t_camera *cam);
 void		debugPrintVec(char *str, t_vec *vector);
-void		ae();
+void		ae(void);
 void		debugPrintdouble(char *str1, char *str2, double a, double b);
-void	clock_end(char *str, clock_t start);
-void	my_mlx_pixel_put(t_img *img, int x, int y, t_color color);
+void		clock_end(char *str, clock_t start);
+void		my_mlx_pixel_put(t_img *img, int x, int y, t_color color);
 
 #endif

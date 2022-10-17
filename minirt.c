@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/17 16:24:32 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/17 17:51:59 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,31 +54,26 @@ int	key_press(int keycode, void *param)
 
 	info = param;
 	if (keycode == KEY_ESC)
+	{
+		printf("The End\n");
 		exit(0);
+	}
 	else if (keycode == KEY_C)
 	{
 		printf("Camera Changed\n");
 		info->camera = info->camera->next;
 		ft_render(info, &info->mlx);
 	}
-	else if (keycode == KEY_R)
-	{
-		printf("EDIT MODE\n");
-		info->flag = ~info->flag;
-		ft_render(info, &info->mlx);
-	}
+	else if (keycode == KEY_E || keycode == KEY_R)
+		change_mode(keycode, info);
 	else if (keycode == KEY_D || keycode == KEY_A
 		|| keycode == KEY_S || keycode == KEY_W)
 		key_press_move(keycode, info);
 	return (0);
 }
 
-int	destroy_win(void *param)
+int	destroy_win(void)
 {
-	t_info	*info;
-
-	info = param;
-	
 	printf("The End\n");
 	exit(0);
 }
@@ -99,7 +94,7 @@ int	main(int argc, char **argv)
 											&(info.mlx.img.endian));
 	info_init(&info, argv[1]);
 	ft_render(&info, &info.mlx);
-	mlx_hook(info.mlx.win, KEY_EXIT, 0, &destroy_win, &info);
+	mlx_hook(info.mlx.win, KEY_EXIT, 0, &destroy_win, 0);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(info.mlx.ptr);
 	return (0);
