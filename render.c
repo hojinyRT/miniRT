@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 15:25:42 by hchang            #+#    #+#             */
-/*   Updated: 2022/10/17 16:13:15 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/17 16:20:30 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ void	ft_render(t_info *info, t_mlx *mlx)
 	pthread_t	tid[THREAD_I];
 	t_info		*tmp_info;
 
-	tmp_info = ft_calloc(THREAD_I, sizeof(t_info));
 	i = 0;
+	tmp_info = ft_calloc(THREAD_I, sizeof(t_info));
 	while (i < THREAD_I)
 	{
 		tmp_info[i] = *info;
@@ -84,5 +84,6 @@ void	ft_render(t_info *info, t_mlx *mlx)
 		pthread_join(tid[i], NULL);
 		++i;
 	}
+	free(tmp_info);
 	mlx_put_image_to_window(mlx->ptr, mlx->win, mlx->img.img_ptr, 0, 0);
 }
