@@ -24,6 +24,7 @@
 # define KEY_W 13
 # define KEY_E 14
 # define KEY_R 15
+# define KEY_EXIT 17
 # define KEY_I 34
 # define KEY_TAB 48
 

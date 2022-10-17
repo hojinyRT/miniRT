@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   light.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/14 09:39:18 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 20:28:26 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/17 12:18:30 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,9 +37,7 @@ t_color	get_specular(t_info *info, t_light *light, t_vec *light_dir)
 
 	view_dir = vec_unit(vec_multi_double(info->ray.dir, -1));
 	reflect_dir = reflect(vec_multi_double(*light_dir, -1), info->rec.normal);
-	// (교점에서 출발하여 광원을 향하는 벡터)와 (교점에서의 법선벡터)의 내적값.
 	spec = pow(fmax(vec_dot(view_dir, reflect_dir), 0.0), KSN);
-	// cosΘ는 Θ 값이 90도 일 때 0이고 Θ가 둔각이 되면 음수가 되므로 0.0보다 작은 경우는 0.0으로 대체한다.
 	return (vec_multi_double(vec_multi_double(light->light_color, KS), spec));
 }
 

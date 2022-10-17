@@ -3,22 +3,42 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+         #
+#    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/10/16 17:13:59 by jinypark         ###   ########.fr        #
+#    Updated: 2022/10/17 12:43:31 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC 			=	cc
 NAME		=	miniRT
 RM 			=	rm -rvf
-CFLAGS 		=	-Wall -Wextra -Werror -g3 -fsanitize=address
+CFLAGS 		=	-Wall -Wextra -Werror -fsanitize=thread
 LIBFT_DIR 	=	libft
 MLX_DIR 	=	mlx
 
-MANDA_SRCS 	=	minirt.c cone.c cylinder.c hit.c light.c object_init.c plane.c put.c put2.c ray.c remove.c sphere.c texture.c utils.c utils2.c utils3.c vector.c vector2.c vector3.c \
-				scene.c info_init.c
+MANDA_SRCS 	=	minirt.c \
+				cone.c \
+				cylinder.c \
+				hit.c \
+				light.c \
+				object_init.c \
+				plane.c \
+				put.c \
+				put2.c \
+				ray.c \
+				remove.c \
+				sphere.c \
+				texture.c \
+				utils.c \
+				utils2.c \
+				utils3.c \
+				vector.c \
+				vector2.c \
+				vector3.c \
+				scene.c \
+				info_init.c \
+
 BONUS_SRCS 	=	minirt.c vector.c
 
 OBJS_MANDA 	=	$(MANDA_SRCS:.c=.o)
@@ -36,7 +56,7 @@ $(NAME): $(OBJS)
 	@make -C $(LIBFT_DIR)
 	@make -C $(MLX_DIR)
 	@mv $(MLX_DIR)/libmlx.dylib ./
-	@$(CC) $(CFLAGS) -o $@ $(OBJS) -L. -lmlx $(LIBFT_DIR)/libft.a -framework openGL -framework AppKit -fsanitize=address
+	@$(CC) $(CFLAGS) -o $@ $(OBJS) -L. -lmlx $(LIBFT_DIR)/libft.a -framework openGL -framework AppKit
 
 %.o : %.c
 	@echo [$<] compiling ...

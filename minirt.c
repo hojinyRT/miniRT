@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minirt.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/16 19:44:41 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/17 12:39:45 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,6 +140,12 @@ int	key_press(int keycode, void *param)
 	return (0);
 }
 
+int	destroy_win(void)
+{
+	printf("The End\n");
+	exit(0);
+}
+
 int	main(int argc, char **argv)
 {
 	t_info	info;
@@ -156,6 +162,7 @@ int	main(int argc, char **argv)
 											&(info.mlx.img.endian));
 	info_init(&info, argv[1]);
 	ft_render(&info, &info.mlx);
+	mlx_hook(info.mlx.win, KEY_EXIT, 0, &destroy_win, 0);
 	mlx_hook(info.mlx.win, EVENT_KEY_PRESS, 0, key_press, &info);
 	mlx_loop(info.mlx.ptr);
 	return (0);
