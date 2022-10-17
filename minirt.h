@@ -6,6 +6,7 @@
 # include <limits.h>
 # include <math.h>
 # include <fcntl.h>
+# include <pthread.h>
 # include "libft/libft.h"
 # include "mlx/mlx.h"
 
@@ -43,7 +44,7 @@
 # define WIN_H 720
 # define WIN_W 1280
 
-# define THREAD_I 10
+# define THREAD_I 100
 
 enum e_material_type
 {
@@ -324,6 +325,11 @@ double		vec_len(t_vec u);
 t_vec		vec_unit(t_vec u);
 double		vec_len_sqr(t_vec u);
 
+// ---------render.c--------////
+int			get_thread_index(int i, int idx[2]);
+void		*render_thread(void *param);
+void		ft_render(t_info *info, t_mlx *mlx);
+
 // ---------tmp--------//
 void		print_obj(t_object *obj);
 void		print_cam(t_camera *cam);
@@ -331,5 +337,6 @@ void		debugPrintVec(char *str, t_vec *vector);
 void		ae();
 void		debugPrintdouble(char *str1, char *str2, double a, double b);
 void	clock_end(char *str, clock_t start);
+void	my_mlx_pixel_put(t_img *img, int x, int y, t_color color);
 
 #endif

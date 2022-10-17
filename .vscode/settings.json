@@ -7,6 +7,8 @@
         "unordered_map": "c",
         "utility": "c",
         "cmath": "c",
-        "algorithm": "c"
+        "algorithm": "c",
+        "libft.h": "c",
+        "__node_handle": "c"
     }
 }

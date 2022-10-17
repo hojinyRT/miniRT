@@ -6,14 +6,14 @@
 #    By: hchang <hchang@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2022/03/24 17:01:08 by jinypark          #+#    #+#              #
-#    Updated: 2022/10/17 14:27:42 by hchang           ###   ########.fr        #
+#    Updated: 2022/10/17 15:36:23 by hchang           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 CC 			=	cc
 NAME		=	miniRT
 RM 			=	rm -rvf
-CFLAGS 		=	-Wall -Wextra -Werror -fsanitize=address
+CFLAGS 		=	-Wall -Wextra -Werror
 LIBFT_DIR 	=	libft
 MLX_DIR 	=	mlx
 
@@ -38,7 +38,7 @@ MANDA_SRCS 	=	minirt.c \
 				vector3.c \
 				scene.c \
 				info_init.c \
-
+				render.c
 BONUS_SRCS 	=	minirt.c vector.c
 
 OBJS_MANDA 	=	$(MANDA_SRCS:.c=.o)
