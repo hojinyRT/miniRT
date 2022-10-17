@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   plane.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:56:26 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 20:00:36 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/17 15:13:40 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,8 +24,10 @@ static void	get_plane_uv(t_hit_record *rec, t_point center, double size)
 	else
 		rec->e1 = vec_unit(vec_cross(vec_init(0, 1, 0), n));
 	rec->e2 = vec_unit(vec_cross(n, rec->e1));
-	rec->u = fmod(vec_dot(rec->e1, p), size) / size + (rec->u < 0);
-	rec->v = fmod(vec_dot(rec->e2, p), size) / size + (rec->v < 0);
+	rec->u = fmod(vec_dot(rec->e1, p), size) / size;
+	rec->u += (rec->u < 0);
+	rec->v = fmod(vec_dot(rec->e2, p), size) / size;
+	rec->v += (rec->v < 0);
 	rec->v = 1 - rec->v;
 }
 

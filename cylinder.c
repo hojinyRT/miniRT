@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cylinder.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jinypark <jinypark@student.42.fr>          +#+  +:+       +#+        */
+/*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 11:46:09 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/14 20:00:36 by jinypark         ###   ########.fr       */
+/*   Updated: 2022/10/17 15:12:36 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ void	get_cylinder_uv(t_hit_record *rec, t_cylinder *cy, double size)
 	p_e1 = vec_dot(vec_sub(rec->p, cy->center), rec->e1);
 	p_e2 = vec_dot(vec_sub(rec->p, cy->center), rec->e2);
 	theta = atan2(p_e2, p_e1);
-	rec->u = (theta / (M_PI)) + (rec->u < 0);
+	rec->u = (theta / (M_PI));
+	rec->u += (rec->u < 0);
 	rec->v = 1 - fmod(vec_dot(vec_sub(rec->p, cy->center), cy->normal) / \
 									(cy->radius * M_PI), 1);
 	rec->u = fmod(rec->u, size) / size;

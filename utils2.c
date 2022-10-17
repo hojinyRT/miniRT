@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:49:40 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/17 12:40:39 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/17 15:19:47 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,12 @@ t_vec	texture_rgb(t_object *obj, t_hit_record *rec)
 	int		y;
 	t_vec	tmp;
 
-	x = (int)(rec->u * obj->texture->width);
-	y = (int)(rec->v * obj->texture->height);
+	x = (int)(rec->u * (obj->texture->width - 1));
+	y = (int)(rec->v * (obj->texture->height - 1));
+	printf("x : %d || y : %d\n", x,y);
 	tmp = convert_int_to_rgb(*(unsigned int *)(obj->texture->addr + \
-				obj->texture->line_length * y + \
-				x * obj->texture->bits_per_pixel / 8));
+		(obj->texture->line_length * y ) + \
+		(x * obj->texture->bits_per_pixel >> 3)));	
 	tmp = vec_div_double(tmp, 255);
 	return (tmp);
 }

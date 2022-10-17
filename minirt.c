@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/17 12:39:45 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/17 15:20:03 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ int	key_press(int keycode, void *param)
 	info = param;
 	if (keycode == KEY_ESC)
 		exit(0);
-	else if (keycode == 8)
+	else if (keycode == KEY_C)
 	{
 		printf("Camera Changed\n");
 		main_loop(info, &info->mlx, keycode);
@@ -115,25 +115,25 @@ int	key_press(int keycode, void *param)
 	}
 	else if (keycode == KEY_D)
 	{
-		printf("D\n");
+		printf("D clicked\n");
 		info->camera->orig.x += 0.1;
 		main_loop(info, &info->mlx, keycode);
 	}
 	else if (keycode == KEY_A)
 	{
-		printf("A\n");
+		printf("A clicked\n");
 		info->camera->orig.x -= 0.1;
 		main_loop(info, &info->mlx, keycode);
 	}
 	else if (keycode == KEY_W)
 	{
-		printf("A\n");
+		printf("W clicked\n");
 		info->camera->orig.z -= 0.1;
 		main_loop(info, &info->mlx, keycode);
 	}
 	else if (keycode == KEY_S)
 	{
-		printf("A\n");
+		printf("S clicked\n");
 		info->camera->orig.z += 0.1;
 		main_loop(info, &info->mlx, keycode);
 	}
