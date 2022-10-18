@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 17:39:22 by hchang            #+#    #+#             */
-/*   Updated: 2022/10/17 18:07:00 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/18 14:40:37 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,13 @@
 # include "libft/libft.h"
 # include "mlx/mlx.h"
 
+# define C_RED     "\x1b[31m"
+# define C_GREEN   "\x1b[32m"
+# define C_YELLOW  "\x1b[33m"
+# define C_BLUE    "\x1b[34m"
+# define C_MAGENTA "\x1b[35m"
+# define C_CYAN    "\x1b[36m"
+# define C_RESET   "\x1b[0m"
 # define EVENT_KEY_PRESS 2
 # define EVENT_MOUSE_CLICK 4
 # define EVENT_CLICK_EXIT 17
@@ -41,6 +48,8 @@
 # define KEY_EXIT 17
 # define KEY_I 34
 # define KEY_TAB 48
+# define KEY_UP 126
+# define KEY_DOWN 125
 
 # define TRUE 1
 # define FALSE 0
@@ -343,7 +352,6 @@ void		ft_render(t_info *info, t_mlx *mlx);
 double		random_double(void);
 void		*render_thread_anti(void *param);
 void		change_mode(int keycode, t_info *info);
-
 
 // ---------tmp--------//
 void		print_obj(t_object *obj);

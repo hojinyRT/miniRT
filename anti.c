@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 16:51:08 by hchang            #+#    #+#             */
-/*   Updated: 2022/10/17 17:59:54 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/18 14:52:51 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,14 @@ void	change_mode(int keycode, t_info *info)
 {
 	if (keycode == KEY_E)
 	{
-		printf("EDIT MODE\n");
+		printf(C_GREEN"[EDIT MODE]\n"C_RESET);
 		info->flag &= 0B01;
 		info->flag ^= 0B01;
 		ft_render(info, &info->mlx);
 	}
 	else if (keycode == KEY_R)
 	{
-		printf("ANTI ALLIASING MODE\n");
+		printf(C_MAGENTA"[ANTI ALLIASING MODE]\n"C_RESET);
 		info->flag &= 0B10;
 		info->flag ^= 0B10;
 		ft_render(info, &info->mlx);
