@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/13 15:59:19 by jinypark          #+#    #+#             */
-/*   Updated: 2022/10/18 14:58:27 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/18 16:07:51 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,17 @@ void	key_press_move2(int keycode, t_info *info)
 {
 	if (keycode == KEY_DOWN)
 	{
-		printf(C_YELLOW"[Camera] Camera origin y -= 0.1\n"C_RESET);
+		printf(C_YELLOW"[Camera] Camera origin y -= 0.1");
 		info->camera->orig.y -= 0.1;
 	}
 	else if (keycode == KEY_W)
 	{
-		printf(C_YELLOW"[Camera] Camera origin z += 0.1\n"C_RESET);
+		printf(C_YELLOW"[Camera] Camera origin z += 0.1");
 		info->camera->orig.z += 0.1;
 	}
 	else if (keycode == KEY_S)
 	{
-		printf(C_YELLOW"[Camera] Camera origin z -= 0.1\n"C_RESET);
+		printf(C_YELLOW"[Camera] Camera origin z -= 0.1");
 		info->camera->orig.z -= 0.1;
 	}
 }
@@ -43,21 +43,23 @@ void	key_press_move(int keycode, t_info *info)
 {
 	if (keycode == KEY_D)
 	{
-		printf(C_YELLOW"[Camera] Camera origin x += 0.1\n"C_RESET);
+		printf(C_YELLOW"[Camera] Camera origin x += 0.1");
 		info->camera->orig.x += 0.1;
 	}
 	else if (keycode == KEY_A)
 	{
-		printf(C_YELLOW"[Camera] Camera origin x -= 0.1\n"C_RESET);
+		printf(C_YELLOW"[Camera] Camera origin x -= 0.1");
 		info->camera->orig.x -= 0.1;
 	}
 	else if (keycode == KEY_UP)
 	{
-		printf(C_YELLOW"[Camera] Camera origin y += 0.1\n"C_RESET);
+		printf(C_YELLOW"[Camera] Camera origin y += 0.1");
 		info->camera->orig.y += 0.1;
 	}
 	else if (keycode == KEY_DOWN || keycode == KEY_W || keycode == KEY_S)
 		key_press_move2(keycode, info);
+	printf("   camera origin x : %.2lf | y : %.2lf | z : %.2lf\n"C_RESET, \
+			info->camera->orig.x, info->camera->orig.y, info->camera->orig.z);
 	ft_render(info, &info->mlx);
 }
 
@@ -73,8 +75,10 @@ int	key_press(int keycode, void *param)
 	}
 	else if (keycode == KEY_C)
 	{
-		printf(C_CYAN"[Camera Changed]\n"C_RESET);
+		printf(C_CYAN"[Camera Changed]\n");
 		info->camera = info->camera->next;
+		printf("   camera origin x : %.2lf | y : %.2lf | z : %.2lf\n"C_RESET, \
+			info->camera->orig.x, info->camera->orig.y, info->camera->orig.z);
 		ft_render(info, &info->mlx);
 	}
 	else if (keycode == KEY_E || keycode == KEY_R)
