@@ -6,11 +6,17 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 15:25:42 by hchang            #+#    #+#             */
-/*   Updated: 2022/10/17 17:10:54 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/18 15:09:31 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minirt.h"
+
+int	destroy_win(void)
+{
+	printf(C_RED"[The End]\n"C_RESET);
+	exit(0);
+}
 
 int	get_thread_index(int i, int idx[2])
 {
@@ -78,7 +84,8 @@ void	ft_render(t_info *info, t_mlx *mlx)
 		if (!(info->flag & 2))
 			pthread_create(&tid[i], NULL, render_thread, (void *)&tmp_info[i]);
 		else
-			pthread_create(&tid[i], NULL, render_thread_anti, (void *)&tmp_info[i]);
+			pthread_create(&tid[i], NULL, \
+				render_thread_anti, (void *)&tmp_info[i]);
 		++i;
 	}
 	i = 0;

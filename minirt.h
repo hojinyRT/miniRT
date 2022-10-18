@@ -6,7 +6,7 @@
 /*   By: hchang <hchang@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/17 17:39:22 by hchang            #+#    #+#             */
-/*   Updated: 2022/10/18 14:40:37 by hchang           ###   ########.fr       */
+/*   Updated: 2022/10/18 14:57:03 by hchang           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -344,6 +344,7 @@ t_vec		vec_unit(t_vec u);
 double		vec_len_sqr(t_vec u);
 
 // ---------render.c--------////
+int			destroy_win(void);
 int			get_thread_index(int i, int idx[2]);
 void		*render_thread(void *param);
 void		ft_render(t_info *info, t_mlx *mlx);
